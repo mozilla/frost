@@ -19,7 +19,7 @@ setup(
     maintainer='Mozilla Services',
     maintainer_email='services-dev@mozilla.com',
     license='Mozilla Public License 2.0',
-    url='https://github.com/mozilla-services/pytest-aws',
+    url='https://github.com/g-k/pytest-aws',
     description='pytest plugin for testing AWS resource configurations',
     long_description=read('README.md'),
     py_modules=['pytest_aws'],
