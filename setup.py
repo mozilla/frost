@@ -40,7 +40,7 @@ setup(
     ],
     entry_points={
         'pytest11': [
-            'aws = pytest_aws',
+            'aws = pytest_aws.plugin',
         ],
     },
 )
