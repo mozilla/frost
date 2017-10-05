@@ -11,6 +11,9 @@ def read(fname):
     return codecs.open(file_path, encoding='utf-8').read()
 
 
+requirements = read('requirements.txt').splitlines()
+
+
 setup(
     name='pytest-aws',
     version='0.1.0',
@@ -23,7 +26,7 @@ setup(
     description='pytest plugin for testing AWS resource configurations',
     long_description=read('README.md'),
     py_modules=['pytest_aws'],
-    install_requires=['pytest>=3.1.1'],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Pytest',
