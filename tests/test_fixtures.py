@@ -121,6 +121,7 @@ rds_snapshot_attrs = {
     }
 }
 
+
 def test_rds_snapshot_attrs_fixture(testdir):
     testdir.makepyfile("""
         import pytest
@@ -140,9 +141,15 @@ def test_rds_snapshot_attrs_fixture(testdir):
     """)
 
     config = testdir.parseconfigure()
-    config.cache.set('pytest_aws:aws-stage:us-east-1:rds:describe_db_snapshot_attributes::DBSnapshotIdentifier=example-db-final-snapshot', rds_snapshot_attrs)
+    cache_key = 'pytest_aws:aws-stage:us-east-1:rds:describe_db_snapshots' \
+        '::IncludeShared=True,IncludePublic=True'
+    config.cache.set(cache_key, rds_snapshot)
 
-    result = testdir.runpytest('-v') #'--fixtures')
+    cache_key = 'pytest_aws:aws-stage:us-east-1:rds:describe_db_snapshot_attributes' \
+        '::DBSnapshotIdentifier=example-db-final-snapshot'
+    config.cache.set(cache_key, rds_snapshot_attrs)
+
+    result = testdir.runpytest('-v')  # '--fixtures')
 
     # fnmatch_lines does an assertion internally
     result.stdout.fnmatch_lines([

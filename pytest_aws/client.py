@@ -99,7 +99,6 @@ def get_aws_resource(profiles, regions, api_call, cache):
             args=api_call.get('args', []),
             kwargs=api_call.get('kwargs', {}))
 
-        # print('looking for', cache_key(call))
         cached = cache.get(cache_key(call), None)
         if cached:
             result = cached
