@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-
-import botocore
+from pytest_aws.client import (
+    get_available_regions,
+    get_available_profiles,
+    get_aws_resource,
+)
+from pytest_aws.cache import (
+    patch_cache_set
+)
 
 
 def pytest_addoption(parser):
-    botocore.__file__  # satisfy flake8 for now
     group = parser.getgroup('aws')
     group.addoption(
         '--foo',
@@ -20,6 +25,6 @@ def pytest_addoption(parser):
     parser.addini('HELLO', 'Dummy pytest.ini setting')
 
 
-@pytest.fixture
-def bar(request):
-    return request.config.option.dest_foo
+def pytest_configure(config):
+    ""
+    patch_cache_set(config)
