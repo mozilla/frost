@@ -93,7 +93,8 @@ def rds_snapshots(metafunc, cache):
 @pytest.fixture()
 def rds_snapshot_attributes(cache, rds_snapshot):
     "AWS RDS Snapshot Attributes"
-    rds_snapshot_attributes_config['kwargs']['DBSnapshotIdentifier'] = rds_snapshot['DBSnapshotIdentifier'].split(':')[-1]
-    snapshot_call = rds_snapshot['aws_api_call']
+    rds_snapshot_attributes_config['kwargs']['DBSnapshotIdentifier'] = \
+        rds_snapshot['DBSnapshotIdentifier'].split(':')[-1]
+    call = rds_snapshot['aws_api_call']
 
-    return next(get_aws_resource([snapshot_call.profile], [snapshot_call.region], rds_snapshot_attributes_config, cache))
+    return next(get_aws_resource([call.profile], [call.region], rds_snapshot_attributes_config, cache))

@@ -83,8 +83,9 @@ def test_rds_snapshots_fixture(testdir):
     """)
 
     config = testdir.parseconfigure()
-    config.cache.set('pytest_aws:aws-stage:us-east-1:rds:describe_db_snapshots::IncludeShared=True,IncludePublic=True',
-                         rds_snapshot)
+    cache_key = 'pytest_aws:aws-stage:us-east-1:rds:describe_db_snapshots' \
+        '::IncludeShared=True,IncludePublic=True'
+    config.cache.set(cache_key, rds_snapshot)
 
     result = testdir.runpytest('-v')
 
