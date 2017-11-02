@@ -1,2 +1,5 @@
-botocore>=1.7.22
-pytest>=3.2.3
+botocore==1.7.32
+pytest-html==1.16.0
+pytest-json==0.4.0
+pytest-metadata==1.5.0
+pytest==3.2.3
