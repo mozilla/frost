@@ -182,3 +182,109 @@ pytest-services
 This is just a convention and any layout where tests can import
 resources for parametrization should work.
 
+### Adding an example test
+
+Let's write a test to check that http://httpbin.org/ip returns an AWS IP:
+
+1. create a file `httpbin/test_httpbin_ip.py` with the contents:
+
+```python
+import itertools
+import ipaddress
+import pytest
+import json
+import urllib.request
+
+
+def get_httpbin_ips():
+    # IPs we always want to test
+    ips = [
+        '127.0.0.1',
+        '13.58.0.0',
+    ]
+
+    req = urllib.request.Request('http://httpbin.org/ip')
+
+    with urllib.request.urlopen(req) as response:
+        body = response.read().decode('utf-8')
+        ips.append(json.loads(body).get('origin', None))
+
+    return ips
+
+
+def get_aws_ips():
+    req = urllib.request.Request('https://ip-ranges.amazonaws.com/ip-ranges.json')
+
+    with urllib.request.urlopen(req) as response:
+        body = response.read().decode('utf-8')
+        return json.loads(body)['prefixes']
+
+
+@pytest.mark.httpbin
+@pytest.mark.aws_ip_ranges
+@pytest.mark.parametrize(
+    ['ip', 'aws_ip_ranges'],
+    zip(get_httpbin_ips(), itertools.repeat(get_aws_ips())))
+def test_httpbin_ip_in_aws(ip, aws_ip_ranges):
+    for aws_ip_range in aws_ip_ranges:
+        assert ipaddress.IPv4Address(ip) not in ipaddress.ip_network(aws_ip_range['ip_prefix']), \
+          "{0} is in AWS range {1[ip_prefix]} region {1[region]} service {1[service]}".format(ip, aws_ip_range)
+```
+
+Notes:
+
+* we add two data fetching functions that return lists that we can zip into tuples for [the pytest parametrize decorator](https://docs.pytest.org/en/latest/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions)
+* we add markers for the services we're fetching data from
+
+
+1. Running it we see that one of the IPs is an AWS IP:
+
+```console
+pytest --ignore pagerduty/ --ignore aws/
+platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
+metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
+rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:
+plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
+collected 3 items
+
+httpbin/test_httpbin_ip_in_aws.py .F.                                                                                               [100%]
+
+================================================================ FAILURES =================================================================
+____________________________________________ test_httpbin_ip_in_aws[13.58.0.0-aws_ip_ranges1] _____________________________________________
+
+ip = '13.58.0.0'
+aws_ip_ranges = [{'ip_prefix': '13.32.0.0/15', 'region': 'GLOBAL', 'service': 'AMAZON'}, {'ip_prefix': '13.35.0.0/16', 'region': 'GLOB...on': 'us-west-1', 'service': 'AMAZON'}, {'ip_prefix': '13.57.0.0/16', 'region': 'us-west-1', 'service': 'AMAZON'}, ...]
+
+    @pytest.mark.httpbin
+    @pytest.mark.aws_ip_ranges
+    @pytest.mark.parametrize(
+        ['ip', 'aws_ip_ranges'],
+        zip(get_httpbin_ips(), itertools.repeat(get_aws_ips())),
+        # ids=lambda ip: ip
+        )
+    def test_httpbin_ip_in_aws(ip, aws_ip_ranges):
+        for aws_ip_range in aws_ip_ranges:
+>           assert ipaddress.IPv4Address(ip) not in ipaddress.ip_network(aws_ip_range['ip_prefix']), \
+              "{0} is in AWS range {1[ip_prefix]} region {1[region]} service {1[service]}".format(ip, aws_ip_range)
+E           AssertionError: 13.58.0.0 is in AWS range 13.58.0.0/15 region us-east-2 service AMAZON
+E           assert IPv4Address('13.58.0.0') not in IPv4Network('13.58.0.0/15')
+E            +  where IPv4Address('13.58.0.0') = <class 'ipaddress.IPv4Address'>('13.58.0.0')
+E            +    where <class 'ipaddress.IPv4Address'> = ipaddress.IPv4Address
+E            +  and   IPv4Network('13.58.0.0/15') = <function ip_network at 0x107cf66a8>('13.58.0.0/15')
+E            +    where <function ip_network at 0x107cf66a8> = ipaddress.ip_network
+
+httpbin/test_httpbin_ip_in_aws.py:43: AssertionError
+=================================================== 1 failed, 2 passed in 15.69 seconds ===================================================
+```
+
+Note: marking tests as expected failures with `@pytest.mark.xfail` can hide data fetching errors
+
+To improve this we could:
+
+1. Add parametrize ids so it's clearer which parametrize caused test failures
+1. Add directions about why it's an issue and how to fix it or what the associated risks are
+
+As we add more tests we can:
+
+1. Move the JSON fetching functions to `<service name>/resources.py` files and import them into the test
+1. Move the fetching logic to a shared library `<service name>/client.py` and save to the pytest cache
