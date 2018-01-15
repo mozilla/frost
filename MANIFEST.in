@@ -1,7 +1,0 @@
-include LICENSE
-include README.md
-include requirements.txt
-include pytest_aws/*.py
-
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
