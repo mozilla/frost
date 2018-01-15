@@ -11,24 +11,27 @@ want to answer questions whether they are configured properly such as:
 * Is there a dangling DNS entry in Route53?
 * Will someone get paged when an alert goes off?
 
-
-NB: We lose parameterization, but can rewrite assertions to be more helpful
-
-* Document security issues for a old AWS account we take ownership of (like Scout2)
-* Run periodically and raise issues (like the baseline scan)
-* Run a subset of tests against a service when it deploys and allow DevOps to write additional tests for their service (or infer config from resource tags)
-* Run tests in an aws-config lambda for high priority alerting e.g. on lateral movement
-* Ad hoc queries for incident response
-
 ## Usage
+
+### Requirements
+
+* [GNU Make 3.81](https://www.gnu.org/software/make/)
+* [Python 3.6.2](https://www.python.org/downloads/)
+
+Note: other versions may work too these are the versions @g-k used for development
 
 ### Installing
 
-```
-python3 -m venv venv
-source venv/bin/activate
+From the project root run:
+
+```console
 make install
 ```
+
+This will:
+
+* create a Python [virtualenv](https://docs.python.org/3/library/venv.html) to isolate it from other Python packages
+* install Python requirements in the virtualenv
 
 ### Running
 
