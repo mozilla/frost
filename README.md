@@ -35,83 +35,92 @@ This will:
 
 ### Running
 
-`pytest --aws-profiles cloudservices-aws-stage --aws-regions us-east-1 -k test_my_test`
+Activate the venv in the project root:
 
-Skip it or other tests by file with --ignore e.g.
+```console
+source venv/bin/activate
+```
 
-`pytest --ignore rules/rds --tb=no -s --aws-profiles cloudservices-aws-stage --aws-regions us-east-1 -m rds -k test_rds_db_instance_backup_enabled`
+To fetch RDS resources from the cache or AWS API and check that
+backups are enabled for DB instances for [the configured aws
+profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
+named `default` in the `us-west-2` region we can run:
 
+```console
+pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --aws-regions us-west-2 --aws-debug-calls
+```
 
-Run tests for certain AWS services:
+The options include pytest options:
 
-Run test names matching a substring:
+* [`--ignore`](https://docs.pytest.org/en/latest/example/pythoncollection.html#ignore-paths-during-test-collection) to skip fetching resources for non-RDS resources
+* [`-k`](https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name) for selecting tests matching the substring `test_rds_db_instance_backup_enabled` for the one test we want to run
+* [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
+* [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
-Run all the tests against all the profiles and regions:
+and options pytest-services adds for the AWS client:
 
-Run tests against specific AWS profiles or regions:
+* `--aws-debug-calls` for printing (with `-s`) API calls we make
+* `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
+* `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
 
-Run tests using profile and creds from env vars:
+and produces output like the following showing a DB instance with backups disabled:
 
-Run all tests against a given resource:
+```console
+=========================================================== test session starts ===========================================================
+platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
+metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.
+0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
+rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:
+plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
+collecting 0 items                                                                                                                        c
+alling AWSAPICall(profile='default', region='us-west-2', service='rds', method='describe_db_instances', args=[], kwargs={})
+collecting 4 items
+...
+aws/rds/test_rds_db_instance_backup_enabled.py ...F                                                                                 [100%]
 
+================================================================ FAILURES =================================================================
+_______________________________________ test_rds_db_instance_backup_enabled[test-db] ________________________________________
 
-## Development
+rds_db_instance = {'AllocatedStorage': 50, 'AutoMinorVersionUpgrade': True, 'AvailabilityZone': 'us-west-2c', 'BackupRetentionPeriod': 0, .
+..}
 
-### Adding a service
+    @pytest.mark.rds
+    @pytest.mark.parametrize('rds_db_instance',
+                             rds_db_instances(),
+                             ids=lambda db_instance: db_instance['DBInstanceIdentifier'])
+    def test_rds_db_instance_backup_enabled(rds_db_instance):
+>       assert rds_db_instance['BackupRetentionPeriod'] > 0, \
+            'Backups disabled for {}'.format(rds_db_instance['DBInstanceIdentifier'])
+E       AssertionError: Backups disabled for test-db
+E       assert 0 > 0
 
-1. create a file in `rules/<service name>/test_my_test.py`
-
-### Adding an endpoint
-
-1. lookup the data you want on the [botocore docs](http://botocore.readthedocs.io/en/stable/reference/services/rds.html#RDS.Client.describe_db_snapshot_attributes)
-1. add data fetching functions to the test for aws like using `botocore_client.get('rds', 'describe_db_instances', [], {}).values()`, which takes the args and kwargs to the botocore method call and profiles and regions from the command line, handles any pagination, caches the result, and returns an array of botocore responses (TODO: directions for testing it from the python shell)
-
-### Adding a test
-
-1. Apply it with `@pytest.mark.parametrize('rds_db_instance', rds_db_instances())`
-1. Marking tests with expected failures using @pytest.mark.xfail can hide errors in the data fetching function
-1. if other tests could use the function move it to `rules/<service name>/resources.py` and import it into the test
-
+aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError
+=========================================================== 72 tests deselected ===========================================================
+============================================ 1 failed, 3 passed, 72 deselected in 3.12 seconds ============================================
+```
 
 ### Caching
 
-**By default tests cache and prefer cached AWS API JSON responses.**
-
-#### Clearing the entire cache
+The AWS client will use AWS API JSON responses when available and save them using AWS profile, region, service name, service method, [botocore](http://botocore.readthedocs.io/) args and kwargs in the cache key to filenames with the format `.cache/v/pytest_aws:<aws profile>:<aws region>:<aws service>:<service method>:<args>:<kwargs>.json` e.g.
 
 ```
-» pytest --cache-clear
-...
-```
-
-#### Show cached API responses:
-
-```
-» pytest --cache-show
-...
-```
-
-#### Cache files
-
-Cached files use the default filename `.cache/v/pytest_aws:<aws profile>:<aws region>:<aws service>:<service method>:<args>:<kwargs>.json` e.g.
-
-```
-» head .cache/v/pytest_aws:cloudservices-aws-stage:us-east-1:rds:describe_db_instances::.json
+head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_instances::.json
 {
     "DBInstances": [
         {
-            "AllocatedStorage": 300,
+            "AllocatedStorage": 5,
             "AutoMinorVersionUpgrade": true,
-            "AvailabilityZone": "us-east-1c",
+            "AvailabilityZone": "us-west-2c",
+            "BackupRetentionPeriod": 1,
+            "CACertificateIdentifier": "rds-ca-2015",
+            "CopyTagsToSnapshot": false,
+            "DBInstanceArn": "arn:aws:rds:us-west-2:123456678901:db:test-db",
 ```
 
-#### Clearing cached files by age
+These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
 
-TODO: these are files so some sort of find -mtime older than delete should work
 
-#### Clearing cached files by service
 
-TODO: glob in the cache dir example
 
 
 
