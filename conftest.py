@@ -63,10 +63,11 @@ def get_node_markers(node):
 def serialize_marker(marker):
     if isinstance(marker, (MarkDecorator, MarkInfo)):
         args = ['...skipped...'] if marker.name == 'parametrize' else marker.args
+        kwargs = ['...skipped...'] if marker.name == 'parametrize' else marker.kwargs
         return {
             'name': marker.name,
             'args': args,
-            'kwargs': marker.kwargs,
+            'kwargs': kwargs,
         }
     else:
         raise NotImplementedError('Unexpected Marker type %s' % repr(marker))
