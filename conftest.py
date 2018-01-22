@@ -105,11 +105,13 @@ def pytest_runtest_makereport(item, call):
 
         fixtures = {fixture_name: item.funcargs[fixture_name] for fixture_name in item.fixturenames if fixture_name != 'request'}
 
+
         # add json metadata
         report.test_metadata = dict(
             outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
             reason=reason,
-            unparametrized_name=item.originalname or item.name,
+            unparametrized_name=item.originalname,
+            parametrized_name=item.name,
             markers=markers,
             fixtures=fixtures,
         )

@@ -29,7 +29,8 @@ Pytest service JSON format:
   },
   'results': [
     {
-       'name':  # unparametrized pytest test name
+       'test_name':  # unparametrized pytest test name
+       'name':
        'status':
        'value':
        'reason':  # pytest test outcome reason if any (e.g. resource fetch failed)
@@ -99,7 +100,8 @@ def get_test_status(outcome):
 def get_result_for_test(test):
     meta = test['metadata'][0]
     return {
-        'name': meta['unparametrized_name'],  # unparametrized pytest name
+        'test_name': meta['unparametrized_name'],  # unparametrized pytest name
+        'name': meta['parametrized_name'],
         'status': get_test_status(meta['outcome']),
         'value': meta['outcome'],
         'reason': meta['reason'],  # pytest test outcome reason if any (e.g. resource fetch failed)
