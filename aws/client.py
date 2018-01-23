@@ -202,7 +202,10 @@ class BotocoreClient:
                 keyed_result = result[key]
                 if isinstance(keyed_result, list):
                     for item in keyed_result:
-                        item['__pytest_meta'] = result['__pytest_meta']
+                        # TODO: Is there a bug in usage (IAM resources) causing it
+                        # to sometimes be a string?
+                        if not isinstance(item, str):
+                            item['__pytest_meta'] = result['__pytest_meta']
                 elif isinstance(keyed_result, dict):
                     keyed_result['__pytest_meta'] = result['__pytest_meta']
 
