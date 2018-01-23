@@ -5,12 +5,12 @@ from botocore.utils import parse_timestamp
 
 import pytest
 
-from aws.rds.resources import rds_db_instances
+from aws.rds.resources import rds_db_instances_with_tags
 
 
 @pytest.mark.rds
 @pytest.mark.parametrize('rds_db_instance',
-                         rds_db_instances(),
+                         rds_db_instances_with_tags(),
                          ids=lambda db_instance: db_instance['DBInstanceIdentifier'])
 def test_rds_db_instance_is_postgres_with_invalid_certificate(rds_db_instance):
     if rds_db_instance['Engine'] != 'postgres':

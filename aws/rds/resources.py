@@ -11,6 +11,20 @@ def rds_db_instances():
       .flatten()\
       .values()
 
+def rds_db_instance_tags(dbname):
+    "http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.list_tags_for_resource"
+    return botocore_client\
+      .get('rds', 'list_tags_for_resource', [], {'ResourceName': dbname})\
+      .extract_key('TagList')\
+      .flatten()\
+      .values()
+
+def rds_db_instances_with_tags():
+    return [
+        {**{'TagList': rds_db_instance_tags(dbname=db['DBInstanceArn'])}, **db}
+        for db in rds_db_instances()
+    ]
+
 
 def rds_db_instance_db_security_groups():
     "http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_security_groups"
