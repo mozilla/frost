@@ -83,39 +83,28 @@ def iam_all_user_policies(username):
 def iam_users_with_policies():
     return [
         {
-            'Policies': iam_all_user_policies(username=user['UserName']),
-            'User': user,
+            **{'Policies': iam_all_user_policies(username=user['UserName'])},
+            **user,
         } for user in iam_users()
     ]
 
 def iam_admin_login_profiles():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
-    return [
-        botocore_client\
-        .get('iam',
-             'get_login_profile',
-             [],
-             {'UserName': user['User']['UserName']},
-             result_from_error=lambda error, call: {'LoginProfile': None})\
-        .extract_key('LoginProfile')\
-        .values()[0]
-        for user in iam_users_with_policies() if user_is_admin(user)
-    ]
+    return iam_login_profiles([user for user in iam_users_with_policies() if user_is_admin(user)])
 
 def iam_admin_mfa_devices():
     "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
-    return [
-        botocore_client\
-        .get('iam',
-             'list_mfa_devices',
-             [],
-             {'UserName': user['User']['UserName']})\
-        .extract_key('MFADevices')\
-        .values()[0]
-        for user in iam_users_with_policies() if user_is_admin(user)
-    ]
+    return iam_mfa_devices([user for user in iam_users_with_policies() if user_is_admin(user)])
 
-def iam_login_profiles():
+def iam_user_login_profiles():
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
+    return iam_login_profiles([user for user in iam_users()])
+
+def iam_user_mfa_devices():
+    "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
+    return iam_mfa_devices([user for user in iam_users()])
+
+def iam_login_profiles(users):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
     return [
         botocore_client\
@@ -126,10 +115,10 @@ def iam_login_profiles():
              result_from_error=lambda error, call: {'LoginProfile': None})\
         .extract_key('LoginProfile')\
         .values()[0]
-        for user in iam_users()
+        for user in users
     ]
 
-def iam_mfa_devices():
+def iam_mfa_devices(users):
     "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
     return [
         botocore_client\
@@ -139,10 +128,10 @@ def iam_mfa_devices():
              {'UserName': user['UserName']})\
         .extract_key('MFADevices')\
         .values()[0]
-        for user in iam_users()
+        for user in users
     ]
 
-#FIXME
+# FIXME
 # Substring matching is _not_ enough of a check, but works for testing.
 # The truth is that we probably shouldn't depend too much on the concept
 # of an "admin" in AWS, since that's not how the ACL's really work. We
