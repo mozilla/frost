@@ -67,11 +67,11 @@ def extract_metadata(resource):
       if metadata_key in resource
     }
 
-def process_funcargs(keys, funcargs):
+def process_funcargs(funcargs):
     metadata = {}
-    for key in keys:
-        if isinstance(funcargs[key], dict):
-            metadata = {**metadata, **extract_metadata(funcargs[key])}
+    for k in funcargs:
+        if isinstance(funcargs[k], dict):
+            metadata = {**metadata, **extract_metadata(funcargs[k])}
     return metadata
 
 def serialize_marker(marker):
@@ -112,7 +112,7 @@ def pytest_runtest_makereport(item, call):
 
     # only add this during call instead of during any stage
     if report.when == 'call':
-        metadata = process_funcargs(item.fixturenames, item.funcargs)
+        metadata = process_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         outcome, reason = get_outcome_and_reason(report, markers, call)
 
