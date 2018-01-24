@@ -72,12 +72,12 @@ def iam_all_user_policies(username):
             if isinstance(policy_name, str):
                 inline += {'PolicyName': policy_name}
 
-
     managed = [
         policy for policies in
         iam_managed_policies(username=username) + iam_user_group_managed_policies(username=username)
         for policy in policies
     ]
+
     return inline + managed
 
 def iam_users_with_policies():
