@@ -13,7 +13,7 @@ def is_ebs_volume_encrypted(ec2_ebs_volume):
     >>> is_ebs_volume_encrypted({})
     Traceback (most recent call last):
     ...
-    KeyError: 'StorageEncrypted'
+    KeyError: 'Encrypted'
     >>> is_ebs_volume_encrypted(0)
     Traceback (most recent call last):
     ...
