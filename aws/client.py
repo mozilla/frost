@@ -209,8 +209,8 @@ class BotocoreClient:
                 keyed_result = result[key]
                 if isinstance(keyed_result, list):
                     for item in keyed_result:
-                        # TODO: Is there a bug in usage (IAM resources) causing it
-                        # to sometimes be a string?
+                        # Added for IAM inline policies call, as it
+                        # returns a list of strings.
                         if not isinstance(item, str):
                             item['__pytest_meta'] = result['__pytest_meta']
                 elif isinstance(keyed_result, dict):
