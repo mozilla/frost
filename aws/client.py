@@ -11,6 +11,9 @@ import botocore.exceptions
 import botocore.session
 
 
+SERVICES_WITHOUT_REGIONS = ["iam"]
+
+
 @functools.lru_cache()
 def get_session(profile=None):
     """Returns a new or cached botocore session for the AWS profile."""
@@ -163,6 +166,10 @@ class BotocoreClient:
             profiles=None,
             regions=None,
             result_from_error=None):
+
+        if service_name in SERVICES_WITHOUT_REGIONS:
+            regions = ["us-east-1"]
+
         self.results = list(get_aws_resource(
             service_name,
             method_name,
