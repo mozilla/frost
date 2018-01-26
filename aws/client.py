@@ -11,6 +11,9 @@ import botocore.exceptions
 import botocore.session
 
 
+SERVICES_WITHOUT_REGIONS = ["iam", "s3"]
+
+
 @functools.lru_cache()
 def get_session(profile=None):
     """Returns a new or cached botocore session for the AWS profile."""
@@ -163,6 +166,15 @@ class BotocoreClient:
             profiles=None,
             regions=None,
             result_from_error=None):
+
+        # TODO:
+        # For services that don't have the concept of regions,
+        # we don't want to do the exact same test N times where
+        # N is the number of regions. But the below hardcoding
+        # is not a very clean solution to this.
+        if service_name in SERVICES_WITHOUT_REGIONS:
+            regions = ["us-east-1"]
+
         self.results = list(get_aws_resource(
             service_name,
             method_name,
@@ -202,7 +214,10 @@ class BotocoreClient:
                 keyed_result = result[key]
                 if isinstance(keyed_result, list):
                     for item in keyed_result:
-                        item['__pytest_meta'] = result['__pytest_meta']
+                        # Added for IAM inline policies call, as it
+                        # returns a list of strings.
+                        if not isinstance(item, str):
+                            item['__pytest_meta'] = result['__pytest_meta']
                 elif isinstance(keyed_result, dict):
                     keyed_result['__pytest_meta'] = result['__pytest_meta']
 
