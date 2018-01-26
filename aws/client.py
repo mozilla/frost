@@ -167,6 +167,11 @@ class BotocoreClient:
             regions=None,
             result_from_error=None):
 
+        # TODO:
+        # For services that don't have the concept of regions,
+        # we don't want to do the exact same test N times where
+        # N is the number of regions. But the below hardcoding
+        # is not a very clean solution to this.
         if service_name in SERVICES_WITHOUT_REGIONS:
             regions = ["us-east-1"]
 
