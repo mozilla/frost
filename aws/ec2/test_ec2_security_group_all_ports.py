@@ -26,7 +26,8 @@ def ec2_security_group_has_all_ports(ec2_security_group):
 
 
 @pytest.mark.ec2
-@pytest.mark.xfail
-@pytest.mark.parametrize('ec2_security_group', ec2_security_groups())
+@pytest.mark.parametrize('ec2_security_group',
+                         ec2_security_groups(),
+                         ids=lambda secgroup: secgroup['GroupName'])
 def test_ec2_security_group_all_ports(ec2_security_group):
     assert not ec2_security_group_has_all_ports(ec2_security_group)

@@ -35,6 +35,7 @@ Pytest service JSON format:
        'value':
        'reason':  # pytest test outcome reason if any (e.g. resource fetch failed)
        'markers':  # pytest markers on the test e.g. aws service, ruleset
+       'metadata':  # additional metadata on the resource being tested
     },
     ...
   ]
@@ -100,12 +101,13 @@ def get_test_status(outcome):
 def get_result_for_test(test):
     meta = test['metadata'][0]
     return {
-        'test_name': meta['unparametrized_name'],  # unparametrized pytest name
+        'test_name': meta['unparametrized_name'],
         'name': meta['parametrized_name'],
         'status': get_test_status(meta['outcome']),
         'value': meta['outcome'],
-        'reason': meta['reason'],  # pytest test outcome reason if any (e.g. resource fetch failed)
-        'markers': meta['markers'],  # pytest markers on the test e.g. aws service, ruleset
+        'reason': meta['reason'],
+        'markers': meta['markers'],
+        'metadata': meta['metadata'],
     }
 
 

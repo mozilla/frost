@@ -59,6 +59,20 @@ def pytest_configure(config):
 def get_node_markers(node):
     return {k: v for k, v in node.keywords.items() if isinstance(v, (MarkDecorator, MarkInfo))}
 
+METADATA_KEYS = ['OwnerId', 'VpcId', 'DBInstanceIdentifier', 'TagList']
+def extract_metadata(resource):
+    return {
+      metadata_key: resource[metadata_key]
+      for metadata_key in METADATA_KEYS
+      if metadata_key in resource
+    }
+
+def get_metadata_from_funcargs(funcargs):
+    metadata = {}
+    for k in funcargs:
+        if isinstance(funcargs[k], dict):
+            metadata = {**metadata, **extract_metadata(funcargs[k])}
+    return metadata
 
 def serialize_marker(marker):
     if isinstance(marker, (MarkDecorator, MarkInfo)):
@@ -94,24 +108,23 @@ def pytest_runtest_makereport(item, call):
 
     outcome = yield
     report = outcome.get_result()
-    extra = getattr(report, 'extra', [])
 
-    markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
-    outcome, reason = get_outcome_and_reason(report, markers, call)
 
     # only add this during call instead of during any stage
     if report.when == 'call':
-        # item.config
+        metadata = get_metadata_from_funcargs(item.funcargs)
+        markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
+        outcome, reason = get_outcome_and_reason(report, markers, call)
 
         fixtures = {fixture_name: item.funcargs[fixture_name] for fixture_name in item.fixturenames if fixture_name != 'request'}
 
-
         # add json metadata
         report.test_metadata = dict(
+            fixtures=fixtures,
+            markers=markers,
+            metadata=metadata,
             outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
+            parametrized_name=item.name,
             reason=reason,
             unparametrized_name=item.originalname,
-            parametrized_name=item.name,
-            markers=markers,
-            fixtures=fixtures,
         )

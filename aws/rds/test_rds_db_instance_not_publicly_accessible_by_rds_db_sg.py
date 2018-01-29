@@ -2,7 +2,7 @@
 import pytest
 
 from aws.rds.resources import (
-    rds_db_instances,
+    rds_db_instances_with_tags,
     rds_db_instance_db_security_groups,
 )
 from .test_rds_db_security_group_does_not_grant_public_access import does_rds_db_security_group_grant_public_access
@@ -11,7 +11,7 @@ from .test_rds_db_security_group_does_not_grant_public_access import does_rds_db
 @pytest.mark.rds
 @pytest.mark.parametrize(
     ['rds_db_instance', 'rds_db_security_groups'],
-    zip(rds_db_instances(), rds_db_instance_db_security_groups()),
+    zip(rds_db_instances_with_tags(), rds_db_instance_db_security_groups()),
     ids=lambda db_instance: db_instance['DBInstanceIdentifier']
 )
 def test_rds_db_instance_not_publicly_accessible_by_rds_db_security_group(rds_db_instance, rds_db_security_groups):
