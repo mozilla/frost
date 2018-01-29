@@ -30,6 +30,14 @@ def pytest_addoption(parser):
                      action='store_true',
                      help='Log whether AWS API calls hit the cache. Requires -s')
 
+def parse_opt(opt):
+    if not len(opt):
+        return None
+
+    if ',' in opt[0]:
+        return opt[0].split(',')
+
+    return opt
 
 def pytest_configure(config):
     global botocore_client
@@ -37,13 +45,7 @@ def pytest_configure(config):
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
-    profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
-
-    if not len(profiles):
-        profiles = None
-
-    if not len(regions):
-        regions = None
+    profiles, regions = parse_opt(config.getoption('--aws-profiles')), parse_opt(config.getoption('--aws-regions'))
 
     botocore_client = BotocoreClient(
         profiles=profiles,
@@ -59,10 +61,27 @@ def pytest_configure(config):
 def get_node_markers(node):
     return {k: v for k, v in node.keywords.items() if isinstance(v, (MarkDecorator, MarkInfo))}
 
-METADATA_KEYS = ['OwnerId', 'VpcId', 'DBInstanceIdentifier', 'TagList']
+def clean_metadata(metadata):
+    if isinstance(metadata, list):
+        for item in metadata:
+            # remove __pytest_meta
+            if isinstance(item, dict):
+                item.pop('__pytest_meta', None)
+    return metadata
+
+METADATA_KEYS = [
+    'DBInstanceIdentifier',
+    'GroupId',
+    'OwnerId',
+    'TagList',
+    'Tags',
+    'UserName',
+    'VolumeId',
+    'VpcId',
+]
 def extract_metadata(resource):
     return {
-      metadata_key: resource[metadata_key]
+      metadata_key: clean_metadata(resource[metadata_key])
       for metadata_key in METADATA_KEYS
       if metadata_key in resource
     }

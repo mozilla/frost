@@ -112,10 +112,12 @@ def get_result_for_test(test):
 
 
 def pytest_json_to_service_json(pytest_json):
-    service_json_template['results'] = [
-        get_result_for_test(test)
-        for test in pytest_json['report']['tests']
-    ]
+    service_json_template['results'] = []
+    for test in pytest_json['report']['tests']:
+        try:
+            service_json_template['results'].append(get_result_for_test(test))
+        except KeyError:
+            pass
     return service_json_template
 
 

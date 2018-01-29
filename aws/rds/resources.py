@@ -11,17 +11,23 @@ def rds_db_instances():
       .flatten()\
       .values()
 
-def rds_db_instance_tags(dbname):
+def rds_db_instance_tags(db):
     "http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.list_tags_for_resource"
     return botocore_client\
-      .get('rds', 'list_tags_for_resource', [], {'ResourceName': dbname})\
+      .get(service_name='rds',
+           method_name='list_tags_for_resource',
+           call_args=[],
+           call_kwargs={'ResourceName': db['DBInstanceArn']},
+           profiles=[db['__pytest_meta']['profile']],
+           regions=[db['__pytest_meta']['region']],
+           result_from_error=lambda e, call: [])\
       .extract_key('TagList')\
       .flatten()\
       .values()
 
 def rds_db_instances_with_tags():
     return [
-        {**{'TagList': rds_db_instance_tags(dbname=db['DBInstanceArn'])}, **db}
+        {**{'TagList': rds_db_instance_tags(db=db)}, **db}
         for db in rds_db_instances()
     ]
 
