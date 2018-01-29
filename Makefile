@@ -7,6 +7,9 @@ ENTER_VENV := source venv/bin/activate
 
 AWS_PROFILE := default
 
+doctest:
+	for f in $$(find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do venv/bin/python -m doctest $$f; done
+
 clean: clean-cache
 
 clean-cache:

@@ -153,6 +153,7 @@ freshness](#5)).
 Additionally we want:
 
 * data fetching functions in a `resources.py`
+* data checking and test helpers in a `helpers.py`
 * prefix test files with `test_`
 * tests to have pytest markers for any services they depend on for data
 * HTTP clients should be read only and use read only credentials
@@ -166,21 +167,22 @@ pytest-services
 ├── <third party service A>
 │   ├── client.py
 │   ├── <subservice A (optional)>
+│   │   ├── __init__.py
+│   │   ├── helpers.py
 │   │   ├── resources.py
 │   │   ├── ...
 │   │   └── test_ec2_security_group_all_ports.py
-│   └── <subservice B (optional)>
-│       ├── __init__.py
-│       ├── resources.py
-│       ├── ...
-│       └── test_s3_bucket_web_hosting_disabled.py
-├── <third party service B>
+│   ├── <subservice b (optional)>
+│   │   ├── __init__.py
+│   │   ├── resources.py
+│   │   ├── ...
+│   │   └─ test_s3_bucket_web_hosting_disabled.py
+└── <third party service B>
+    ├── __init__.py
+    ├── helpers.py
     ├── resources.py
     └── test_user_has_escalation_policy.py
 ```
-
-This is just a convention and any layout where tests can import
-resources for parametrization should work.
 
 ### Adding an example test
 
