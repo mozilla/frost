@@ -30,7 +30,7 @@ def pytest_addoption(parser):
                      action='store_true',
                      help='Log whether AWS API calls hit the cache. Requires -s')
 
-    parser.addoption('--aws-require-tag',
+    parser.addoption('--aws-require-tags',
                      action='append',
                      default=[],
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
