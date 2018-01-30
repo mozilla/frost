@@ -11,6 +11,7 @@ doctest:
 	for f in $$(find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do venv/bin/python -m doctest $$f; done
 
 clean: clean-cache
+	rm -rf venv
 
 clean-cache:
 	venv/bin/pytest --cache-clear --aws-profiles $(AWS_PROFILE)
