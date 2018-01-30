@@ -70,6 +70,7 @@ def clean_metadata(metadata):
     return metadata
 
 METADATA_KEYS = [
+    'DBInstanceArn',
     'DBInstanceIdentifier',
     'GroupId',
     'OwnerId',

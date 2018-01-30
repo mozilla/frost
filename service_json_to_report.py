@@ -1,5 +1,5 @@
 import json
-
+import sys
 
 # TODO's:
 #   - How do we mark a resource as exempt from a test? Where is this data stored?
@@ -17,7 +17,8 @@ def extract_resource_name(name):
     # "test_something[resource-name]" -> "resource-name"
     return name.split("[")[-1][0:-1]
 
-service_report = json.loads(open('cs-stage-service-report.json', 'r').read())
+#service_report = json.loads(open('cs-stage-service-report.json', 'r').read())
+service_report = json.loads(open(sys.argv[1], 'r').read())
 
 #{'test_name': [results], ____}
 test_results = {
@@ -34,7 +35,7 @@ tests_with_failures = []
 for test in test_results:
     if len([r for r in test_results[test] if r['status'] == 'fail']) != 0:
         tests_with_failures.append(test)
-	print("- [%s](#%s)" % (test,test))
+        print("- [%s](#%s)" % (test,test))
 print("---\n")
 
 
