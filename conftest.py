@@ -3,6 +3,7 @@
 import botocore
 import pytest
 
+from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
@@ -30,6 +31,12 @@ def pytest_addoption(parser):
                      action='store_true',
                      help='Log whether AWS API calls hit the cache. Requires -s')
 
+    parser.addoption('--aws-require-tags',
+                     action='append',
+                     default=[],
+                     help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
+
+
 def parse_opt(opt):
     if not len(opt):
         return None
@@ -38,6 +45,7 @@ def parse_opt(opt):
         return opt[0].split(',')
 
     return opt
+
 
 def pytest_configure(config):
     global botocore_client
@@ -131,7 +139,7 @@ def pytest_runtest_makereport(item, call):
 
 
     # only add this during call instead of during any stage
-    if report.when == 'call':
+    if report.when == 'call' and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         outcome, reason = get_outcome_and_reason(report, markers, call)
