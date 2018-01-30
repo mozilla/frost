@@ -181,6 +181,11 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     return False
 
 
+def ec2_instance_test_id(ec2_instance):
+    """A getter fn for test ids for EC2 instances"""
+    return '{0[InstanceId]}'.format(ec2_instance)
+
+
 def ec2_security_group_test_id(ec2_security_group):
     """A getter fn for test ids for EC2 security groups"""
     return '{0[GroupId]} {0[GroupName]}'.format(ec2_security_group)
