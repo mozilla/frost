@@ -69,14 +69,6 @@ def pytest_configure(config):
 def get_node_markers(node):
     return {k: v for k, v in node.keywords.items() if isinstance(v, (MarkDecorator, MarkInfo))}
 
-def clean_metadata(metadata):
-    if isinstance(metadata, list):
-        for item in metadata:
-            # remove __pytest_meta
-            if isinstance(item, dict):
-                item.pop('__pytest_meta', None)
-    return metadata
-
 METADATA_KEYS = [
     'DBInstanceArn',
     'DBInstanceIdentifier',
@@ -90,7 +82,7 @@ METADATA_KEYS = [
 ]
 def extract_metadata(resource):
     return {
-      metadata_key: clean_metadata(resource[metadata_key])
+      metadata_key: resource[metadata_key]
       for metadata_key in METADATA_KEYS
       if metadata_key in resource
     }
