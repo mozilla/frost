@@ -3,6 +3,7 @@
 import botocore
 import pytest
 
+from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
@@ -116,7 +117,7 @@ def pytest_runtest_makereport(item, call):
 
 
     # only add this during call instead of during any stage
-    if report.when == 'call':
+    if report.when == 'call' and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         outcome, reason = get_outcome_and_reason(report, markers, call)
