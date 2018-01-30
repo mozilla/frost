@@ -1,57 +1,71 @@
 import json
 import sys
+from collections import defaultdict
 
-# TODO's:
-#   - How do we mark a resource as exempt from a test? Where is this data stored?
-#   - Need to add region (also needed in JSON service report)
-
-
-# sort by test name
-# for each test, create a list of fails, a list of warns, a list of passing and a list of errs as a markdown doc
-# Options:
-#   - to only list fails
-#   - add checkboxes next to each test failure (for creating github issues)
-#   - CSV instead of markdown
-
-def extract_resource_name(name):
-    # "test_something[resource-name]" -> "resource-name"
-    return name.split("[")[-1][0:-1]
-
-#service_report = json.loads(open('cs-stage-service-report.json', 'r').read())
-service_report = json.loads(open(sys.argv[1], 'r').read())
-
-#{'test_name': [results], ____}
-test_results = {
-    k: [] for k in set([r['test_name'] for r in service_report['results']])
-}
-
-for result in service_report['results']:
-    test_results[result['test_name']].append(result)
-
-print("# AWS pytest-services results\n")
-print("#### Result Meanings: TODO\n")
-print("#### Jump to test\n")
-tests_with_failures = []
-for test in test_results:
-    if len([r for r in test_results[test] if r['status'] == 'fail']) != 0:
-        tests_with_failures.append(test)
-        print("- [%s](#%s)" % (test,test))
-print("---\n")
+STATUSES_TO_LIST = ['err', 'warn', 'fail']
 
 
-for test in test_results:
-    if len([r for r in test_results[test] if r['status'] == 'fail']) == 0:
-        continue
+class ReportGenerator:
 
-    print("### %s\n\n" % test)
-    print("Resource Name | Metadata")
-    print("------------ | -------------")
+    def __init__(self, service_json):
+        #{'test_name': [results], ...}
+        self.test_results = defaultdict(list)
 
-    for result in test_results[test]:
-        if result["status"] == "fail":
-            print("%s | %s" % (
-                extract_resource_name(result['name']),
-                ''.join(["{}: {} - ".format(k,v) for k,v in result['metadata'].items()])[0:-3]
-            ))
+        #{'test_name_fail': 2, ...}
+        self.test_status_counter = defaultdict(int)
 
-    print("\n---\n\n")
+        for result in service_json['results']:
+            if result['status'] in STATUSES_TO_LIST:
+                self.test_results[result['test_name']].append(result)
+                self.test_status_counter[result['test_name']+"_"+result['status']] += 1
+
+    def generate(self):
+        self.print_header()
+        self.print_table_of_contents()
+        self.print_report()
+
+    def print_header(self):
+        print("# AWS pytest-services results\n")
+        print("#### Result Meanings: TODO\n")
+
+    def print_table_of_contents(self):
+        print("#### Table of Contents\n")
+        for test in self.test_results:
+            print("- [%s](#%s)" % (test,test))
+            for status in STATUSES_TO_LIST:
+                if self.test_status_counter[test+'_'+status]:
+                    print("    - [%s (%s)](#%s)" % (
+                        status,
+                        self.test_status_counter[test+'_'+status],
+                        test+'_'+status,
+                    ))
+        print("---\n")
+
+    def print_report(self):
+        for test in self.test_results:
+            print("### %s\n\n" % test)
+
+            for status in STATUSES_TO_LIST:
+                if self.test_status_counter[test+'_'+status]:
+                    print("#### %s_%s\n\n" % (test,status))
+                    print("Resource Name | Metadata")
+                    print("------------ | -------------")
+
+                    for result in self.test_results[test]:
+                        if result["status"] == status:
+                            print("%s | %s" % (
+                                self._extract_resource_name(result['name']),
+                                ''.join(["{}: {} - ".format(k,v) for k,v in result['metadata'].items()])[0:-3]
+                            ))
+
+                    print("\n\n")
+
+            print("\n---\n\n")
+
+    def _extract_resource_name(self, name):
+        # "test_something[resource-name]" -> "resource-name"
+        return name.split("[")[-1][0:-1]
+
+
+if __name__ == '__main__':
+    ReportGenerator(json.loads(open(sys.argv[1], 'r').read())).generate()
