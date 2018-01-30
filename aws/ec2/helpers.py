@@ -189,3 +189,27 @@ def ec2_instance_test_id(ec2_instance):
 def ec2_security_group_test_id(ec2_security_group):
     """A getter fn for test ids for EC2 security groups"""
     return '{0[GroupId]} {0[GroupName]}'.format(ec2_security_group)
+
+
+def is_ebs_volume_encrypted(ebs):
+    """
+    Checks the EBS volume 'Encrypted' value.
+
+    >>> is_ebs_volume_encrypted({'Encrypted': True})
+    True
+    >>> is_ebs_volume_encrypted({'Encrypted': False})
+    False
+    >>> is_ebs_volume_encrypted({})
+    Traceback (most recent call last):
+    ...
+    KeyError: 'Encrypted'
+    >>> is_ebs_volume_encrypted(0)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'int' object is not subscriptable
+    >>> is_ebs_volume_encrypted(None)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'NoneType' object is not subscriptable
+    """
+    return ebs['Encrypted']
