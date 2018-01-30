@@ -62,6 +62,7 @@ and options pytest-services adds for the AWS client:
 * `--aws-debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
+* `--aws-require-tag` for the `aws.ec2.test_ec2_instance_has_required_tags` test adds a Tag Name to check on all EC2 instances
 
 and produces output like the following showing a DB instance with backups disabled:
 
