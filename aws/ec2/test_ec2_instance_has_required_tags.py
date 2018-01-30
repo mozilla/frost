@@ -19,8 +19,18 @@ def test_ec2_instance_has_required_tags(ec2_instance, required_tag_names):
     Checks that all EC2 instances have the tags with the required names.
 
     Does not not check tag values.
+
+    >>> test_ec2_instance_has_required_tags({'Tags': [{'Key': 'Name'}]}, frozenset(['Name']))
+
+    >>> test_ec2_instance_has_required_tags({
+    ... 'InstanceId': 'iid', 'Tags': [{'Key': 'Bar'}]}, frozenset(['Name']))
+    Traceback (most recent call last):
+    ...
+    AssertionError: EC2 Instance iid missing required tags frozenset({'Name'})
+    assert not frozenset({'Name'})
     """
-    instance_tag_names = set(tag['Key'] for tag in ec2_instance['Tags'])
+    tags = ec2_instance.get('Tags', [])
+    instance_tag_names = set(tag['Key'] for tag in tags if 'Key' in tag)
 
     # set difference to find required tags not on instance
     missing_tag_names = required_tag_names - instance_tag_names
