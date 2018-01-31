@@ -2,7 +2,6 @@ import pytest
 
 from aws.ec2.helpers import ec2_instance_test_id
 from aws.ec2.resources import ec2_instances
-from conftest import parse_opt
 
 
 @pytest.fixture
