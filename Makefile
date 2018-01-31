@@ -30,9 +30,13 @@ install: venv
 all:
 	venv/bin/pytest
 
+flake8:
+	venv/bin/flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
+
 .PHONY:
 	all \
 	clean \
 	clean-cache \
+	flake8 \
 	install \
 	venv
