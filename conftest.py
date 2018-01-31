@@ -99,9 +99,9 @@ METADATA_KEYS = [
 
 def extract_metadata(resource):
     return {
-      metadata_key: resource[metadata_key]
-      for metadata_key in METADATA_KEYS
-      if metadata_key in resource
+        metadata_key: resource[metadata_key]
+        for metadata_key in METADATA_KEYS
+        if metadata_key in resource
     }
 
 
@@ -156,7 +156,7 @@ def pytest_runtest_makereport(item, call):
         severity = markers.get('severity', None) and markers.get('severity')['args'][0]
         outcome, reason = get_outcome_and_reason(report, markers, call)
         rationale = markers.get('rationale', None) and \
-                clean_docstring(markers.get('rationale')['args'][0])
+            clean_docstring(markers.get('rationale')['args'][0])
         description = item._obj.__doc__ and clean_docstring(item._obj.__doc__)
 
         fixtures = {fixture_name: item.funcargs[fixture_name]
