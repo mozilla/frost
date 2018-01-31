@@ -93,9 +93,9 @@ METADATA_KEYS = [
 
 def extract_metadata(resource):
     return {
-      metadata_key: resource[metadata_key]
-      for metadata_key in METADATA_KEYS
-      if metadata_key in resource
+        metadata_key: resource[metadata_key]
+        for metadata_key in METADATA_KEYS
+        if metadata_key in resource
     }
 
 
@@ -134,6 +134,18 @@ def get_outcome_and_reason(report, markers, call):
         return report.outcome, None  # passed, failed, skipped
 
 
+def clean_docstring(docstr):
+    """
+    Transforms a docstring into a properly formatted single line string.
+
+    >>> clean_docstring("\nfoo\n    bar\n")
+    "foo bar"
+    >>> clean_docstring("foo bar")
+    "foo bar"
+    """
+    return " ".join([word for word in docstr.replace("\n", " ").strip().split(" ") if word != ""])
+
+
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
     outcome = yield
@@ -145,6 +157,9 @@ def pytest_runtest_makereport(item, call):
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         severity = markers.get('severity', None) and markers.get('severity')['args'][0]
         outcome, reason = get_outcome_and_reason(report, markers, call)
+        rationale = markers.get('rationale', None) and \
+            clean_docstring(markers.get('rationale')['args'][0])
+        description = item._obj.__doc__ and clean_docstring(item._obj.__doc__)
 
         fixtures = {fixture_name: item.funcargs[fixture_name]
                     for fixture_name in item.fixturenames
@@ -154,11 +169,13 @@ def pytest_runtest_makereport(item, call):
 
         # add json metadata
         report.test_metadata = dict(
+            description=description,
             fixtures=fixtures,
             markers=markers,
             metadata=metadata,
             outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
             parametrized_name=item.name,
+            rationale=rationale,
             reason=reason,
             severity=severity,
             unparametrized_name=item.originalname,

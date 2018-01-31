@@ -11,4 +11,8 @@ from aws.rds.helpers import \
     rds_db_security_groups(),
     ids=lambda sg: sg['DBSecurityGroupArn'])
 def test_rds_db_security_group_does_not_grant_public_access(rds_db_security_group):
+    """
+    Checks whether any RDS security group allows for inbound
+    access from the public internet
+    """
     assert not does_rds_db_security_group_grant_public_access(rds_db_security_group)
