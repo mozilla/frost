@@ -4,6 +4,10 @@ from aws.ec2.resources import \
     ec2_security_groups_with_in_use_flag
 
 @pytest.mark.ec2
+@pytest.mark.rationale("""
+Having unused security groups adds cruft in an AWS account, increases the
+likelihood of a mistake, and makes security testing harder.
+""")
 @pytest.mark.parametrize('ec2_security_group',
                          ec2_security_groups_with_in_use_flag(),
                          ids=lambda secgroup: secgroup['GroupName'])
