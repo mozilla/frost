@@ -1,5 +1,7 @@
 
 
+import argparse
+
 import botocore
 import pytest
 
@@ -7,6 +9,7 @@ from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
+import severity
 
 
 botocore_client = None
@@ -36,6 +39,10 @@ def pytest_addoption(parser):
                      default=[],
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
+    parser.addoption('--severity-config',
+                     type=argparse.FileType('r'),
+                     help='Path to a config file specifying test severity levels.')
+
 
 def parse_opt(opt):
     if not len(opt):
@@ -61,6 +68,14 @@ def pytest_configure(config):
         cache=config.cache,
         debug_calls=config.getoption('--aws-debug-calls'),
         debug_cache=config.getoption('--aws-debug-cache'))
+
+    config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
+
+
+def pytest_runtest_setup(item):
+    """
+    """
+    severity.add_severity_marker(item)
 
 
 ## Reporting
@@ -93,6 +108,7 @@ def get_metadata_from_funcargs(funcargs):
         if isinstance(funcargs[k], dict):
             metadata = {**metadata, **extract_metadata(funcargs[k])}
     return metadata
+
 
 def serialize_marker(marker):
     if isinstance(marker, (MarkDecorator, MarkInfo)):
@@ -134,9 +150,14 @@ def pytest_runtest_makereport(item, call):
     if report.when == 'call' and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
+        severity = markers.get('severity', None) and markers.get('severity')['args'][0]
         outcome, reason = get_outcome_and_reason(report, markers, call)
 
-        fixtures = {fixture_name: item.funcargs[fixture_name] for fixture_name in item.fixturenames if fixture_name != 'request'}
+        fixtures = {fixture_name: item.funcargs[fixture_name]
+                        for fixture_name in item.fixturenames
+                        if fixture_name not in ['request',
+                                                'required_tag_names',
+                                                'pytestconfig']}
 
         # add json metadata
         report.test_metadata = dict(
@@ -146,5 +167,6 @@ def pytest_runtest_makereport(item, call):
             outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
             parametrized_name=item.name,
             reason=reason,
+            severity=severity,
             unparametrized_name=item.originalname,
         )
