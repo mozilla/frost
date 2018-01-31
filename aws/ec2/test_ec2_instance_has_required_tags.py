@@ -6,7 +6,7 @@ from conftest import parse_opt
 
 @pytest.fixture
 def required_tag_names(pytestconfig):
-    return frozenset(parse_opt(pytestconfig.getoption('--aws-require-tags')))
+    return frozenset(pytestconfig.getoption('--aws-require-tags'))
 
 
 @pytest.mark.ec2
