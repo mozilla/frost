@@ -33,7 +33,8 @@ def test_s3_bucket_does_not_grant_all_principals_all_actions(
     Mitigations:
 
     * limit actions instead of using * or S3:* http://docs.aws.amazon.com/AmazonS3/latest/dev/using-with-s3-actions.html
-    * limit principals to specific IAMs http://docs.aws.amazon.com/AmazonS3/latest/dev/s3-bucket-user-policy-specifying-principal-intro.html
+    * limit principals to specific IAMs
+      http://docs.aws.amazon.com/AmazonS3/latest/dev/s3-bucket-user-policy-specifying-principal-intro.html
     * add conditions http://docs.aws.amazon.com/AmazonS3/latest/dev/amazon-s3-policy-keys.html
     """
     if not s3_bucket_policy:

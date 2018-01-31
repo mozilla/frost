@@ -30,15 +30,17 @@ def is_rds_db_snapshot_attr_public_access(rds_db_snapshot_attribute):
     ...
     TypeError: 'NoneType' object is not subscriptable
     """
-    return rds_db_snapshot_attribute['AttributeName'] == 'restore' \
-      and 'any' in rds_db_snapshot_attribute['AttributeValues']
+    return rds_db_snapshot_attribute['AttributeName'] == 'restore' and \
+        'any' in rds_db_snapshot_attribute['AttributeValues']
 
 
 def does_rds_db_security_group_grant_public_access(sg):
     """
     Checks an RDS instance for a DB security group with CIDRIP 0.0.0.0/0
 
-    >>> does_rds_db_security_group_grant_public_access({"IPRanges": [{"CIDRIP": "127.0.0.1/32", "Status": "authorized"}, {"CIDRIP": "0.0.0.0/0", "Status": "authorized"}]})
+    >>> does_rds_db_security_group_grant_public_access(
+    ... {"IPRanges": [{"CIDRIP": "127.0.0.1/32", "Status": "authorized"},
+    ... {"CIDRIP": "0.0.0.0/0", "Status": "authorized"}]})
     True
     >>> does_rds_db_security_group_grant_public_access({"IPRanges": []})
     False
@@ -50,15 +52,19 @@ def does_vpc_security_group_grant_public_access(sg):
     """
     Checks an RDS instance for a VPC security groups with ingress permission ipv4 range 0.0.0.0/0 or ipv6 range :::/0
 
-    >>> does_vpc_security_group_grant_public_access({'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}]})
+    >>> does_vpc_security_group_grant_public_access(
+    ... {'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}]})
     True
-    >>> does_vpc_security_group_grant_public_access({'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': []}]})
+    >>> does_vpc_security_group_grant_public_access(
+    ... {'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': []}]})
     False
-    >>> does_vpc_security_group_grant_public_access({'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': [{'CidrIp': '192.168.1.0/0'}]}]})
+    >>> does_vpc_security_group_grant_public_access(
+    ... {'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': [{'CidrIp': '192.168.1.0/0'}]}]})
     False
     """
-    return any(ipr['CidrIp'] == '::/0' for ipp in sg['IpPermissions'] for ipr in ipp['Ipv6Ranges']) or \
-      any(ipr['CidrIp'] == '0.0.0.0/0' for ipp in sg['IpPermissions'] for ipr in ipp['IpRanges'])
+    public_ipv4 = any(ipr['CidrIp'] == '0.0.0.0/0' for ipp in sg['IpPermissions'] for ipr in ipp['IpRanges'])
+    public_ipv6 = any(ipr['CidrIpv6'] == '::/0' for ipp in sg['IpPermissions'] for ipr in ipp['Ipv6Ranges'])
+    return public_ipv4 or public_ipv6
 
 
 def is_rds_db_instance_encrypted(rds_db_instance):

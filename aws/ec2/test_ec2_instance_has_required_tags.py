@@ -4,6 +4,7 @@ from aws.ec2.helpers import ec2_instance_test_id
 from aws.ec2.resources import ec2_instances
 from conftest import parse_opt
 
+
 @pytest.fixture
 def required_tag_names(pytestconfig):
     return frozenset(parse_opt(pytestconfig.getoption('--aws-require-tags')))
@@ -34,5 +35,5 @@ def test_ec2_instance_has_required_tags(ec2_instance, required_tag_names):
 
     # set difference to find required tags not on instance
     missing_tag_names = required_tag_names - instance_tag_names
-    assert not missing_tag_names, \
-      "EC2 Instance {0[InstanceId]} missing required tags {1!r}".format(ec2_instance, missing_tag_names)
+    assert not missing_tag_names, "EC2 Instance {0[InstanceId]} missing required tags {1!r}".format(
+          ec2_instance, missing_tag_names)

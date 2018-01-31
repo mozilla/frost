@@ -1,7 +1,7 @@
 import pytest
 
-from aws.ec2.resources import \
-    ec2_security_groups_with_in_use_flag
+from aws.ec2.resources import ec2_security_groups_with_in_use_flag
+
 
 @pytest.mark.ec2
 @pytest.mark.rationale("""

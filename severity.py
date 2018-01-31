@@ -72,6 +72,9 @@ def parse_conf_file(conf_fd):
     # dict of test name to severity level
     rules = {}
 
+    if not conf_fd:
+        return rules
+
     for line_number, line in enumerate(conf_fd):
         if line.startswith('#'):
             continue
