@@ -1,40 +1,44 @@
 
 TODAY := $(shell date '+%Y-%m-%d')
 
-ENTER_VENV := source venv/bin/activate
-
 .DEFAULT_GOAL := all
 
 AWS_PROFILE := default
 
-doctest:
-	for f in $$(find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do venv/bin/python -m doctest $$f; done
+all: check_venv
+	pytest
+
+awsci: clean-aws-ci
+
+check_venv:
+ifeq ($(VIRTUAL_ENV),)
+	$(error "Run pytest-services from a virtualenv (try 'make install && source venv/bin/activate')")
+endif
 
 clean: clean-cache
 	rm -rf venv
 
-clean-cache:
-	venv/bin/pytest --cache-clear --aws-profiles $(AWS_PROFILE)
-
-awsci: clean-aws-ci
+clean-cache: check_venv
+	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
 
 clean-aws-ci:
-	venv/bin/pytest --cache-clear aws/ --aws-profiles $(AWS_PROFILE) --json=results-$(AWS_PROFILE)-$(TODAY).json
+	pytest --cache-clear aws/ --aws-profiles $(AWS_PROFILE) --json=results-$(AWS_PROFILE)-$(TODAY).json
+
+doctest: check_venv
+	for f in $$(find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do python -m doctest $$f; done
+
+flake8: check_venv
+	flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
+
+install: venv
+	pip install -r requirements.txt
 
 venv:
 	python3 -m venv venv
 
-install: venv
-	venv/bin/pip3 install -r requirements.txt
-
-all:
-	venv/bin/pytest
-
-flake8:
-	venv/bin/flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
-
 .PHONY:
 	all \
+	check_venv \
 	clean \
 	clean-cache \
 	flake8 \
