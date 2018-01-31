@@ -12,4 +12,7 @@ likelihood of a mistake, and makes security testing harder.
                          ec2_security_groups_with_in_use_flag(),
                          ids=lambda secgroup: secgroup['GroupName'])
 def test_ec2_security_group_in_use(ec2_security_group):
+    """Checks to make sure that the security group
+    is currently attached to at least one EC2 instance
+    """
     assert ec2_security_group["InUse"], "Security group is not currently attached to any instance."
