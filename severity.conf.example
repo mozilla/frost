@@ -1,0 +1,3 @@
+# pytest-sevices example severity conf
+test_ec2_instance_has_required_tags	INFO
+*  WARN

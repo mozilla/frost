@@ -120,6 +120,61 @@ head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_insta
 
 These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
 
+### Test Severity
+
+pytest-services adds the command line arg `--severity-config` for
+adding a severity marker to tests. A severity can be `INFO`, `WARN`,
+or `ERROR`.
+
+These do not modify pytest results (pass, fail, xfail, skip, etc.).
+
+The config file looks like (available in `./severity.conf.example`):
+
+```
+# pytest-sevices example severity conf
+test_ec2_instance_has_required_tags	INFO
+*  WARN
+```
+
+And results in a severity and severity marker being included in the
+json metadata:
+
+```console
+pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name,Type,App,Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
+...
+```
+
+```json
+python -m json.tool report.json
+{
+    "report": {
+        "environment": {
+            "Python": "3.6.2",
+            "Platform": "Darwin-15.6.0-x86_64-i386-64bit"
+        },
+        "tests": [
+            {
+...
+                "metadata": [
+                    {
+...
+                    "markers": {
+...
+                            "severity": {
+                                "name": "severity",
+                                "args": [
+                                    "INFO"
+                                ],
+                                "kwargs": {}
+                            }
+                        },
+...
+                        "severity": "INFO",
+                        "unparametrized_name": "test_ec2_instance_has_required_tags"
+                    }
+...
+```
+
 ## Development
 
 ### Goals
