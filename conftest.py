@@ -122,7 +122,11 @@ def pytest_runtest_makereport(item, call):
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         outcome, reason = get_outcome_and_reason(report, markers, call)
 
-        fixtures = {fixture_name: item.funcargs[fixture_name] for fixture_name in item.fixturenames if fixture_name != 'request'}
+        fixtures = {fixture_name: item.funcargs[fixture_name]
+                        for fixture_name in item.fixturenames
+                        if fixture_name not in ['request',
+                                                'required_tag_names',
+                                                'pytestconfig']}
 
         # add json metadata
         report.test_metadata = dict(
