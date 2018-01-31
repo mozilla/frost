@@ -141,6 +141,14 @@ def get_outcome_and_reason(report, markers, call):
 
 
 def clean_docstring(docstr):
+    """
+    Transforms a docstring into a properly formatted single line string.
+
+    >>> clean_docstring("\nfoo\n    bar\n")
+    "foo bar"
+    >>> clean_docstring("foo bar")
+    "foo bar"
+    """
     return " ".join([word for word in docstr.replace("\n", " ").strip().split(" ") if word != ""])
 
 
