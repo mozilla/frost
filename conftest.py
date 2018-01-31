@@ -16,13 +16,11 @@ botocore_client = None
 
 def pytest_addoption(parser):
     parser.addoption('--aws-profiles',
-                     action='append',
-                     default=[],
+                     nargs='*',
                      help='Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].')
 
     parser.addoption('--aws-regions',
-                     action='append',
-                     default=[],
+                     nargs='*',
                      help='Set default AWS regions to use. Defaults to all available ec2 regions')
 
     parser.addoption('--aws-debug-calls',
@@ -34,8 +32,7 @@ def pytest_addoption(parser):
                      help='Log whether AWS API calls hit the cache. Requires -s')
 
     parser.addoption('--aws-require-tags',
-                     action='append',
-                     default=[],
+                     nargs='*',
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
     parser.addoption('--severity-config',
@@ -46,9 +43,6 @@ def pytest_addoption(parser):
 def parse_opt(opt):
     if not len(opt):
         return None
-
-    if ',' in opt[0]:
-        return opt[0].split(',')
 
     return opt
 

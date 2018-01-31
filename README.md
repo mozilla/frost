@@ -140,7 +140,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name,Type,App,Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
+pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
 ...
 ```
 
