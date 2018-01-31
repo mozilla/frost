@@ -16,5 +16,4 @@ def test_s3_bucket_logging_enabled(s3_bucket, s3_bucket_logging_enabled):
     """
     Enable access logs for S3 buckets.
     """
-    assert s3_bucket_logging_enabled, \
-       'Logging not enabled for {0[Name]}'.format(s3_bucket)
+    assert s3_bucket_logging_enabled, 'Logging not enabled for {0[Name]}'.format(s3_bucket)

@@ -114,7 +114,6 @@ def get_aws_resource(service_name,
                                      kwargs=call_kwargs)
         ckey = cache_key(call)
 
-
         if debug_calls:
             print('calling', call)
 

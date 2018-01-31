@@ -8,10 +8,10 @@ STATUSES_TO_LIST = ['err', 'warn', 'fail']
 class ReportGenerator:
 
     def __init__(self, service_json):
-        #{'test_name': [results], ...}
+        # {'test_name': [results], ...}
         self.test_results = defaultdict(list)
 
-        #{'test_name_fail': 2, ...}
+        # {'test_name_fail': 2, ...}
         self.test_status_counter = defaultdict(int)
 
         for result in service_json['results']:
@@ -31,7 +31,7 @@ class ReportGenerator:
     def print_table_of_contents(self):
         print("#### Table of Contents\n")
         for test in self.test_results:
-            print("- [%s](#%s)" % (test,test))
+            print("- [%s](#%s)" % (test, test))
             for status in STATUSES_TO_LIST:
                 if self.test_status_counter[test+'_'+status]:
                     print("    - [%s (%s)](#%s)" % (
@@ -47,7 +47,7 @@ class ReportGenerator:
 
             for status in STATUSES_TO_LIST:
                 if self.test_status_counter[test+'_'+status]:
-                    print("#### %s_%s\n\n" % (test,status))
+                    print("#### %s_%s\n\n" % (test, status))
                     print("Resource Name | Metadata")
                     print("------------ | -------------")
 
@@ -55,7 +55,7 @@ class ReportGenerator:
                         if result["status"] == status:
                             print("%s | %s" % (
                                 self._extract_resource_name(result['name']),
-                                ''.join(["{}: {} - ".format(k,v) for k,v in result['metadata'].items()])[0:-3]
+                                ''.join(["{}: {} - ".format(k, v) for k, v in result['metadata'].items()])[0:-3]
                             ))
 
                     print("\n\n")

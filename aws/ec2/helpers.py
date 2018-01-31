@@ -60,6 +60,7 @@ def ip_permission_cidr_allows_all_ips(ipp):
 
     return False
 
+
 def ip_permission_grants_access_to_group_with_id(ipp, security_group_id):
     """
     Returns True if an EC2 security group IP permission opens access to
@@ -144,7 +145,7 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
 
     for ipp in ec2_security_group['IpPermissions']:
         if ip_permission_opens_all_ports(ipp) and \
-            ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
+              ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
             return True
 
     return False
