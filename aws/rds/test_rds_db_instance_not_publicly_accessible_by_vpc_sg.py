@@ -15,6 +15,10 @@ from aws.rds.helpers import \
     ids=lambda db_instance: db_instance['DBInstanceIdentifier']
 )
 def test_rds_db_instance_not_publicly_accessible_by_vpc_security_group(rds_db_instance, ec2_security_groups):
+    """
+    Checks whether any VPC/EC2 security groups that are attached to an RDS instance
+    allow for access from the public internet.
+    """
     if not ec2_security_groups:
         assert not rds_db_instance['VpcSecurityGroups']
     else:
