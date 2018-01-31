@@ -25,24 +25,6 @@ def rds_db_instances_with_tags():
         for db in rds_db_instances()
     ]
 
-
-def rds_db_instance_db_security_groups():
-    "http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_security_groups"
-    return [
-        [botocore_client\
-             .get(service_name='rds',
-                  method_name='describe_db_security_groups',
-                  call_args=[],
-                  call_kwargs={'DBSecurityGroupName': sg['DBSecurityGroupName']},
-                  profiles=[instance['__pytest_meta']['profile']],
-                  regions=[instance['__pytest_meta']['region']],
-                  result_from_error=lambda e, call: {'DBSecurityGroups': []})  # treat not found as empty list
-             .extract_key('DBSecurityGroups')
-             .values()
-             for sg in instance['DBSecurityGroups']]
-        for instance in rds_db_instances()]
-
-
 def rds_db_instances_vpc_security_groups():
     "http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups"
     return [
