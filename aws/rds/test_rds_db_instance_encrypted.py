@@ -1,8 +1,8 @@
 import pytest
 
 from aws.rds.resources import rds_db_instances_with_tags
-from aws.rds.helpers import \
-    is_rds_db_instance_encrypted
+from aws.rds.helpers import is_rds_db_instance_encrypted
+
 
 @pytest.mark.rds
 @pytest.mark.parametrize('rds_db_instance',

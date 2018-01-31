@@ -2,7 +2,6 @@
 
 import argparse
 
-import botocore
 import pytest
 
 from _pytest.doctest import DoctestItem
@@ -78,11 +77,12 @@ def pytest_runtest_setup(item):
     severity.add_severity_marker(item)
 
 
-## Reporting
+# Reporting
 
 
 def get_node_markers(node):
     return {k: v for k, v in node.keywords.items() if isinstance(v, (MarkDecorator, MarkInfo))}
+
 
 METADATA_KEYS = [
     'DBInstanceArn',
@@ -95,12 +95,15 @@ METADATA_KEYS = [
     'VolumeId',
     'VpcId',
 ]
+
+
 def extract_metadata(resource):
     return {
       metadata_key: resource[metadata_key]
       for metadata_key in METADATA_KEYS
       if metadata_key in resource
     }
+
 
 def get_metadata_from_funcargs(funcargs):
     metadata = {}
@@ -139,12 +142,8 @@ def get_outcome_and_reason(report, markers, call):
 
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
-    pytest_html = item.config.pluginmanager.getplugin('html')
-    pytest_json = item.config.pluginmanager.getplugin('json')
-
     outcome = yield
     report = outcome.get_result()
-
 
     # only add this during call instead of during any stage
     if report.when == 'call' and not isinstance(item, DoctestItem):
@@ -154,10 +153,10 @@ def pytest_runtest_makereport(item, call):
         outcome, reason = get_outcome_and_reason(report, markers, call)
 
         fixtures = {fixture_name: item.funcargs[fixture_name]
-                        for fixture_name in item.fixturenames
-                        if fixture_name not in ['request',
-                                                'required_tag_names',
-                                                'pytestconfig']}
+                    for fixture_name in item.fixturenames
+                    if fixture_name not in ['request',
+                                            'required_tag_names',
+                                            'pytestconfig']}
 
         # add json metadata
         report.test_metadata = dict(

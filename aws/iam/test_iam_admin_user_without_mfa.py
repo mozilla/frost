@@ -5,6 +5,7 @@ from aws.iam.resources import (
     iam_admin_mfa_devices,
 )
 
+
 @pytest.mark.iam
 @pytest.mark.parametrize(
         ['iam_login_profile', 'iam_user_mfa_devices'],

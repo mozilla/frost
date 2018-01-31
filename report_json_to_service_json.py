@@ -10,17 +10,20 @@ Pytest service JSON format:
   'tool_url': 'https://github.com/mozilla-services/foxsec/tree/master/tools/pytest-services',
   'version': 1,
   'meanings': {
-    'pass' : {
-      'short' : 'pass',    // text that _could_ be used in a badge
-      'long' : 'Test passed / no issues found.'
+    'pass': {
+      'short': 'pass',    // text that _could_ be used in a badge
+      'long': 'Test passed / no issues found.'
     },
-    'warn' : {
-      'short' : 'warn',
-      'long' : 'Non-critical test result like an unexpected test failure (xpass, xfail, skip). Examples: S3 bucket not tagged as public, error fetching resource from the AWS API, test skipped due to it not applying'
+    'warn': {
+      'short': 'warn',
+      'long': 'Non-critical test result like an unexpected test failure (xpass, xfail, skip). '
+              'Examples: S3 bucket not tagged as public, error fetching resource from the AWS '
+              'API, test skipped due to it not applying'
     },
-    'fail' : {
-      'short' : 'fail',
-      'long' : 'Critical test failure that should never happen e.g. publicly accessible DB snapshot, user without MFA in prod.'
+    'fail': {
+      'short': 'fail',
+      'long': 'Critical test failure that should never happen e.g. publicly accessible DB snapshot,'
+              ' user without MFA in prod.'
     },
     'err': {
       'short': 'err',
@@ -52,17 +55,20 @@ service_json_template = {
     'tool_url': 'https://github.com/mozilla-services/foxsec/tree/master/tools/pytest-services',
     'version': 1,
     'meanings': {
-        'pass' : {
-            'short' : 'Pass',
-            'long' : 'Test passed / no issues found.'
+        'pass': {
+            'short': 'Pass',
+            'long': 'Test passed / no issues found.'
         },
-        'warn' : {
-            'short' : 'Warn',
-            'long' : 'Non-critical test result like an unexpected test failure (xpass, xfail, skip). Examples: S3 bucket not tagged as public, error fetching resource from the AWS API, test skipped due to it not applying'
+        'warn': {
+            'short': 'Warn',
+            'long': 'Non-critical test result like an unexpected test failure '
+            '(xpass, xfail, skip). Examples: S3 bucket not tagged as public, '
+            'error fetching resource from the AWS API, test skipped due to it not applying'
         },
-        'fail' : {
-            'short' : 'FAIL',
-            'long' : 'Critical test failure that should never happen e.g. publicly accessible DB snapshot, user without MFA in prod.'
+        'fail': {
+            'short': 'FAIL',
+            'long': 'Critical test failure that should never happen '
+            'e.g. publicly accessible DB snapshot, user without MFA in prod.'
         },
         'err': {
             'short': 'Err',
