@@ -2,11 +2,11 @@ import pytest
 
 from aws.ec2.helpers import ec2_instance_test_id
 from aws.ec2.resources import ec2_instances
-
+from conftest import parse_opt
 
 @pytest.fixture
 def required_tag_names(pytestconfig):
-    return frozenset(pytestconfig.getoption('--aws-require-tags'))
+    return frozenset(parse_opt(pytestconfig.getoption('--aws-require-tags')))
 
 
 @pytest.mark.ec2
