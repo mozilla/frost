@@ -145,7 +145,7 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
 
     for ipp in ec2_security_group['IpPermissions']:
         if ip_permission_opens_all_ports(ipp) and \
-              ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
+                ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
             return True
 
     return False
@@ -214,3 +214,18 @@ def is_ebs_volume_encrypted(ebs):
     TypeError: 'NoneType' object is not subscriptable
     """
     return ebs['Encrypted']
+
+
+def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
+    """
+    Returns any tag names that are missing from an EC2 Instance.
+
+    >>> ec2_instance_missing_tag_names({'Tags': [{'Key': 'Name'}]}, frozenset(['Name']))
+    frozenset()
+    >>> ec2_instance_missing_tag_names({
+    ... 'InstanceId': 'iid', 'Tags': [{'Key': 'Bar'}]}, frozenset(['Name']))
+    frozenset({'Name'})
+    """
+    tags = ec2_instance.get('Tags', [])
+    instance_tag_names = set(tag['Key'] for tag in tags if 'Key' in tag)
+    return required_tag_names - instance_tag_names
