@@ -8,7 +8,8 @@ AWS_PROFILE := default
 all: check_venv
 	pytest
 
-awsci: clean-aws-ci
+awsci: check_venv
+	pytest --cache-clear aws/ --aws-profiles $(AWS_PROFILE) --json=results-$(AWS_PROFILE)-$(TODAY).json
 
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
@@ -21,11 +22,8 @@ clean: clean-cache
 clean-cache: check_venv
 	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
 
-clean-aws-ci:
-	pytest --cache-clear aws/ --aws-profiles $(AWS_PROFILE) --json=results-$(AWS_PROFILE)-$(TODAY).json
-
 doctest: check_venv
-	for f in $$(find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do python -m doctest $$f; done
+	for f in $(shell find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do python -m doctest $$f; done
 
 flake8: check_venv
 	flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
