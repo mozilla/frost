@@ -44,8 +44,8 @@ def parse_conf_file(conf_fd):
     {'test_foo': 'ERROR'}
     >>> parse_conf_file(StringIO('* INFO'))  # doctest:+ELLIPSIS
     defaultdict(<function parse_conf_file.<locals>.<lambda> at 0x...>, {})
-    >>> parse_conf_file(StringIO('test_foo ERROR\\ntest_bar INFO'))
-    {'test_foo': 'ERROR', 'test_bar': 'INFO'}
+    >>> parse_conf_file(StringIO('test_foo ERROR\\ntest_bar INFO')) == {'test_foo': 'ERROR', 'test_bar': 'INFO'}
+    True
 
     Short lines are skipped with a warning:
 
@@ -63,8 +63,8 @@ def parse_conf_file(conf_fd):
 
     Duplicate test names are ignored with a warning:
 
-    >>> parse_conf_file(StringIO('test_foo INFO\\ntest_foo WARN'))
-    {'test_foo': 'INFO'}
+    >>> parse_conf_file(StringIO('test_foo INFO\\ntest_foo WARN')) == {'test_foo': 'INFO'}
+    True
     >>> # UserWarning: Line 1: Skipping line with duplicate test name 'test_foo'
 
     Does not check that test names exist (since they might not be collected).
