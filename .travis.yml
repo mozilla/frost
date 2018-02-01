@@ -6,4 +6,4 @@ install:
   - make install
 
 script:
-  - make flake8
+  - make doctest flake8
