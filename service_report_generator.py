@@ -113,7 +113,7 @@ class MarkdownReportGenerator:
         for test in self.test_results:
             print("- [%s](#%s)" % (test, test), file=self.fout)
             for status in STATUSES_TO_LIST:
-                if self.test_status_counter[test+'_'+status]:
+                if self._test_results_include_status(test, status):
                     print("    - [%s (%s)](#%s)" % (
                         status,
                         self.test_status_counter[test+'_'+status],
@@ -123,28 +123,38 @@ class MarkdownReportGenerator:
 
     def print_report(self):
         for test in self.test_results:
-            print("### %s\n\n" % test, file=self.fout)
-            if self.test_results[test][0]['description']:
-                print("**Description:** %s\n" % self.test_results[test][0]['description'], file=self.fout)
-            if self.test_results[test][0]['rationale']:
-                print("**Rationale:** %s\n" % self.test_results[test][0]['rationale'], file=self.fout)
+            self._print_test_header(
+                test,
+                self.test_results[test][0]['description'],
+                self.test_results[test][0]['rationale']
+            )
 
-            for status in STATUSES_TO_LIST:
-                if self.test_status_counter[test+'_'+status]:
-                    print("#### %s_%s\n\n" % (test, status), file=self.fout)
-                    print("Resource Name | Metadata", file=self.fout)
-                    print("------------ | -------------", file=self.fout)
-
-                    for result in self.test_results[test]:
-                        if result["status"] == status:
-                            print("%s | %s" % (
-                                self._extract_resource_name(result['name']),
-                                ''.join(["{}: {} - ".format(k, v) for k, v in result['metadata'].items()])[0:-3]
-                            ), file=self.fout)
-
-                    print("\n\n", file=self.fout)
+            self._print_test_result_tables(test)
 
             print("\n---\n\n", file=self.fout)
+
+    def _print_test_header(self, test_name, description, rationale):
+        print("### %s\n\n" % test_name, file=self.fout)
+        if description:
+            print("**Description:** %s\n" % description, file=self.fout)
+        if rationale:
+            print("**Rationale:** %s\n" % rationale, file=self.fout)
+
+    def _print_test_result_tables(self, test_name):
+        for status in STATUSES_TO_LIST:
+            if self._test_results_include_status(test_name, status):
+                print("#### %s_%s\n\n" % (test_name, status), file=self.fout)
+                print("Resource Name | Metadata", file=self.fout)
+                print("------------ | -------------", file=self.fout)
+
+                for result in self.test_results[test_name]:
+                    if result["status"] == status:
+                        print("%s | %s" % (
+                            self._extract_resource_name(result['name']),
+                            self._format_metadata(result['metadata'])
+                        ), file=self.fout)
+
+                print("\n\n", file=self.fout)
 
     def _print_status_table(self):
         print("Status Name | Meaning", file=self.fout)
@@ -160,6 +170,21 @@ class MarkdownReportGenerator:
     def _extract_resource_name(self, name):
         # "test_something[resource-name]" -> "resource-name"
         return name.split("[")[-1][0:-1]
+
+    def _format_metadata(self, metadata):
+        """
+        Formats the metadata dictionary to a string that is somewhat readable in a markdown table.
+
+        >>> _format_metadata({'foo': 'bar'})
+        "foo: bar"
+        >>> _format_metadata({'VpcId': '1234', 'GroupName': 'ssh-only'})
+        "VpcId: 1234 - GroupName: ssh-only"
+        """
+        return ''.join(["{}: {} - ".format(k, v) for k, v in metadata.items()])[0:-3]
+
+    # test results include at least one with status of
+    def _test_results_include_status(self, test_name, status):
+        return bool(self.test_status_counter[test_name+'_'+status])
 
 
 def parse_args():
