@@ -175,10 +175,10 @@ class MarkdownReportGenerator:
         """
         Formats the metadata dictionary to a string that is somewhat readable in a markdown table.
 
-        >>> _format_metadata({'foo': 'bar'})
-        "foo: bar"
-        >>> _format_metadata({'VpcId': '1234', 'GroupName': 'ssh-only'})
-        "VpcId: 1234 - GroupName: ssh-only"
+        >>> MarkdownReportGenerator({'results': []})._format_metadata({'foo': 'bar'})
+        'foo: bar'
+        >>> MarkdownReportGenerator({'results': []})._format_metadata({'VpcId': '1234', 'GroupName': 'ssh-only'})
+        'VpcId: 1234 - GroupName: ssh-only'
         """
         return ''.join(["{}: {} - ".format(k, v) for k, v in metadata.items()])[0:-3]
 
