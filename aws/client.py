@@ -22,6 +22,10 @@ def get_session(profile=None):
     # we proceed.
     if 'AWS_PROFILE' in os.environ and os.environ['AWS_PROFILE'] != profile:
         del os.environ['AWS_PROFILE']
+        # If the AWS_PROFILE was incorrect, these are probably incorrect as well.
+        for envvar in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_SESSION_TOKEN']:
+            if envvar in os.environ:
+                del os.environ[envvar]
 
     # can raise botocore.exceptions.ProfileNotFound
     return botocore.session.Session(profile=profile)
@@ -39,7 +43,13 @@ def get_client(profile, region, service):
     if region not in session.get_available_regions(service):
         warnings.warn('service {} not available in {}'.format(service, region))
 
-    return session.create_client(service, region_name=region)
+    return session.create_client(
+        service,
+        region_name=region,
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', None),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', None),
+        aws_session_token=os.environ.get('AWS_SESSION_TOKEN', None)
+    )
 
 
 @functools.lru_cache(maxsize=1)
