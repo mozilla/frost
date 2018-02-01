@@ -190,10 +190,10 @@ class MarkdownReportGenerator:
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument('-jo', '--json-out', default='service-report.json',
+    parser.add_argument('--jo', '--json-out', default='service-report.json',
                         help='Service json output filename.')
 
-    parser.add_argument('-mo', '--markdown-out', default='service-report.md',
+    parser.add_argument('--mo', '--markdown-out', default='service-report.md',
                         help='Service markdown output filename.')
 
     parser.add_argument('pytest_json', metavar='<pytest-results.json>',

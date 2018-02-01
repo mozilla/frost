@@ -18,8 +18,8 @@ set -e
 
 date=`date +%F`
 venv/bin/python3 service_report_generator.py \
-  -jo service-report-${AWS_PROFILE}-${date}.json \
-  -jm service-report-${AWS_PROFILE}-${date}.md \
+  --jo service-report-${AWS_PROFILE}-${date}.json \
+  --jm service-report-${AWS_PROFILE}-${date}.md \
   results-${AWS_PROFILE}-${date}.json
 
 # Check in the generated files
