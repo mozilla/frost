@@ -40,20 +40,13 @@ def pytest_addoption(parser):
                      help='Path to a config file specifying test severity levels.')
 
 
-def parse_opt(opt):
-    if not len(opt):
-        return None
-
-    return opt
-
-
 def pytest_configure(config):
     global botocore_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
-    profiles, regions = parse_opt(config.getoption('--aws-profiles')), parse_opt(config.getoption('--aws-regions'))
+    profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
 
     botocore_client = BotocoreClient(
         profiles=profiles,
