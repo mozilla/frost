@@ -23,7 +23,7 @@ clean-cache: check_venv
 	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
 
 doctest: check_venv
-	for f in $(shell find . -name '*.py' | grep -vP '(venv|test|resources|init)'); do python -m doctest $$f; done
+	for f in $(shell find . -name '*.py' | egrep -v '(venv|test|resources|init)'); do python -m doctest $$f; done
 
 flake8: check_venv
 	flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
