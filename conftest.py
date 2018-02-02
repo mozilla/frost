@@ -35,6 +35,11 @@ def pytest_addoption(parser):
                      nargs='*',
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
+    parser.addoption('--offline',
+                     action='store_true',
+                     default=False,
+                     help='Instruct service clients to return empty lists and not make HTTP requests.')
+
     parser.addoption('--severity-config',
                      type=argparse.FileType('r'),
                      help='Path to a config file specifying test severity levels.')
