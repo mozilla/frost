@@ -1,5 +1,6 @@
 
 
+from collections import defaultdict
 from datetime import datetime
 import warnings
 
@@ -41,11 +42,12 @@ def parse_conf_file(conf_fd):
     Examples:
 
     >>> from io import StringIO
-    >>> parse_conf_file(StringIO('# comment'))
-    {}
+    >>> parse_conf_file(StringIO('# comment')) == {}
+    True
 
-    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-01 in prod never allow foo\\n'))
-    {'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
+    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-01 in prod never allow foo\\n'
+    ... )) == {'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
+    True
 
     >>> parse_conf_file(StringIO(
     ... 'test_foo foo-id 2050-01-01 in prod never allow foo for foo-id\\n'
@@ -59,17 +61,17 @@ def parse_conf_file(conf_fd):
 
     Short lines are skipped with a warning:
 
-    >>> parse_conf_file(StringIO('invalid line'))  # doctest:+ELLIPSIS
-    {}
+    >>> parse_conf_file(StringIO('invalid line')) == {}
+    True
     >>> # UserWarning: Line 0: Skipping line with fewer than 4 whitespace delimited parts.
 
     Invalid expirations dates are skipped with a warning:
 
-    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-AA in prod never allow foo'))
-    {}
+    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-AA in prod never allow foo')) == {}
+    True
     >>> # UserWarning: Line 0: Skipping line with invalid expiration day '2050-01-AA'
-    >>> parse_conf_file(StringIO('test_foo foo-id 2000-01-01 in prod never allow foo'))
-    {}
+    >>> parse_conf_file(StringIO('test_foo foo-id 2000-01-01 in prod never allow foo')) == {}
+    True
     >>> # UserWarning: Line 0: Skipping line with expiration day in the past '2000-01-01'
 
     Duplicate test name and IDs are ignored with a warning:
@@ -77,15 +79,16 @@ def parse_conf_file(conf_fd):
     >>> parse_conf_file(StringIO(
     ... 'test_foo foo-id 2050-01-01 in prod never allow foo for foo-id\\n'
     ... 'test_foo foo-id 2051-01-01 in prod never allow foo for bar-id'
-    ... ))
-    {'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo for foo-id')}}
+    ... )) == {
+    ... 'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo for foo-id')}}
+    True
     >>> # UserWarning: Line 1: Skipping line with duplicate test name and ID 'test_foo' 'foo-id'
 
     Does not check that test name and IDs exist (since names might not
     be collected and IDs can require an HTTP call).
     """
     # dict of test name to severity level
-    rules = {}
+    rules = defaultdict(dict)
 
     if not conf_fd:
         return rules
@@ -108,9 +111,6 @@ def parse_conf_file(conf_fd):
         if expiration_date < datetime.now():
             warnings.warn('Line {}: Skipping line with expiration day in the past {!r}'.format(line_number, expiration))
             continue
-
-        if test_name not in rules:
-            rules[test_name] = {}
 
         if test_id in rules[test_name]:
             warnings.warn('Line {}: Skipping line with duplicate test name and ID {!r} {!r}'.format(
