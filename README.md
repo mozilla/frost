@@ -57,12 +57,14 @@ The options include pytest options:
 * [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
 * [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
-and options pytest-services adds for the AWS client:
+and options pytest-services adds:
 
 * `--aws-debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
-* `--aws-require-tag` for the `aws.ec2.test_ec2_instance_has_required_tags` test adds a Tag Name to check on all EC2 instances
+* `--aws-require-tag` adds Tag names to check on all EC2 instances for the `aws.ec2.test_ec2_instance_has_required_tags` test
+* `--offline` a flag to tell HTTP clients to not make requests and return empty params
+* [`--severity-config`](#test-severity) path to a config file for marking different tests with different severities
 
 and produces output like the following showing a DB instance with backups disabled:
 
