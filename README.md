@@ -47,7 +47,7 @@ profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
 named `default` in the `us-west-2` region we can run:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --aws-regions us-west-2 --aws-debug-calls
+pytest --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --aws-regions us-west-2 --aws-debug-calls
 ```
 
 The options include pytest options:
@@ -142,7 +142,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
+pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
 ...
 ```
 
@@ -300,7 +300,7 @@ Notes:
 1. Running it we see that one of the IPs is an AWS IP:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/
+pytest --ignore aws/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:
