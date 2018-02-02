@@ -58,7 +58,8 @@ def pytest_configure(config):
         regions=regions,
         cache=config.cache,
         debug_calls=config.getoption('--aws-debug-calls'),
-        debug_cache=config.getoption('--aws-debug-cache'))
+        debug_cache=config.getoption('--aws-debug-cache'),
+        offline=config.getoption('--offline'))
 
     config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
 
