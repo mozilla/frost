@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-# verbose Print shell input lines as they are read.
-set -v
-# fail on error
-set -e
-
 # Wrapper script for running the pytest service tests in Jenkins
 
-# Docker should mount an ~/.aws/credentials file
+set -ex
+
+if [ -z "$1" ]; then
+  echo "USAGE: ./pytest_wrapper.sh AWS_PROFILE"
+  exit 1
+fi
+
+export AWS_PROFILE=$1
 
 make install
 . venv/bin/activate
 
 # allow pytest commands to fail so we can report results
-set +e
-make awsci AWS_PROFILE=$AWS_PROFILE
-set -e
+make awsci AWS_PROFILE=$AWS_PROFILE || true
 
-date=`date +%F`
+date=$(date +%F)
 venv/bin/python3 service_report_generator.py \
   --jo service-report-${AWS_PROFILE}-${date}.json \
   --jm service-report-${AWS_PROFILE}-${date}.md \
@@ -32,5 +32,5 @@ cd /$RESULTS_DIR/
 git pull
 git add aws-pytest/${AWS_PROFILE}/service-report-${AWS_PROFILE}-${date}.json
 git add aws-pytest/${AWS_PROFILE}/service-report-${AWS_PROFILE}-${date}.md
-git commit -m "Pytest Services Results ${AWS_PROFILE} ${date}"
+git commit -m "Pytest Services Results - ${AWS_PROFILE} ${date}"
 git push origin master:master
