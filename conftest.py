@@ -35,6 +35,11 @@ def pytest_addoption(parser):
                      nargs='*',
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
+    parser.addoption('--offline',
+                     action='store_true',
+                     default=False,
+                     help='Instruct service clients to return empty lists and not make HTTP requests.')
+
     parser.addoption('--severity-config',
                      type=argparse.FileType('r'),
                      help='Path to a config file specifying test severity levels.')
@@ -53,7 +58,8 @@ def pytest_configure(config):
         regions=regions,
         cache=config.cache,
         debug_calls=config.getoption('--aws-debug-calls'),
-        debug_cache=config.getoption('--aws-debug-cache'))
+        debug_cache=config.getoption('--aws-debug-cache'),
+        offline=config.getoption('--offline'))
 
     config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
 
@@ -61,7 +67,8 @@ def pytest_configure(config):
 def pytest_runtest_setup(item):
     """
     """
-    severity.add_severity_marker(item)
+    if not isinstance(item, DoctestItem):
+        severity.add_severity_marker(item)
 
 
 # Reporting
@@ -131,10 +138,10 @@ def clean_docstring(docstr):
     """
     Transforms a docstring into a properly formatted single line string.
 
-    >>> clean_docstring("\nfoo\n    bar\n")
-    "foo bar"
+    >>> clean_docstring("\\nfoo\\n    bar\\n")
+    'foo bar'
     >>> clean_docstring("foo bar")
-    "foo bar"
+    'foo bar'
     """
     return " ".join([word for word in docstr.replace("\n", " ").strip().split(" ") if word != ""])
 

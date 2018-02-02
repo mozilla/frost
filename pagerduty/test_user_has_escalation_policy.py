@@ -6,16 +6,28 @@ import pytest
 import pygerduty.v2
 
 
-pager = pygerduty.v2.PagerDuty(os.environ['pagerdutyRoKey'])
+PD_RO_KEY = os.environ.get('pagerdutyRoKey', None)
+
+
+def pd_client():
+    if not PD_RO_KEY:
+        return None
+    return pygerduty.v2.PagerDuty(PD_RO_KEY)
 
 
 def pd_users():
-    global pager
+    pager = pd_client()
+    if not pager:
+        return []
+
     return pager.users.list()
 
 
 def pd_users_escalation_policies():
-    global pager
+    pager = pd_client()
+    if not pager:
+        return []
+
     return [
         pager.escalation_policies.list(user_ids=[user['id']])
         for user in pd_users()
@@ -23,7 +35,8 @@ def pd_users_escalation_policies():
 
 
 @pytest.mark.pagerduty
-@pytest.mark.xfail
+@pytest.mark.skipif(lambda: not PD_RO_KEY,
+                    reason='Env var "pagerdutyRoKey" of Pagerduty API key not found.')
 @pytest.mark.parametrize([
     'pd_user',
     'pd_user_escalation_policy',

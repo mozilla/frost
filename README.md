@@ -47,7 +47,7 @@ profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
 named `default` in the `us-west-2` region we can run:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --aws-regions us-west-2 --aws-debug-calls
+pytest --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --aws-regions us-west-2 --aws-debug-calls
 ```
 
 The options include pytest options:
@@ -57,12 +57,14 @@ The options include pytest options:
 * [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
 * [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
-and options pytest-services adds for the AWS client:
+and options pytest-services adds:
 
 * `--aws-debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
-* `--aws-require-tag` for the `aws.ec2.test_ec2_instance_has_required_tags` test adds a Tag Name to check on all EC2 instances
+* `--aws-require-tag` adds Tag names to check on all EC2 instances for the `aws.ec2.test_ec2_instance_has_required_tags` test
+* `--offline` a flag to tell HTTP clients to not make requests and return empty params
+* [`--severity-config`](#test-severity) path to a config file for marking different tests with different severities
 
 and produces output like the following showing a DB instance with backups disabled:
 
@@ -140,7 +142,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
+pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
 ...
 ```
 
@@ -298,7 +300,7 @@ Notes:
 1. Running it we see that one of the IPs is an AWS IP:
 
 ```console
-pytest --ignore pagerduty/ --ignore aws/
+pytest --ignore aws/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:

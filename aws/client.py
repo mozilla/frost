@@ -147,13 +147,20 @@ def get_aws_resource(service_name,
 
 class BotocoreClient:
 
-    def __init__(self, profiles, regions, cache, debug_calls, debug_cache):
+    def __init__(self,
+                 profiles,
+                 regions,
+                 cache,
+                 debug_calls,
+                 debug_cache,
+                 offline):
         self.profiles = profiles or [None]
         self.regions = regions or get_available_regions()
         self.cache = cache
 
         self.debug_calls = debug_calls
         self.debug_cache = debug_cache
+        self.offline = offline
 
         self.results = []
 
@@ -174,17 +181,20 @@ class BotocoreClient:
         if service_name in SERVICES_WITHOUT_REGIONS:
             regions = ["us-east-1"]
 
-        self.results = list(get_aws_resource(
-            service_name,
-            method_name,
-            call_args,
-            call_kwargs,
-            profiles=profiles or self.profiles,
-            regions=regions or self.regions,
-            cache=self.cache,
-            result_from_error=result_from_error,
-            debug_calls=self.debug_calls,
-            debug_cache=self.debug_cache))
+        if self.offline:
+            self.results = []
+        else:
+            self.results = list(get_aws_resource(
+                service_name,
+                method_name,
+                call_args,
+                call_kwargs,
+                profiles=profiles or self.profiles,
+                regions=regions or self.regions,
+                cache=self.cache,
+                result_from_error=result_from_error,
+                debug_calls=self.debug_calls,
+                debug_cache=self.debug_cache))
 
         return self
 
