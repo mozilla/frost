@@ -67,7 +67,8 @@ def pytest_configure(config):
 def pytest_runtest_setup(item):
     """
     """
-    severity.add_severity_marker(item)
+    if not isinstance(item, DoctestItem):
+        severity.add_severity_marker(item)
 
 
 # Reporting
