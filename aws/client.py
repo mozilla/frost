@@ -207,14 +207,14 @@ class BotocoreClient:
         From an iterable of dicts returns the value with the given
         keys discarding other values:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None)
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {'id': 2}]
         >>> c.extract_key('id').results
         [1, 2]
 
         When the key does not exist it returns the second arg which defaults to None:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None)
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {}]
         >>> c.extract_key('id').results
         [1, None]

@@ -51,7 +51,7 @@ def parse_conf_file(conf_fd):
 
     >>> parse_conf_file(StringIO('invalid'))
     {}
-    >>> # UserWarning: Line 0: Skipping line with fewer than 2 tab delimited parts.
+    >>> # UserWarning: Line 0: Skipping line with fewer than 2 whitespace delimited parts.
 
 
     Invalid severity levels are skipped with a warning:
