@@ -65,6 +65,7 @@ and options pytest-services adds:
 * `--aws-require-tag` adds Tag names to check on all EC2 instances for the `aws.ec2.test_ec2_instance_has_required_tags` test
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--severity-config`](#test-severity) path to a config file for marking different tests with different severities
+* [`--exemptions-config`](#test-exemptions) path to a config file for marking test name and resource IDs as expected failures
 
 and produces output like the following showing a DB instance with backups disabled:
 
@@ -174,6 +175,64 @@ python -m json.tool report.json
                         "severity": "INFO",
                         "unparametrized_name": "test_ec2_instance_has_required_tags"
                     }
+...
+```
+
+### Test Exemptions
+
+pytest-services adds the command line arg `--exemptions-config` for
+marking test and test resource IDs as expected failures.
+
+The conf file format consists of whitespace delimited columns like the
+severity config, but requires additional columns for test ID (usually
+an AWS resource ID), exception expiration day (as YYYY-MM-DD), and
+exception reason.
+
+The config file looks like (available in `./exemptions.conf.example`):
+
+```
+# pytest-sevices example exemptions conf
+# columns:
+# unparametrized test name; test_param_id; expiration day; expiration comment
+test_ec2_instance_has_required_tags i-0123456789f014c162 2019-01-01 ec2 instance has no owner
+```
+
+Pytest-services will mark matching test names and test IDs with
+[`xfail(reason='<conf reason>', strict=True, expiration='<conf
+expiration>')`](https://docs.pytest.org/en/latest/skipping.html) and
+`pytest.mark.services_exception(expiration='<conf expiration>')`.
+
+When a json report is generated, the exemptions will show up in the
+json metadata as serialized markers:
+
+```json
+python -m json.tool report.json | grep -C 20 xfail
+...
+                        "markers": {
+                            "ec2": {
+                                "name": "ec2",
+                                "args": [],
+                                "kwargs": {}
+                            },
+                            "parametrize": {
+                                "name": "parametrize",
+                                "args": [
+                                    "...skipped..."
+                                ],
+                                "kwargs": [
+                                    "...skipped..."
+                                ]
+                            },
+                            "xfail": {
+                                "name": "xfail",
+                                "args": [],
+                                "kwargs": {
+                                    "reason": "ec2 instance has no owner",
+                                    "strict": true,
+                                    "expiration": "2019-01-01"
+                                }
+                            }
+                        },
 ...
 ```
 
