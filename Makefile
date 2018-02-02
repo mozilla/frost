@@ -29,7 +29,7 @@ flake8: check_venv
 	flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
 
 install: venv
-	( . venv/bin/activate; pip install -r requirements.txt )
+	( . venv/bin/activate && pip install -r requirements.txt )
 
 venv:
 	python3 -m venv venv
