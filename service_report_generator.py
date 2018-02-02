@@ -178,9 +178,9 @@ class MarkdownReportGenerator:
         >>> MarkdownReportGenerator({'results': []})._format_metadata({'foo': 'bar'})
         'foo: bar'
         >>> MarkdownReportGenerator({'results': []})._format_metadata({'VpcId': '1234', 'GroupName': 'ssh-only'})
-        'VpcId: 1234 - GroupName: ssh-only'
+        'GroupName: ssh-only - VpcId: 1234'
         """
-        return ''.join(["{}: {} - ".format(k, v) for k, v in metadata.items()])[0:-3]
+        return ''.join(["{}: {} - ".format(k, v) for k, v in sorted(metadata.items())])[0:-3]
 
     # test results include at least one with status of
     def _test_results_include_status(self, test_name, status):

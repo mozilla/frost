@@ -197,11 +197,17 @@ class BotocoreClient:
         From an iterable of dicts returns the value with the given
         keys discarding other values:
 
-        [{'id': 1}, {'id': 2}] -> [1, 2]
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None)
+        >>> c.results = [{'id': 1}, {'id': 2}]
+        >>> c.extract_key('id').results
+        [1, 2]
 
         When the key does not exist it returns the second arg which defaults to None:
 
-        [{'id': 1}, {}] -> [1, None]
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None)
+        >>> c.results = [{'id': 1}, {}]
+        >>> c.extract_key('id').results
+        [1, None]
 
         Propagates the '__pytest_meta' key to dicts and list items.
         """
