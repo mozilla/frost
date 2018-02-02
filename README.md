@@ -103,6 +103,49 @@ aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError
 ============================================ 1 failed, 3 passed, 72 deselected in 3.12 seconds ============================================
 ```
 
+#### IAM Policy for pytest-services
+
+The below policy will allow you to run all AWS tests in pytest-services against all resources in your account.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PytestServicesReadOnly",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVolumes",
+        "iam:GetLoginProfile",
+        "iam:ListAttachedGroupPolicies",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListGroupPolicies",
+        "iam:ListGroupsForUser",
+        "iam:ListMFADevices",
+        "iam:ListUserPolicies",
+        "iam:ListUsers",
+        "rds:DescribeDbInstance",
+        "rds:DescribeDbSnapshotAttributes",
+        "rds:DescribeDbSnapshots",
+        "rds:DescribeSecurityGroups",
+        "rds:ListTagsForResource",
+        "redshift:DescribeClusterSecurityGroups",
+        "s3:GetBucketAcl",
+        "s3:GetBucketCORS",
+        "s3:GetBucketLogging",
+        "s3:GetBucketPolicy",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketWebsite",
+        "s3:ListBuckets"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+```
+
 ### Caching
 
 The AWS client will use AWS API JSON responses when available and save them using AWS profile, region, service name, service method, [botocore](http://botocore.readthedocs.io/) args and kwargs in the cache key to filenames with the format `.cache/v/pytest_aws:<aws profile>:<aws region>:<aws service>:<service method>:<args>:<kwargs>.json` e.g.
