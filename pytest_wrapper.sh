@@ -10,6 +10,7 @@ set -e
 # Docker should mount an ~/.aws/credentials file
 
 make install
+. venv/bin/activate
 
 # allow pytest commands to fail so we can report results
 set +e
