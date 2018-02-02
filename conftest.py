@@ -8,6 +8,7 @@ from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
+import exemptions
 import severity
 
 
@@ -44,6 +45,10 @@ def pytest_addoption(parser):
                      type=argparse.FileType('r'),
                      help='Path to a config file specifying test severity levels.')
 
+    parser.addoption('--exemptions-config',
+                     type=argparse.FileType('r'),
+                     help='Path to a config file specifying test and resource exemptions.')
+
 
 def pytest_configure(config):
     global botocore_client
@@ -61,6 +66,7 @@ def pytest_configure(config):
         debug_cache=config.getoption('--aws-debug-cache'),
         offline=config.getoption('--offline'))
 
+    config.exemptions = exemptions.parse_conf_file(config.getoption('--exemptions-config'))
     config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
 
 
@@ -69,6 +75,7 @@ def pytest_runtest_setup(item):
     """
     if not isinstance(item, DoctestItem):
         severity.add_severity_marker(item)
+        exemptions.add_xfail_marker(item)
 
 
 # Reporting
