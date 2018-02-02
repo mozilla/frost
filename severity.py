@@ -81,7 +81,7 @@ def parse_conf_file(conf_fd):
 
         line_parts = line.split()
         if len(line_parts) < 2:
-            warnings.warn('Line {}: Skipping line with fewer than 2 tab delimited parts.'.format(line_number))
+            warnings.warn('Line {}: Skipping line with fewer than 2 whitespace delimited parts.'.format(line_number))
             continue
 
         test_name, severity = line_parts[0], line_parts[1]
