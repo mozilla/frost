@@ -137,6 +137,7 @@ The below policy will allow you to run all AWS tests in pytest-services against 
         "s3:GetBucketPolicy",
         "s3:GetBucketVersioning",
         "s3:GetBucketWebsite",
+        "s3:ListAllMyBuckets",
         "s3:ListBucket"
       ],
       "Effect": "Allow",
