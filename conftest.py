@@ -34,6 +34,7 @@ def pytest_addoption(parser):
 
     parser.addoption('--aws-require-tags',
                      nargs='*',
+                     default=[],
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
     parser.addoption('--offline',
