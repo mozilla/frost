@@ -125,10 +125,10 @@ The below policy will allow you to run all AWS tests in pytest-services against 
         "iam:ListMFADevices",
         "iam:ListUserPolicies",
         "iam:ListUsers",
-        "rds:DescribeDbInstance",
+        "rds:DescribeDbInstances",
         "rds:DescribeDbSnapshotAttributes",
         "rds:DescribeDbSnapshots",
-        "rds:DescribeSecurityGroups",
+        "rds:DescribeDbSecurityGroups",
         "rds:ListTagsForResource",
         "redshift:DescribeClusterSecurityGroups",
         "s3:GetBucketAcl",
@@ -137,7 +137,7 @@ The below policy will allow you to run all AWS tests in pytest-services against 
         "s3:GetBucketPolicy",
         "s3:GetBucketVersioning",
         "s3:GetBucketWebsite",
-        "s3:ListBuckets"
+        "s3:ListBucket"
       ],
       "Effect": "Allow",
       "Resource": "*"
