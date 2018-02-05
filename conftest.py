@@ -168,16 +168,9 @@ def pytest_runtest_makereport(item, call):
             clean_docstring(markers.get('rationale')['args'][0])
         description = item._obj.__doc__ and clean_docstring(item._obj.__doc__)
 
-        fixtures = {fixture_name: item.funcargs[fixture_name]
-                    for fixture_name in item.fixturenames
-                    if fixture_name not in ['request',
-                                            'required_tag_names',
-                                            'pytestconfig']}
-
         # add json metadata
         report.test_metadata = dict(
             description=description,
-            fixtures=fixtures,
             markers=markers,
             metadata=metadata,
             outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
