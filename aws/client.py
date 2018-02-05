@@ -231,7 +231,7 @@ class BotocoreClient:
                     for item in keyed_result:
                         # Added for IAM inline policies call, as it
                         # returns a list of strings.
-                        if not isinstance(item, str):
+                        if isinstance(item, dict):
                             item['__pytest_meta'] = result['__pytest_meta']
                 elif isinstance(keyed_result, dict):
                     keyed_result['__pytest_meta'] = result['__pytest_meta']

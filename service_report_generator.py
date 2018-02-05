@@ -205,9 +205,9 @@ def parse_args():
 def get_test_status(outcome):
     if outcome == 'errored':
         return 'err'
-    elif outcome in ['xfailed', 'xpassed', 'skipped']:
+    elif outcome in ['xfailed', 'xpassed']:
         return 'warn'
-    elif outcome == 'passed':
+    elif outcome in ['passed', 'skipped']:
         return 'pass'
     elif outcome == 'failed':
         return 'fail'
