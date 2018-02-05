@@ -37,6 +37,11 @@ clean-cache: check_venv
 doctest: check_venv
 	pytest --doctest-modules -s --offline --aws-debug-calls
 
+doctest-coverage: check_venv
+	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --aws-debug-calls
+	coverage report -m
+	coverage html
+
 flake8: check_venv
 	flake8 --max-line-length 120 $(shell find . -name '*.py' -not -path "./venv/*")
 
