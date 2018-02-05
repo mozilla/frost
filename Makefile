@@ -5,21 +5,23 @@ TODAY := $(shell date '+%Y-%m-%d')
 
 AWS_PROFILE := default
 
+PYTEST_OPTS := ''
+
 all: check_venv
 	pytest
 
 awsci: check_venv
-	pytest aws/ --aws-profiles $(AWS_PROFILE) --json=results-$(AWS_PROFILE)-$(TODAY).json
+	pytest --continue-on-collection-errors aws/ --json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
 aws-sg: check_venv
-	pytest \
+	pytest --continue-on-collection-errors \
 		aws/ec2/test_ec2_security_group_in_use.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports_to_all.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports_to_self.py \
 		aws/rds/test_rds_db_security_group_does_not_grant_public_access.py \
 		aws/rds/test_rds_db_instance_not_publicly_accessible_by_vpc_sg.py \
-		--aws-profiles $(AWS_PROFILE) --json=results-sg-$(AWS_PROFILE)-$(TODAY).json
+		--json=results-sg-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
