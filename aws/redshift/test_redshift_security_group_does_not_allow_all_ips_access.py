@@ -10,6 +10,7 @@ from aws.redshift.helpers import (
 
 
 @pytest.mark.redshift
+@pytest.mark.xskip(reason="Most don't use Redshift security groups")
 @pytest.mark.parametrize(
     'security_group',
     redshift_cluster_security_groups(),
