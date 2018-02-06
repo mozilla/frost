@@ -79,8 +79,17 @@ default_call = AWSAPICall(*[None] * (len(AWSAPICall._fields) - 2) + [[], {}])
 
 
 def cache_key(call):
-    """Returns the fullname (directory and filename) for an AWS API call."""
+    """Returns the fullname (directory and filename) for an AWS API call.
 
+    >>> cache_key(default_call._replace(
+    ... profile='profile',
+    ... region='region',
+    ... service='service_name',
+    ... method='method_name',
+    ... args=['arg1', 'arg2'],
+    ... kwargs=dict(kwarg1=True)))
+    'pytest_aws:profile:region:service_name:method_name:arg1,arg2:kwarg1=True.json'
+    """
     return ':'.join([
         'pytest_aws',
         str(call.profile),
@@ -199,7 +208,13 @@ class BotocoreClient:
         return self
 
     def values(self):
-        "Returns the wrapped value"
+        """Returns the wrapped value
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = []
+        >>> c.values()
+        []
+        """
         return self.results
 
     def extract_key(self, key, default=None):
@@ -219,7 +234,22 @@ class BotocoreClient:
         >>> c.extract_key('id').results
         [1, None]
 
-        Propagates the '__pytest_meta' key to dicts and list items.
+
+        Propagates the '__pytest_meta' key to dicts and lists of dicts:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [{'Attrs': {'Name': 'Test'}, '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.extract_key('Attrs').results
+        [{'Name': 'Test', '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.results = [{'Tags': [{'Name': 'Test', 'Value': 'Tag'}], '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.extract_key('Tags').results
+        [[{'Name': 'Test', 'Value': 'Tag', '__pytest_meta': {'meta': 'dict'}}]]
+
+        But not to primitives:
+
+        >>> c.results = [{'PolicyNames': ['P1', 'P2']}]
+        >>> c.extract_key('PolicyNames').results
+        [['P1', 'P2']]
         """
         tmp = []
         for result in self.results:
@@ -243,7 +273,22 @@ class BotocoreClient:
         return self
 
     def flatten(self):
-        "Flattens one level of a nested list: [[A], [B]] -> [A, B]"
+        """
+        Flattens one level of a nested list:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [['A', 1], ['B']]
+        >>> c.flatten().values()
+        ['A', 1, 'B']
+
+        Only works for a list of lists:
+
+        >>> c.results = [{'A': 1}, {'B': 2}]
+        >>> c.flatten().values()
+        Traceback (most recent call last):
+        ...
+        TypeError: can only concatenate list (not "dict") to list
+        """
         self.results = sum(self.results, [])
         return self
 
