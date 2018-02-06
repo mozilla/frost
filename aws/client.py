@@ -242,6 +242,16 @@ class BotocoreClient:
         >>> c.results = [{'PolicyNames': ['P1', 'P2']}]
         >>> c.extract_key('PolicyNames').results
         [['P1', 'P2']]
+
+
+        Errors when the outer dict is missing a meta key:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [{'Attrs': {'Name': 'Test'}}]
+        >>> c.extract_key('Attrs')
+        Traceback (most recent call last):
+        ...
+        KeyError: '__pytest_meta'
         """
         tmp = []
         for result in self.results:
