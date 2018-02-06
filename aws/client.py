@@ -57,21 +57,13 @@ def get_available_services(profile=None):
     return get_session(profile=profile).get_available_services()
 
 
-def reify_response(resp):
-    """
-    If botocore is lazily loading some response data force top-level attrs to a dict.
-    """
-    # TODO: find out wtf botocore is actually doing or use its internal methods
-    return {k: v for (k, v) in resp.items()}
-
-
 def full_results(client, method, args, kwargs):
     """Returns JSON results for an AWS botocore call. Flattens paginated results (if any)."""
     if client.can_paginate(method):
         paginator = client.get_paginator(method)
         return paginator.paginate(*args, **kwargs).build_full_result()
     else:
-        return reify_response(getattr(client, method)(*args, **kwargs))
+        return getattr(client, method)(*args, **kwargs)
 
 
 AWSAPICall = namedtuple('AWSAPICall', 'profile region service method args kwargs')
