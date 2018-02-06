@@ -31,7 +31,7 @@ def test_s3_bucket_no_world_acl(s3_bucket,
     for grant in s3_bucket_acl['Grants']:
         grantee = grant['Grantee']
         if 'URI' not in grantee:
-            pytest.skip()  # reason='S3 Bucket ACL does not use URI.'
+            pytest.skip('S3 Bucket ACL does not use URI.')
 
         grantee_uri = grantee['URI']
         assert not any(grantee_uri.startswith(group) for group in AWS_PREDEFINED_GROUPS)

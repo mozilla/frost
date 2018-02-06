@@ -38,7 +38,7 @@ def test_s3_bucket_does_not_grant_all_principals_all_actions(
     * add conditions http://docs.aws.amazon.com/AmazonS3/latest/dev/amazon-s3-policy-keys.html
     """
     if not s3_bucket_policy:
-        pytest.skip()  # reason='Bucket has no policy.' which defaults to private
+        pytest.skip('Bucket has no policy, which means it defaults to private.')
         # https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy.html
 
     policy = json.loads(s3_bucket_policy)
