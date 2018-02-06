@@ -94,7 +94,7 @@ class MarkdownReportGenerator:
         self.test_status_counter = defaultdict(int)
 
         for result in service_json['results']:
-            if result['status'] in STATUSES_TO_LIST:
+            if result['status'] in STATUSES_TO_LIST and result['severity'] != 'INFO':
                 self.test_results[result['test_name']].append(result)
                 self.test_status_counter[result['test_name']+"_"+result['status']] += 1
 
@@ -107,6 +107,12 @@ class MarkdownReportGenerator:
         print("# AWS pytest-services results\n", file=self.fout)
         print("#### Status Meanings: \n", file=self.fout)
         self._print_status_table()
+        print("#### About this report: \n", file=self.fout)
+        print("This report **does not** include passing test results or test results "
+              "with a severity level of INFO.\n", file=self.fout)
+        print('If you want to view all results, check out the file in this directory '
+              'with the exact same name as this file, except .json instead of .md.', file=self.fout)
+        print("\n\n", file=self.fout)
 
     def print_table_of_contents(self):
         print("#### Table of Contents\n", file=self.fout)
