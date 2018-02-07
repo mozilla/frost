@@ -10,7 +10,6 @@ from aws.redshift.helpers import (
 
 
 @pytest.mark.redshift
-@pytest.mark.xskip(reason="Redshift security groups are only supported on EC2-Classic accounts")
 @pytest.mark.parametrize(
     'security_group',
     redshift_cluster_security_groups(),
