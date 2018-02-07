@@ -57,21 +57,13 @@ def get_available_services(profile=None):
     return get_session(profile=profile).get_available_services()
 
 
-def reify_response(resp):
-    """
-    If botocore is lazily loading some response data force top-level attrs to a dict.
-    """
-    # TODO: find out wtf botocore is actually doing or use its internal methods
-    return {k: v for (k, v) in resp.items()}
-
-
 def full_results(client, method, args, kwargs):
     """Returns JSON results for an AWS botocore call. Flattens paginated results (if any)."""
     if client.can_paginate(method):
         paginator = client.get_paginator(method)
         return paginator.paginate(*args, **kwargs).build_full_result()
     else:
-        return reify_response(getattr(client, method)(*args, **kwargs))
+        return getattr(client, method)(*args, **kwargs)
 
 
 AWSAPICall = namedtuple('AWSAPICall', 'profile region service method args kwargs')
@@ -79,8 +71,17 @@ default_call = AWSAPICall(*[None] * (len(AWSAPICall._fields) - 2) + [[], {}])
 
 
 def cache_key(call):
-    """Returns the fullname (directory and filename) for an AWS API call."""
+    """Returns the fullname (directory and filename) for an AWS API call.
 
+    >>> cache_key(default_call._replace(
+    ... profile='profile',
+    ... region='region',
+    ... service='service_name',
+    ... method='method_name',
+    ... args=['arg1', 'arg2'],
+    ... kwargs=dict(kwarg1=True)))
+    'pytest_aws:profile:region:service_name:method_name:arg1,arg2:kwarg1=True.json'
+    """
     return ':'.join([
         'pytest_aws',
         str(call.profile),
@@ -199,7 +200,13 @@ class BotocoreClient:
         return self
 
     def values(self):
-        "Returns the wrapped value"
+        """Returns the wrapped value
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = []
+        >>> c.values()
+        []
+        """
         return self.results
 
     def extract_key(self, key, default=None):
@@ -219,7 +226,32 @@ class BotocoreClient:
         >>> c.extract_key('id').results
         [1, None]
 
-        Propagates the '__pytest_meta' key to dicts and list items.
+
+        Propagates the '__pytest_meta' key to dicts and lists of dicts:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [{'Attrs': {'Name': 'Test'}, '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.extract_key('Attrs').results
+        [{'Name': 'Test', '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.results = [{'Tags': [{'Name': 'Test', 'Value': 'Tag'}], '__pytest_meta': {'meta': 'dict'}}]
+        >>> c.extract_key('Tags').results
+        [[{'Name': 'Test', 'Value': 'Tag', '__pytest_meta': {'meta': 'dict'}}]]
+
+        But not to primitives:
+
+        >>> c.results = [{'PolicyNames': ['P1', 'P2']}]
+        >>> c.extract_key('PolicyNames').results
+        [['P1', 'P2']]
+
+
+        Errors when the outer dict is missing a meta key:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [{'Attrs': {'Name': 'Test'}}]
+        >>> c.extract_key('Attrs')
+        Traceback (most recent call last):
+        ...
+        KeyError: '__pytest_meta'
         """
         tmp = []
         for result in self.results:
@@ -243,7 +275,22 @@ class BotocoreClient:
         return self
 
     def flatten(self):
-        "Flattens one level of a nested list: [[A], [B]] -> [A, B]"
+        """
+        Flattens one level of a nested list:
+
+        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c.results = [['A', 1], ['B']]
+        >>> c.flatten().values()
+        ['A', 1, 'B']
+
+        Only works for a list of lists:
+
+        >>> c.results = [{'A': 1}, {'B': 2}]
+        >>> c.flatten().values()
+        Traceback (most recent call last):
+        ...
+        TypeError: can only concatenate list (not "dict") to list
+        """
         self.results = sum(self.results, [])
         return self
 
