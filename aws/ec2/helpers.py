@@ -101,7 +101,6 @@ def ec2_security_group_opens_all_ports(ec2_security_group):
     if 'IpPermissions' not in ec2_security_group:
         return False
 
-
     for ipp in ec2_security_group['IpPermissions']:
         if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
             continue
