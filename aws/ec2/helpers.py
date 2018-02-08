@@ -204,6 +204,49 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     return False
 
 
+def ec2_security_group_opens_specific_ports_to_all(ec2_security_group):
+    """
+    Returns True if an ec2 security group includes a permission
+    allowing all IPs inbound access on specific unsafe ports and False
+    otherwise or if protocol is ICMP.
+
+    >>> ec2_security_group_opens_specific_ports_to_all({'IpPermissions': [
+    ... {'FromPort': 22,'ToPort': 22,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+    ... ]})
+    True
+    >>> ec2_security_group_opens_specific_ports_to_all({'IpPermissions': [
+    ... {'FromPort': 234,'ToPort': 432,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+    ... ]})
+    True
+
+    >>> ec2_security_group_opens_specific_ports_to_all({'IpPermissions': [
+    ... {'FromPort': 80,'ToPort': 80,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+    ... ]})
+    False
+    >>> ec2_security_group_opens_specific_ports_to_all({'IpPermissions': []})
+    False
+    >>> ec2_security_group_opens_specific_ports_to_all({})
+    False
+    >>> ec2_security_group_opens_specific_ports_to_all([])
+    False
+    """
+    if 'IpPermissions' not in ec2_security_group:
+        return False
+
+    for ipp in ec2_security_group['IpPermissions']:
+        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+            continue
+
+        if ip_permission_cidr_allows_all_ips(ipp):
+            from_port, to_port = ipp['FromPort'], ipp['ToPort']
+            if from_port == to_port and from_port in [80, 25, 443, 465]:
+                continue
+
+            return True
+
+    return False
+
+
 def ec2_instance_test_id(ec2_instance):
     """A getter fn for test ids for EC2 instances"""
     return '{0[InstanceId]}'.format(ec2_instance)
