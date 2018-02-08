@@ -232,6 +232,8 @@ severity config, but requires additional columns for test ID (usually
 an AWS resource ID), exception expiration day (as YYYY-MM-DD), and
 exception reason.
 
+You can prefix the test ID with a `*` to enable substring matching.
+
 The config file looks like (available in `./exemptions.conf.example`):
 
 ```
@@ -239,6 +241,9 @@ The config file looks like (available in `./exemptions.conf.example`):
 # columns:
 # unparametrized test name; test_param_id; expiration day; expiration comment
 test_ec2_instance_has_required_tags i-0123456789f014c162 2019-01-01 ec2 instance has no owner
+
+# uses substring matching
+test_ec2_security_group_opens_specific_ports_to_all *HoneyPot 2020-01-01 purposefully insecure security group
 ```
 
 Pytest-services will mark matching test names and test IDs with

@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
+import re
 import warnings
 
 import pytest
@@ -36,7 +37,7 @@ def parse_conf_file(conf_fd):
     <exemption expiration> := date in YYYY-MM-DD format the exemption expires
     <exemption reason> := reason for the test exemption (e.g. S3 bucket contains public data)
     <test name> := unparametrized test name
-    <test id> := id from the parametrize decorator
+    <test id> := id from the parametrize decorator, optionally prefixed with `*` to enable fuzzy matching
     <whitespace> := anything str.split i.e. one or more ' ', '\t', or '\n' chars
 
     Examples:
@@ -47,6 +48,10 @@ def parse_conf_file(conf_fd):
 
     >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-01 in prod never allow foo\\n'
     ... )) == {'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
+    True
+
+    >>> parse_conf_file(StringIO('test_foo *foo-id 2050-01-01 in prod never allow foo\\n'
+    ... )) == {'test_foo': {'*foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
     True
 
     >>> parse_conf_file(StringIO(
@@ -133,6 +138,16 @@ def add_xfail_marker(item):
     test_exemptions = item.config.exemptions.get(item.originalname, None)
     test_id = item._genid
 
-    if test_exemptions and test_id in test_exemptions:
-        line_number, expiration, reason = test_exemptions[test_id]
-        item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
+    if test_exemptions:
+        # Check for any substring matchers
+        for exemption_test_id in test_exemptions:
+            if exemption_test_id.startswith('*'):
+                substring = exemption_test_id[1:]
+                if re.search(substring, test_id):
+                    line_number, expiration, reason = test_exemptions[test_id]
+                    item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
+                    return
+
+        if test_id in test_exemptions:
+            line_number, expiration, reason = test_exemptions[test_id]
+            item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
