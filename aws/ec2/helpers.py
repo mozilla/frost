@@ -85,19 +85,26 @@ def ip_permission_grants_access_to_group_with_id(ipp, security_group_id):
 def ec2_security_group_opens_all_ports(ec2_security_group):
     """
     Returns True if an ec2 security group includes a permission
-    allowing inbound access on all ports and False otherwise.
+    allowing inbound access on all ports and False otherwise
+    or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports(
     ... {'IpPermissions': [{}, {'FromPort': -1,'ToPort': 65536}]})
     True
 
+    >>> ec2_security_group_opens_all_ports(
+    ... {'IpPermissions': [{}, {'IpProtocol': 'icmp', 'FromPort': -1,'ToPort': -1}]})
+    False
     >>> ec2_security_group_opens_all_ports({})
     False
     """
     if 'IpPermissions' not in ec2_security_group:
         return False
 
+
     for ipp in ec2_security_group['IpPermissions']:
+        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+            continue
         if ip_permission_opens_all_ports(ipp):
             return True
 
@@ -107,7 +114,8 @@ def ec2_security_group_opens_all_ports(ec2_security_group):
 def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
     """
     Returns True if an ec2 security group includes a permission
-    allowing all IPs inbound access on all ports and False otherwise.
+    allowing all IPs inbound access on all ports and False otherwise
+    or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports_to_self({
     ... 'GroupId': 'test-sgid',
@@ -116,6 +124,12 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
     ... ]})
     True
 
+    >>> ec2_security_group_opens_all_ports_to_self({
+    ... 'GroupId': 'test-sgid',
+    ... 'IpPermissions': [
+    ...     {'IpProtocol': "icmp", 'FromPort': -1, 'ToPort': -1, 'UserIdGroupPairs': [{'GroupId': 'test-sgid'}]},
+    ... ]})
+    False
     >>> ec2_security_group_opens_all_ports_to_self({
     ... 'GroupId': 'test-sgid',
     ... 'IpPermissions': [
@@ -144,6 +158,8 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
         return False
 
     for ipp in ec2_security_group['IpPermissions']:
+        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+            continue
         if ip_permission_opens_all_ports(ipp) and \
                 ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
             return True
@@ -154,7 +170,8 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
 def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     """
     Returns True if an ec2 security group includes a permission
-    allowing all IPs inbound access on all ports and False otherwise.
+    allowing all IPs inbound access on all ports and False otherwise
+    or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports_to_all({'IpPermissions': [
     ... {'FromPort': -1,'ToPort': 65535,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
@@ -165,6 +182,10 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     ... ]})
     True
 
+    >>> ec2_security_group_opens_all_ports_to_all({'IpPermissions': [
+    ... {'IpProtocol': 'icmp','FromPort': -1,'ToPort': -1,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+    ... ]})
+    False
     >>> ec2_security_group_opens_all_ports_to_all({'IpPermissions': []})
     False
     >>> ec2_security_group_opens_all_ports_to_all({})
@@ -176,6 +197,8 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
         return False
 
     for ipp in ec2_security_group['IpPermissions']:
+        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+            continue
         if ip_permission_opens_all_ports(ipp) and ip_permission_cidr_allows_all_ips(ipp):
             return True
 
