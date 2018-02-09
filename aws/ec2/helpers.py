@@ -242,7 +242,7 @@ def ec2_security_group_opens_specific_ports_to_all(ec2_security_group):
                 continue
 
             from_port, to_port = ipp['FromPort'], ipp['ToPort']
-            if from_port == to_port and from_port in [80, 25, 443, 465]:
+            if from_port == to_port and from_port in [80, 443]:
                 continue
 
             return True
