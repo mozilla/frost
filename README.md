@@ -232,6 +232,21 @@ severity config, but requires additional columns for test ID (usually
 an AWS resource ID), exception expiration day (as YYYY-MM-DD), and
 exception reason.
 
+#### Enabling regex for test ID
+
+You can prefix the test ID with a `*` to enable regex matching for the test ID. The `*` prefix will be stripped
+off, and the rest will be used as a regex.
+
+For example:
+ - `*foobar` becomes `foobar`
+ - `*foo\w+` becomes `foo\w+`
+
+For more information on Python's regex syntax see: [Regular Expression HOWTO](https://docs.python.org/3.4/howto/regex.html#regex-howto).
+
+**Note:** All regex rules are applied first. As well, the ordering of both regex and non-regex rules is top to bottom and the first one wins.
+
+#### Exemption Config
+
 The config file looks like (available in `./exemptions.conf.example`):
 
 ```
@@ -239,6 +254,9 @@ The config file looks like (available in `./exemptions.conf.example`):
 # columns:
 # unparametrized test name; test_param_id; expiration day; expiration comment
 test_ec2_instance_has_required_tags i-0123456789f014c162 2019-01-01 ec2 instance has no owner
+
+# uses regex matching
+test_ec2_security_group_opens_specific_ports_to_all *HoneyPot 2020-01-01 purposefully insecure security group
 ```
 
 Pytest-services will mark matching test names and test IDs with
