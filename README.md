@@ -426,6 +426,9 @@ Additionally we want:
 * data fetching functions in a `resources.py`
 * data checking and test helpers in a `helpers.py`
 * prefix test files with `test_`
+* doctests for non test files (e.g. `helpers.py`, `resources.py`, `client.py`)
+  * tests that depend on external IO or the runtime environment (env vars, file system, HTTP) to use the prefix `meta_test_` (and probably `mock` or `pytest.monkeypatch`)
+    * JSON fixtures for anonymized cached http call in `example_cache/v/`
 * tests to have pytest markers for any services they depend on for data
 * HTTP clients should be read only and use read only credentials
 * running a test should not modify services
@@ -435,8 +438,16 @@ Additionally we want:
 ```console
 pytest-services
 ...
+├── example_cache
+│   └── v
+│       ├── cache
+│       │   └── lastfailed
+│       ├── pytest_aws:example-account:us-east-1:ec2:describe_instances::.json
+│       ├── pytest_aws:example-account:us-east-1:ec2:describe_security_groups::.json
+...
 ├── <third party service A>
 │   ├── client.py
+│   ├── meta_test_client.py
 │   ├── <subservice A (optional)>
 │   │   ├── __init__.py
 │   │   ├── helpers.py
