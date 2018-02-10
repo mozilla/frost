@@ -2,6 +2,14 @@ from collections import defaultdict
 
 from conftest import botocore_client
 
+from aws.elasticache.resources import elasticache_clusters
+from aws.elb.resources import (
+    elbs,
+    elbs_v2,
+)
+from aws.rds.resources import rds_db_instances
+from aws.redshift.resources import redshift_clusters
+
 
 def ec2_instances():
     "http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_instances"
@@ -39,12 +47,39 @@ def ec2_security_groups_with_in_use_flag():
     instance.
     """
     sec_groups = ec2_security_groups()
-    instances = ec2_instances()
+
+    resources = sum([ec2_instances(), elbs(), elbs_v2(), elasticache_clusters()], [])
+    vpc_namespaced_resources = sum([rds_db_instances(), redshift_clusters()], [])
+
+    # Included:
+    # - ELBs (v1 and v2?)
+    # - RDS
+    # - Redshift
+    # - ElasticCache
+
+    # TODO:
+    # Need to include:
+    # - AutoScaling (describe_launch_configurations)
+    #
+    # - ElasticSearchService
+    #   - Are these just ec2 instances?
+    # - EMR?
+    #   - Are these just ec2 instances?
 
     in_use_sec_group_ids = defaultdict(int)
-    for instance in instances:
-        for attached_sec_group in instance['SecurityGroups']:
-            in_use_sec_group_ids[attached_sec_group['GroupId']] += 1
+    for resource in resources:
+        for attached_sec_group in resource.get('SecurityGroups', []):
+            if isinstance(attached_sec_group, dict):
+                if attached_sec_group.get('GroupId'):
+                    in_use_sec_group_ids[attached_sec_group['GroupId']] += 1
+                if attached_sec_group.get('SecurityGroupId'):
+                    in_use_sec_group_ids[attached_sec_group['SecurityGroupId']] += 1
+            elif isinstance(attached_sec_group, str):
+                in_use_sec_group_ids[attached_sec_group] += 1
+
+    for resource in vpc_namespaced_resources:
+        for attached_sec_group in resource['VpcSecurityGroups']:
+            in_use_sec_group_ids[attached_sec_group['VpcSecurityGroupId']] += 1
 
     for sec_group in sec_groups:
         if sec_group["GroupId"] in in_use_sec_group_ids.keys():
