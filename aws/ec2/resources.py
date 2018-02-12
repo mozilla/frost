@@ -9,6 +9,7 @@ from aws.elb.resources import (
 )
 from aws.rds.resources import rds_db_instances
 from aws.redshift.resources import redshift_clusters
+from aws.elasticsearch.resources import elasticsearch_domains
 
 
 def ec2_instances():
@@ -70,16 +71,19 @@ def ec2_security_groups_with_in_use_flag():
     for resource in resources:
         for attached_sec_group in resource.get('SecurityGroups', []):
             if isinstance(attached_sec_group, dict):
-                if attached_sec_group.get('GroupId'):
-                    in_use_sec_group_ids[attached_sec_group['GroupId']] += 1
-                if attached_sec_group.get('SecurityGroupId'):
-                    in_use_sec_group_ids[attached_sec_group['SecurityGroupId']] += 1
+                for key in ['SecurityGroupId', 'GroupId']:
+                    if key in attached_sec_group:
+                        in_use_sec_group_ids[attached_sec_group[key]] += 1
             elif isinstance(attached_sec_group, str):
                 in_use_sec_group_ids[attached_sec_group] += 1
 
     for resource in vpc_namespaced_resources:
         for attached_sec_group in resource['VpcSecurityGroups']:
             in_use_sec_group_ids[attached_sec_group['VpcSecurityGroupId']] += 1
+
+    for domain in elasticsearch_domains():
+        for attached_sec_group in domain['VPCOptions']['SecurityGroupIds']:
+            in_use_sec_group_ids[attached_sec_group] += 1
 
     for sec_group in sec_groups:
         if sec_group["GroupId"] in in_use_sec_group_ids.keys():
