@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from conftest import botocore_client
 
+from aws.autoscaling.resources import autoscaling_launch_configurations
 from aws.elasticache.resources import elasticache_clusters
 from aws.elb.resources import (
     elbs,
@@ -44,26 +45,30 @@ def ec2_ebs_volumes():
 
 def ec2_security_groups_with_in_use_flag():
     """Returns security groups with an additional "InUse" key,
-    which is True if it is associated with at least one EC2
-    instance.
+    which is True if it is associated with at least one resource.
+
+    Possible resources:
+    - EC2
+    - ELBs (v1 and v2)
+    - RDS
+    - Redshift
+    - ElasticCache
+    - ElasticSearchService
+    - AutoScaling
     """
     sec_groups = ec2_security_groups()
 
-    resources = sum([ec2_instances(), elbs(), elbs_v2(), elasticache_clusters()], [])
+    resources = sum([
+        ec2_instances(),
+        elbs(),
+        elbs_v2(),
+        elasticache_clusters(),
+        autoscaling_launch_configurations()
+    ], [])
     vpc_namespaced_resources = sum([rds_db_instances(), redshift_clusters()], [])
-
-    # Included:
-    # - ELBs (v1 and v2?)
-    # - RDS
-    # - Redshift
-    # - ElasticCache
 
     # TODO:
     # Need to include:
-    # - AutoScaling (describe_launch_configurations)
-    #
-    # - ElasticSearchService
-    #   - Are these just ec2 instances?
     # - EMR?
     #   - Are these just ec2 instances?
 
@@ -82,8 +87,9 @@ def ec2_security_groups_with_in_use_flag():
             in_use_sec_group_ids[attached_sec_group['VpcSecurityGroupId']] += 1
 
     for domain in elasticsearch_domains():
-        for attached_sec_group in domain['VPCOptions']['SecurityGroupIds']:
-            in_use_sec_group_ids[attached_sec_group] += 1
+        if 'VPCOptions' in domain:
+            for attached_sec_group in domain['VPCOptions']['SecurityGroupIds']:
+                in_use_sec_group_ids[attached_sec_group] += 1
 
     for sec_group in sec_groups:
         if sec_group["GroupId"] in in_use_sec_group_ids.keys():
