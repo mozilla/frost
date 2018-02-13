@@ -96,6 +96,7 @@ METADATA_KEYS = [
     'UserName',
     'VolumeId',
     'VpcId',
+    '__pytest_meta',
 ]
 
 
