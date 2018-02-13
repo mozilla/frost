@@ -11,14 +11,16 @@ all: check_venv
 	pytest
 
 awsci: check_venv
-	pytest --continue-on-collection-errors aws/ --json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
+	pytest --continue-on-collection-errors aws/ \
+		--ignore aws/ec2/test_ec2_security_group_in_use.py \
+		--json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
 aws-sg: check_venv
 	pytest --continue-on-collection-errors \
-		aws/ec2/test_ec2_security_group_in_use.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports_to_all.py \
 		aws/ec2/test_ec2_security_group_opens_all_ports_to_self.py \
+		aws/ec2/test_ec2_security_group_opens_specific_ports_to_all.py \
 		aws/rds/test_rds_db_security_group_does_not_grant_public_access.py \
 		aws/rds/test_rds_db_instance_not_publicly_accessible_by_vpc_sg.py \
 		--json=results-sg-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
