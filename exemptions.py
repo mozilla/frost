@@ -144,7 +144,7 @@ def add_xfail_marker(item):
             if exemption_test_id.startswith('*'):
                 substring = exemption_test_id[1:]
                 if re.search(substring, test_id):
-                    line_number, expiration, reason = test_exemptions[test_id]
+                    line_number, expiration, reason = test_exemptions[exemption_test_id]
                     item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
                     return
 
