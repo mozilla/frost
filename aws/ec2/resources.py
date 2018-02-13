@@ -2,6 +2,16 @@ from collections import defaultdict
 
 from conftest import botocore_client
 
+from aws.autoscaling.resources import autoscaling_launch_configurations
+from aws.elasticache.resources import elasticache_clusters
+from aws.elb.resources import (
+    elbs,
+    elbs_v2,
+)
+from aws.rds.resources import rds_db_instances
+from aws.redshift.resources import redshift_clusters
+from aws.elasticsearch.resources import elasticsearch_domains
+
 
 def ec2_instances():
     "http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_instances"
@@ -35,16 +45,53 @@ def ec2_ebs_volumes():
 
 def ec2_security_groups_with_in_use_flag():
     """Returns security groups with an additional "InUse" key,
-    which is True if it is associated with at least one EC2
-    instance.
+    which is True if it is associated with at least one resource.
+
+    Possible resources:
+    - EC2
+    - ELBs (v1 and v2)
+    - RDS
+    - Redshift
+    - ElasticCache
+    - ElasticSearchService
+    - AutoScaling
     """
     sec_groups = ec2_security_groups()
-    instances = ec2_instances()
-
     in_use_sec_group_ids = defaultdict(int)
-    for instance in instances:
-        for attached_sec_group in instance['SecurityGroups']:
-            in_use_sec_group_ids[attached_sec_group['GroupId']] += 1
+
+    # These resources have their security groups under 'SecurityGroups'.
+    # Most of these are a list of dictionaries which include either SecurityGroupId
+    # or GroupId, but some have just a list of group ids.
+    resources = sum([
+        ec2_instances(),
+        elbs(),
+        elbs_v2(),
+        elasticache_clusters(),
+        autoscaling_launch_configurations()
+    ], [])
+    for resource in resources:
+        for attached_sec_group in resource.get('SecurityGroups', []):
+            if isinstance(attached_sec_group, dict):
+                for key in ['SecurityGroupId', 'GroupId']:
+                    if key in attached_sec_group:
+                        in_use_sec_group_ids[attached_sec_group[key]] += 1
+            elif isinstance(attached_sec_group, str):
+                in_use_sec_group_ids[attached_sec_group] += 1
+            else:
+                raise Exception("Got security group value with a type of %s" % type(attached_sec_group))
+
+    # These resources have two types of security groups, therefore
+    # the Vpc ones are namespaced under "VpcSecurityGroups"
+    vpc_namespaced_resources = sum([rds_db_instances(), redshift_clusters()], [])
+    for resource in vpc_namespaced_resources:
+        for attached_sec_group in resource.get('VpcSecurityGroups', []):
+            in_use_sec_group_ids[attached_sec_group['VpcSecurityGroupId']] += 1
+
+    # ElasticSearchService does it a little differently
+    for domain in elasticsearch_domains():
+        if 'VPCOptions' in domain:
+            for attached_sec_group in domain['VPCOptions']['SecurityGroupIds']:
+                in_use_sec_group_ids[attached_sec_group] += 1
 
     for sec_group in sec_groups:
         if sec_group["GroupId"] in in_use_sec_group_ids.keys():
