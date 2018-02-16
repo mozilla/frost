@@ -63,6 +63,7 @@ and options pytest-services adds:
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
 * `--aws-require-tag` adds Tag names to check on all EC2 instances for the `aws.ec2.test_ec2_instance_has_required_tags` test
+* `--aws-whitelisted-ports` adds ports to the whitelist for the `aws.ec2.test_ec2_security_group_opens_specific_ports_to_all` test
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--severity-config`](#test-severity) path to a config file for marking different tests with different severities
 * [`--exemptions-config`](#test-exemptions) path to a config file for marking test name and resource IDs as expected failures

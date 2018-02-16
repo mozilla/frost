@@ -20,6 +20,7 @@ def test_ec2_security_group_opens_specific_ports_to_all(ec2_security_group):
     inbound access on specific ports. Excluded ports are 80 and 443.
     """
     if ec2_security_group["InUse"]:
+        # Additional ports can be whitelisted with --aws-whitelisted-ports
         assert not ec2_security_group_opens_specific_ports_to_all(ec2_security_group)
     else:
         pytest.skip("Security group not in use")
