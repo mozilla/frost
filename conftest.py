@@ -13,6 +13,7 @@ import severity
 
 
 botocore_client = None
+whitelisted_ports = None
 
 
 def pytest_addoption(parser):
@@ -37,6 +38,12 @@ def pytest_addoption(parser):
                      default=[],
                      help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
 
+    parser.addoption('--aws-whitelisted-ports',
+                     nargs='*',
+                     default=[],
+                     help='Additional ports to whitelist for '
+                          'aws.ec2.test_ec2_security_group_opens_specific_ports_to_all test.')
+
     parser.addoption('--offline',
                      action='store_true',
                      default=False,
@@ -53,11 +60,14 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     global botocore_client
+    global whitelisted_ports
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
     profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
+
+    whitelisted_ports = frozenset([int(port) for port in config.getoption('--aws-whitelisted-ports')])
 
     botocore_client = BotocoreClient(
         profiles=profiles,

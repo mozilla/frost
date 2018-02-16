@@ -1,3 +1,4 @@
+from conftest import whitelisted_ports
 
 
 def ip_permission_opens_all_ports(ipp):
@@ -243,6 +244,9 @@ def ec2_security_group_opens_specific_ports_to_all(ec2_security_group):
 
             from_port, to_port = ipp['FromPort'], ipp['ToPort']
             if from_port == to_port and from_port in [80, 443]:
+                continue
+
+            if from_port == to_port and from_port in whitelisted_ports:
                 continue
 
             return True
