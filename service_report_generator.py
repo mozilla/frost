@@ -174,6 +174,11 @@ class CsvReportGenerator(ReportGenerator):
                 resource_name = self._extract_resource_name(result['name'])
 
                 rtype = self._get_resource_type(test_name)
+
+                display_resource_name = resource_name
+                if rtype == "Security Group":
+                    display_resource_name = " ".join(resource_name.split(" ")[1:])
+
                 rid = self._get_resource_id(rtype, resource_name, result)
 
                 # Get App and Owner Tag
@@ -187,7 +192,7 @@ class CsvReportGenerator(ReportGenerator):
                     test_name,
                     rtype,
                     rid,
-                    resource_name,
+                    display_resource_name,
                     region,
                     app,
                     owner
