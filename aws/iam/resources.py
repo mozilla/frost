@@ -1,3 +1,6 @@
+import csv
+import time
+
 from conftest import botocore_client
 
 
@@ -8,6 +11,10 @@ def iam_users():
         .extract_key('Users')\
         .flatten()\
         .values()
+
+
+def iam_admin_users():
+    return [user for user in iam_users_with_policies() if user_is_admin(user)]
 
 
 def iam_inline_policies(username):
@@ -99,12 +106,12 @@ def iam_users_with_policies():
 
 def iam_admin_login_profiles():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
-    return iam_login_profiles([user for user in iam_users_with_policies() if user_is_admin(user)])
+    return iam_login_profiles(iam_admin_users())
 
 
 def iam_admin_mfa_devices():
     "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
-    return iam_mfa_devices([user for user in iam_users_with_policies() if user_is_admin(user)])
+    return iam_mfa_devices(iam_admin_users())
 
 
 def iam_user_login_profiles():
@@ -144,6 +151,44 @@ def iam_mfa_devices(users):
         .values()[0]
         for user in users
     ]
+
+
+def iam_generate_credential_report():
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report"
+    return botocore_client.get('iam', 'generate_credential_report', [], {}, dont_cache=True).results[0].get('State')
+
+
+def iam_get_credential_report():
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_credential_report"
+    # the story of the wack api
+    while True:
+        cred_report_state = iam_generate_credential_report()
+        if cred_report_state not in ['STARTED', 'INPROGRESS']:
+            break
+        time.sleep(2)
+
+    # We want this to blow up if it can't get the "Content"
+    content = botocore_client.get('iam', 'get_credential_report', [], {}, dont_cache=True).results[0]['Content']
+    decoded_content = content.decode("utf-8")
+    return list(csv.DictReader(decoded_content.split("\n")))
+
+
+# (ajvb) I'm not a big fan of this, but it seems to be the easiest way to
+# only have to call `get_credential_report` once since it is not easily cacheable.
+def iam_admin_users_with_credential_report():
+    """Returns all "admin" users with an additional "CredentialReport" key,
+    which is a dict containing their row in the Credentials Report.
+    """
+    admins = iam_admin_users()
+    credential_report = iam_get_credential_report()
+
+    for admin in admins:
+        for user in credential_report:
+            if admin['UserName'] == user['user']:
+                admin["CredentialReport"] = user
+                break
+
+    return admins
 
 
 # FIXME
