@@ -177,7 +177,7 @@ class BotocoreClient:
             profiles=None,
             regions=None,
             result_from_error=None,
-            dont_cache=False):
+            do_not_cache=False):
 
         # TODO:
         # For services that don't have the concept of regions,
@@ -197,7 +197,7 @@ class BotocoreClient:
                 call_kwargs,
                 profiles=profiles or self.profiles,
                 regions=regions or self.regions,
-                cache=self.cache if not dont_cache else None,
+                cache=self.cache if not do_not_cache else None,
                 result_from_error=result_from_error,
                 debug_calls=self.debug_calls,
                 debug_cache=self.debug_cache))
