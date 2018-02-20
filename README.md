@@ -122,6 +122,8 @@ The below policy will allow you to run all AWS tests in pytest-services against 
         "elasticloadbalancing:DescribeLoadBalancers",
         "es:DescribeElasticsearchDomains",
         "es:ListDomainNames",
+        "iam:GenerateCredentialReport",
+        "iam:GetCredentialReport",
         "iam:GetLoginProfile",
         "iam:ListAttachedGroupPolicies",
         "iam:ListAttachedUserPolicies",
