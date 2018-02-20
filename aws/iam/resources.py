@@ -155,7 +155,10 @@ def iam_mfa_devices(users):
 
 def iam_generate_credential_report():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report"
-    return botocore_client.get('iam', 'generate_credential_report', [], {}, do_not_cache=True).results[0].get('State')
+    results = botocore_client.get('iam', 'generate_credential_report', [], {}, do_not_cache=True).results
+    if len(results):
+        return results[0].get('State')
+    return ""
 
 
 def iam_get_credential_report():
@@ -168,7 +171,10 @@ def iam_get_credential_report():
         time.sleep(2)
 
     # We want this to blow up if it can't get the "Content"
-    content = botocore_client.get('iam', 'get_credential_report', [], {}, do_not_cache=True).results[0]['Content']
+    results = botocore_client.get('iam', 'get_credential_report', [], {}, do_not_cache=True).results
+    if not len(results):
+        return []
+    content = results[0]['Content']
     decoded_content = content.decode("utf-8")
     return list(csv.DictReader(decoded_content.split("\n")))
 
