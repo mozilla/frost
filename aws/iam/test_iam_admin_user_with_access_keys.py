@@ -1,0 +1,18 @@
+import pytest
+
+from aws.iam.resources import iam_admin_users_with_credential_report
+
+
+@pytest.mark.iam
+@pytest.mark.parametrize(
+        'iam_admin_user',
+        iam_admin_users_with_credential_report(),
+        ids=lambda login: login['UserName'])
+def test_iam_admin_user_with_access_key(iam_admin_user):
+    """Test that all "admin" users do not have access keys
+    associated to their user.
+    """
+    assert iam_admin_user['CredentialReport']['access_key_1_active'] != 'true', \
+        'Access key found for admin user: {}'.format(iam_admin_user['UserName'])
+    assert iam_admin_user['CredentialReport']['access_key_2_active'] != 'true', \
+        'Access key found for admin user: {}'.format(iam_admin_user['UserName'])

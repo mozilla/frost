@@ -113,14 +113,17 @@ def get_aws_resource(service_name,
                                      method=method_name,
                                      args=call_args,
                                      kwargs=call_kwargs)
-        ckey = cache_key(call)
 
         if debug_calls:
             print('calling', call)
 
-        cached_result = cache.get(ckey, None)
-        if debug_cache and cached_result is not None:
-            print('found cached value for', ckey)
+        cached_result = None
+        if cache is not None:
+            ckey = cache_key(call)
+            cached_result = cache.get(ckey, None)
+
+            if debug_cache and cached_result is not None:
+                print('found cached value for', ckey)
 
         if cached_result is not None:
             result = cached_result
@@ -138,10 +141,11 @@ def get_aws_resource(service_name,
 
                     result = result_from_error(error, call)
 
-            if debug_cache:
-                print('setting cache value for', ckey)
+            if cache is not None:
+                if debug_cache:
+                    print('setting cache value for', ckey)
 
-            cache.set(ckey, result)
+                cache.set(ckey, result)
 
         yield result
 
@@ -172,7 +176,8 @@ class BotocoreClient:
             call_kwargs,
             profiles=None,
             regions=None,
-            result_from_error=None):
+            result_from_error=None,
+            do_not_cache=False):
 
         # TODO:
         # For services that don't have the concept of regions,
@@ -192,7 +197,7 @@ class BotocoreClient:
                 call_kwargs,
                 profiles=profiles or self.profiles,
                 regions=regions or self.regions,
-                cache=self.cache,
+                cache=self.cache if not do_not_cache else None,
                 result_from_error=result_from_error,
                 debug_calls=self.debug_calls,
                 debug_cache=self.debug_cache))
