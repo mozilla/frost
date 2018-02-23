@@ -36,14 +36,13 @@ class AWSConfig:
         self.whitelisted_ports = config.get('whitelisted_ports', [])
 
     def overlay_cli_opts(self, cli_opts):
-        # TODO: move keys to consts
-        if 'aws-required-tags' in cli_opts:
-            self.required_tags = frozenset(cli_opts['aws-required-tags'])
-        if 'aws-whitelisted-ports' in cli_opts:
+        if len(cli_opts['aws-require-tags']):
+            self.required_tags = frozenset(cli_opts['aws-require-tags'])
+        if len(cli_opts['aws-whitelisted-ports']):
             self.whitelisted_ports_global = set(cli_opts['aws-whitelisted-ports'])
 
     def get_whitelisted_ports(self, test_id):
-        self.get_whitelisted_ports_from_test_id(test_id) + self.whitelisted_ports_global
+        return self.get_whitelisted_ports_from_test_id(test_id) | self.whitelisted_ports_global
 
     def get_whitelisted_ports_from_test_id(self, test_id):
         for rule in self.whitelisted_ports:

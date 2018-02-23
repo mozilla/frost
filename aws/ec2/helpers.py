@@ -202,7 +202,7 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     return False
 
 
-def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelisted_ports=[]):
+def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelisted_ports=None):
     """
     Returns True if an ec2 security group includes a permission
     allowing all IPs inbound access on specific unsafe ports and False
@@ -228,6 +228,9 @@ def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelist
     >>> ec2_security_group_opens_specific_ports_to_all([])
     False
     """
+    if whitelisted_ports is None:
+        whitelisted_ports = []
+
     if 'IpPermissions' not in ec2_security_group:
         return False
 
