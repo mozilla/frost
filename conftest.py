@@ -176,6 +176,7 @@ def pytest_runtest_makereport(item, call):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         severity = markers.get('severity', None) and markers.get('severity')['args'][0]
+        regression = markers.get('regression', None) and markers.get('regression')['args'][0]
         outcome, reason = get_outcome_and_reason(report, markers, call)
         rationale = markers.get('rationale', None) and \
             clean_docstring(markers.get('rationale')['args'][0])
@@ -191,5 +192,6 @@ def pytest_runtest_makereport(item, call):
             rationale=rationale,
             reason=reason,
             severity=severity,
+            regression=regression,
             unparametrized_name=item.originalname,
         )

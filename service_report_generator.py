@@ -35,9 +35,10 @@ Pytest Service JSON format:
        'reason':  # pytest test outcome reason if any (e.g. resource fetch failed)
        'markers':  # pytest markers on the test e.g. aws service, ruleset
        'metadata':  # additional metadata on the resource being tested
-       'rationale': # (optional) rationale behind the test.
-       'description': # (optional) description of the test
-       'severity': # (optional) severity of the test
+       'rationale': # (optional) rationale behind the test. (null if not set)
+       'description': # (optional) description of the test (null if not set)
+       'severity': # (optional) severity of the test (null if not set)
+       'regression': # (optional) regression comment (null if not set)
     },
     ...
   ]
@@ -312,6 +313,7 @@ def get_result_for_test(test):
         'rationale': meta['rationale'],
         'description': meta['description'],
         'severity': meta['severity'],
+        'regression': meta['regression'],
     }
 
 
