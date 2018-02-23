@@ -9,7 +9,7 @@ from aws.ec2.resources import ec2_instances
 
 @pytest.fixture
 def required_tag_names(pytestconfig):
-    return frozenset(pytestconfig.getoption('--aws-require-tags'))
+    return frozenset(pytestconfig.custom_config.aws.required_tags)
 
 
 @pytest.mark.ec2

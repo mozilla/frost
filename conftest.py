@@ -1,5 +1,3 @@
-
-
 import argparse
 
 import pytest
@@ -8,8 +6,8 @@ from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
-import exemptions
-import severity
+
+import custom_config
 
 
 botocore_client = None
@@ -49,13 +47,9 @@ def pytest_addoption(parser):
                      default=False,
                      help='Instruct service clients to return empty lists and not make HTTP requests.')
 
-    parser.addoption('--severity-config',
+    parser.addoption('--config',
                      type=argparse.FileType('r'),
-                     help='Path to a config file specifying test severity levels.')
-
-    parser.addoption('--exemptions-config',
-                     type=argparse.FileType('r'),
-                     help='Path to a config file specifying test and resource exemptions.')
+                     help='Path to the config file.')
 
 
 def pytest_configure(config):
@@ -77,16 +71,23 @@ def pytest_configure(config):
         debug_cache=config.getoption('--aws-debug-cache'),
         offline=config.getoption('--offline'))
 
-    config.exemptions = exemptions.parse_conf_file(config.getoption('--exemptions-config'))
-    config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
+    config.custom_config = custom_config.CustomConfig(config.getoption('--config'))
+    config.custom_config.overlay_cli_opts({
+        'aws-require-tags': config.getoption('--aws-require-tags'),
+        'aws-whitelisted-ports': frozenset([int(port) for port in config.getoption('--aws-whitelisted-ports')])
+    })
+
+
+@pytest.fixture
+def aws_config(pytestconfig):
+    return pytestconfig.custom_config.aws
 
 
 def pytest_runtest_setup(item):
     """
     """
     if not isinstance(item, DoctestItem):
-        severity.add_severity_marker(item)
-        exemptions.add_xfail_marker(item)
+        item.config.custom_config.add_markers(item)
 
 
 # Reporting

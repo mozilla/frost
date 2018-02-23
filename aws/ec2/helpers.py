@@ -1,6 +1,3 @@
-from conftest import whitelisted_ports
-
-
 def ip_permission_opens_all_ports(ipp):
     """
     Returns True if an EC2 security group IP permission opens all
@@ -205,7 +202,7 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     return False
 
 
-def ec2_security_group_opens_specific_ports_to_all(ec2_security_group):
+def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelisted_ports=[]):
     """
     Returns True if an ec2 security group includes a permission
     allowing all IPs inbound access on specific unsafe ports and False

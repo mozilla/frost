@@ -1,14 +1,14 @@
 
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import date
 import re
 import warnings
 
 import pytest
 
 
-def parse_conf_file(conf_fd):
+def load(rules):
     """Marks tests as xfail based on test name and ID.
 
     Parses an open exemptions conf file and returns a two level dict with format:
@@ -92,39 +92,32 @@ def parse_conf_file(conf_fd):
     Does not check that test name and IDs exist (since names might not
     be collected and IDs can require an HTTP call).
     """
-    # dict of test name to severity level
-    rules = defaultdict(dict)
+    processed_rules = defaultdict(dict)
 
-    if not conf_fd:
-        return rules
+    if not rules:
+        return processed_rules
 
-    for line_number, line in enumerate(conf_fd):
-        if line.startswith('#'):
+    for rule in rules:
+        test_name, test_id = rule['test_name'], rule['test_param_id']
+        expiration, reason = rule['expiration_day'], rule['reason']
+
+        if expiration < date.today():
+            warnings.warn(
+                'Exemptions: test_name: {} | test_id: {} | Skipping line with expiration day in the past {!r}'
+                .format(test_name, test_id, expiration)
+            )
             continue
 
-        line_parts = line.split(maxsplit=3)
-        if len(line_parts) < 4:
-            warnings.warn('Line {}: Skipping line with fewer than 4 whitespace delimited parts.'.format(line_number))
+        if test_id in processed_rules[test_name]:
+            warnings.warn(
+                'Exemptions: test_name: {} | test_id: {} | Skipping line with duplicate test name and ID'
+                .format(test_name, test_id)
+            )
             continue
 
-        test_name, test_id, expiration, reason = line_parts[0], line_parts[1], line_parts[2], line_parts[3].strip('\n')
-        try:
-            expiration_date = datetime.strptime(expiration, '%Y-%m-%d')
-        except ValueError:
-            warnings.warn('Line {}: Skipping line with invalid expiration day {!r}'.format(line_number, expiration))
-            continue
-        if expiration_date < datetime.now():
-            warnings.warn('Line {}: Skipping line with expiration day in the past {!r}'.format(line_number, expiration))
-            continue
+        processed_rules[test_name][test_id] = (expiration, reason)
 
-        if test_id in rules[test_name]:
-            warnings.warn('Line {}: Skipping line with duplicate test name and ID {!r} {!r}'.format(
-                line_number, test_name, test_id))
-            continue
-
-        rules[test_name][test_id] = (line_number, expiration, reason)
-
-    return rules
+    return processed_rules
 
 
 def add_xfail_marker(item):
@@ -135,7 +128,7 @@ def add_xfail_marker(item):
         warnings.warn('Skipping exemption checks for test without resource name {!r}'.format(item.name))
         return
 
-    test_exemptions = item.config.exemptions.get(item.originalname, None)
+    test_exemptions = item.config.custom_config.exemptions.get(item.originalname, None)
     test_id = item._genid
 
     if test_exemptions:
@@ -144,10 +137,10 @@ def add_xfail_marker(item):
             if exemption_test_id.startswith('*'):
                 substring = exemption_test_id[1:]
                 if re.search(substring, test_id):
-                    line_number, expiration, reason = test_exemptions[exemption_test_id]
+                    expiration, reason = test_exemptions[exemption_test_id]
                     item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
                     return
 
         if test_id in test_exemptions:
-            line_number, expiration, reason = test_exemptions[test_id]
+            expiration, reason = test_exemptions[test_id]
             item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
