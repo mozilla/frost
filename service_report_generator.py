@@ -120,10 +120,12 @@ class ReportGenerator:
         return bool(self.test_status_counter[test_name+'_'+status])
 
     def _get_resource_type(self, test_name):
-        if 'security_group' in test_name:
-            return 'Security Group'
         if 'rds' in test_name:
             return 'RDS'
+        if 'security_group' in test_name:
+            return 'Security Group'
+        if 'iam' in test_name:
+            return 'IAM'
         return ''
 
     def _get_resource_id(self, resource_type, resource_name, result_metadata):
