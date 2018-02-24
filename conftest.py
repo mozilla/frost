@@ -11,7 +11,6 @@ import custom_config
 
 
 botocore_client = None
-whitelisted_ports = None
 
 
 def pytest_addoption(parser):
@@ -54,14 +53,11 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     global botocore_client
-    global whitelisted_ports
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
     profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
-
-    whitelisted_ports = frozenset([int(port) for port in config.getoption('--aws-whitelisted-ports')])
 
     botocore_client = BotocoreClient(
         profiles=profiles,
