@@ -16,54 +16,29 @@ SEVERITY_LEVELS = [
 
 def load(rules):
     """
-    Parses an open severity conf file and returns a dict of test name to severity level for tests.
+    Parses severities section of the conf file and returns a dict of test name to severity level for tests.
 
-    The files consist of:
-
-    comment lines that have the format:
-
-    '#'<anything>\n
-
-    test severity lines that have either of the formats:
-
-    <test matcher><whitespace><severity>\n
-
-    <test matcher><whitespace><severity><whitespace><comment>\n
-
-    where:
-
-    <anything> := is any non newline character
-    <test matcher> := is an unparametrized test name or '*' to match all tests
-    <severity> := is one of INFO, WARN, or ERROR
-    <whitespace> := anything str.split i.e. one or more ' ', '\t', or '\n' chars
-
-    >>> from io import StringIO
-    >>> parse_conf_file(StringIO('# comment'))
-    {}
-    >>> parse_conf_file(StringIO('test_foo ERROR in prod never allow foo'))
+    >>> load([{'test_name': 'test_foo', 'severity': 'ERROR'}])
     {'test_foo': 'ERROR'}
-    >>> parse_conf_file(StringIO('* INFO'))  # doctest:+ELLIPSIS
-    defaultdict(<function parse_conf_file.<locals>.<lambda> at 0x...>, {})
-    >>> parse_conf_file(StringIO('test_foo ERROR\\ntest_bar INFO')) == {'test_foo': 'ERROR', 'test_bar': 'INFO'}
+    >>> load([{'test_name': '*', 'severity': 'INFO'}])  # doctest:+ELLIPSIS
+    defaultdict(<function load.<locals>.<lambda> at 0x...>, {})
+    >>> load([
+    ... {'test_name': 'test_foo', 'severity': 'ERROR'}, {'test_name': 'test_bar', 'severity': 'INFO'}
+    ... ]) == {'test_foo': 'ERROR', 'test_bar': 'INFO'}
     True
-
-    Short lines are skipped with a warning:
-
-    >>> parse_conf_file(StringIO('invalid'))
-    {}
-    >>> # UserWarning: Line 0: Skipping line with fewer than 2 whitespace delimited parts.
-
 
     Invalid severity levels are skipped with a warning:
 
-    >>> parse_conf_file(StringIO('test AHHH!'))
+    >>> load([{'test_name': 'test_foo', 'severity': 'AHHH!'}])
     {}
     >>> # UserWarning: Line 0: Skipping line with invalid severity level 'AHHH!'
 
 
     Duplicate test names are ignored with a warning:
 
-    >>> parse_conf_file(StringIO('test_foo INFO\\ntest_foo WARN')) == {'test_foo': 'INFO'}
+    >>> load([
+    ... {'test_name': 'test_foo', 'severity': 'ERROR'}, {'test_name': 'test_foo', 'severity': 'INFO'}
+    ... ]) == {'test_foo': 'ERROR'}
     True
     >>> # UserWarning: Line 1: Skipping line with duplicate test name 'test_foo'
 

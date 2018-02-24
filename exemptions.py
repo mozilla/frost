@@ -11,81 +11,73 @@ import pytest
 def load(rules):
     """Marks tests as xfail based on test name and ID.
 
-    Parses an open exemptions conf file and returns a two level dict with format:
+    Parses the exemptions section of the conf file and returns a two level dict with format:
 
     {<test_name>:
-        {<test_id>: (<exemption line number>, <exemption expiration>, <exemption reason>)
+        {<test_id>: (<exemption expiration>, <exemption reason>)
         ...
         }
     ...
     }
 
-    The config file consists of:
-
-    comment lines that have the format:
-
-    '#'<anything>\n
-
-    and exemption lines with the format:
-
-    <test name><whitespace><test id><whitespace><exemption expiration><whitespace><exemption reason>\n
-
-    where:
-
-    <anything> := is any non newline character
-    <exemption line number> := line number from the exemption config file
-    <exemption expiration> := date in YYYY-MM-DD format the exemption expires
-    <exemption reason> := reason for the test exemption (e.g. S3 bucket contains public data)
-    <test name> := unparametrized test name
-    <test id> := id from the parametrize decorator, optionally prefixed with `*` to enable fuzzy matching
-    <whitespace> := anything str.split i.e. one or more ' ', '\t', or '\n' chars
-
     Examples:
 
-    >>> from io import StringIO
-    >>> parse_conf_file(StringIO('# comment')) == {}
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'expiration_day': date(2050, 1, 1),
+    ... 'reason': 'in prod never allow foo'
+    ... }
+    ... ]) == {'test_foo': {'foo-id': ('2050-01-01', 'in prod never allow foo')}}
     True
 
-    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-01 in prod never allow foo\\n'
-    ... )) == {'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
+    >>> load([
+    ... {
+    ... 'test_name': '*test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'expiration_day': date(2050, 1, 1),
+    ... 'reason': 'in prod never allow foo'
+    ... }
+    ... ]) == {'*test_foo': {'foo-id': ('2050-01-01', 'in prod never allow foo')}}
     True
 
-    >>> parse_conf_file(StringIO('test_foo *foo-id 2050-01-01 in prod never allow foo\\n'
-    ... )) == {'test_foo': {'*foo-id': (0, '2050-01-01', 'in prod never allow foo')}}
-    True
-
-    >>> parse_conf_file(StringIO(
-    ... 'test_foo foo-id 2050-01-01 in prod never allow foo for foo-id\\n'
-    ... 'test_foo bar-id 2050-01-01 in prod never allow foo for bar-id'
-    ... )) == {
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'expiration_day': date(2050, 1, 1),
+    ... 'reason': 'in prod never allow foo'
+    ... },
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'bar-id',
+    ... 'expiration_day': date(2050, 1, 1),
+    ... 'reason': 'in prod never allow bar'
+    ... }
+    ... ]) == {
     ... 'test_foo': {
-    ... 'foo-id': (0, '2050-01-01', 'in prod never allow foo for foo-id'),
-    ... 'bar-id': (1, '2050-01-01', 'in prod never allow foo for bar-id')}}
+    ... 'foo-id': ('2050-01-01', 'in prod never allow foo'),
+    ... 'bar-id': ('2050-01-01', 'in prod never allow bar')}}
     True
 
-
-    Short lines are skipped with a warning:
-
-    >>> parse_conf_file(StringIO('invalid line')) == {}
-    True
-    >>> # UserWarning: Line 0: Skipping line with fewer than 4 whitespace delimited parts.
-
-    Invalid expirations dates are skipped with a warning:
-
-    >>> parse_conf_file(StringIO('test_foo foo-id 2050-01-AA in prod never allow foo')) == {}
-    True
-    >>> # UserWarning: Line 0: Skipping line with invalid expiration day '2050-01-AA'
-    >>> parse_conf_file(StringIO('test_foo foo-id 2000-01-01 in prod never allow foo')) == {}
-    True
-    >>> # UserWarning: Line 0: Skipping line with expiration day in the past '2000-01-01'
 
     Duplicate test name and IDs are ignored with a warning:
 
-    >>> parse_conf_file(StringIO(
-    ... 'test_foo foo-id 2050-01-01 in prod never allow foo for foo-id\\n'
-    ... 'test_foo foo-id 2051-01-01 in prod never allow foo for bar-id'
-    ... )) == {
-    ... 'test_foo': {'foo-id': (0, '2050-01-01', 'in prod never allow foo for foo-id')}}
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'expiration_day': date(2050, 1, 1),
+    ... 'reason': 'in prod never allow foo'
+    ... },
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'expiration_day': date(2051, 1, 1),
+    ... 'reason': 'in prod never allow foo another'
+    ... }
+    ... ]) == {'test_foo': {'foo-id': ('2050-01-01', 'in prod never allow foo')}}
     True
     >>> # UserWarning: Line 1: Skipping line with duplicate test name and ID 'test_foo' 'foo-id'
 
@@ -115,7 +107,7 @@ def load(rules):
             )
             continue
 
-        processed_rules[test_name][test_id] = (expiration, reason)
+        processed_rules[test_name][test_id] = (str(expiration), reason)
 
     return processed_rules
 
