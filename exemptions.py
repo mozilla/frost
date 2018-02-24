@@ -79,7 +79,7 @@ def load(rules):
     ... }
     ... ]) == {'test_foo': {'foo-id': ('2050-01-01', 'in prod never allow foo')}}
     True
-    >>> # UserWarning: Line 1: Skipping line with duplicate test name and ID 'test_foo' 'foo-id'
+    >>> # UserWarning: Exemptions: test_name: test_foo | test_id: foo-id | Skipping duplicate test name and ID
 
     Does not check that test name and IDs exist (since names might not
     be collected and IDs can require an HTTP call).
@@ -95,14 +95,14 @@ def load(rules):
 
         if expiration < date.today():
             warnings.warn(
-                'Exemptions: test_name: {} | test_id: {} | Skipping line with expiration day in the past {!r}'
+                'Exemptions: test_name: {} | test_id: {} | Skipping rule with expiration day in the past {!r}'
                 .format(test_name, test_id, expiration)
             )
             continue
 
         if test_id in processed_rules[test_name]:
             warnings.warn(
-                'Exemptions: test_name: {} | test_id: {} | Skipping line with duplicate test name and ID'
+                'Exemptions: test_name: {} | test_id: {} | Skipping duplicate test name and ID'
                 .format(test_name, test_id)
             )
             continue

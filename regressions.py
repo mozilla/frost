@@ -8,7 +8,64 @@ import pytest
 
 def load(rules):
     """
-    TODO
+    Parses the regression section of the conf file and returns a two level dict with format:
+
+    {<test_name>:
+        {<test_id>: <comment>
+        ...
+        }
+    ...
+    }
+
+    Examples:
+
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'comment': 'foo bar baz!'
+    ... }
+    ... ]) == {'test_foo': {'foo-id': 'foo bar baz!'}}
+    True
+
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'comment': 'foo bar baz!'
+    ... },
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'bar-id',
+    ... 'comment': 'bar bar baz!'
+    ... }
+    ... ]) == {
+    ... 'test_foo': {
+    ... 'foo-id': 'foo bar baz!',
+    ... 'bar-id': 'bar bar baz!' }}
+    True
+
+
+    Duplicate test name and IDs are ignored with a warning:
+
+    >>> load([
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'comment': 'foo bar baz!'
+    ... },
+    ... {
+    ... 'test_name': 'test_foo',
+    ... 'test_param_id': 'foo-id',
+    ... 'comment': 'bar bar baz!'
+    ... }
+    ... ]) == {'test_foo': {'foo-id': 'foo bar baz!'}}
+    True
+    >>> # UserWarning: Regressions: test_name: test_foo | test_id: foo-id | Skipping duplicate test name and ID
+
+    Does not check that test name and IDs exist (since names might not
+    be collected and IDs can require an HTTP call).
+
     """
     processed_rules = defaultdict(dict)
 
@@ -20,7 +77,7 @@ def load(rules):
 
         if test_id in processed_rules[test_name]:
             warnings.warn(
-                'Regressions: test_name: {} | test_id: {} | Skipping line with duplicate test name and ID'
+                'Regressions: test_name: {} | test_id: {} | Skipping duplicate test name and ID'
                 .format(test_name, test_id)
             )
             continue
