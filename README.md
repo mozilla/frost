@@ -63,7 +63,7 @@ and options pytest-services adds:
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
-* [`--config`](#test-config) path to test custom config file
+* [`--config`](#custom-test-config) path to test custom config file
 
 and produces output like the following showing a DB instance with backups disabled:
 
@@ -173,9 +173,9 @@ head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_insta
 
 These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
 
-## Test Config
+## Custom Test Config
 
-pytest-services adds an optional `--config` cli option for passing in a custom config file specific to tests within pytest-services.
+pytest-services adds a `--config` cli option for passing in a custom config file specific to tests within pytest-services.
 
 The example config in repo (`config.yaml.example`):
 ```
@@ -289,7 +289,7 @@ python -m json.tool report.json | grep -C 20 xfail
 
 #### Test Severity
 
-pytest-services adds the ability to mark the severity of a certain test. A severity can be `INFO`, `WARN`, or `ERROR`.
+pytest-services custom config format adds support for marking the severity of a certain test. A severity can be `INFO`, `WARN`, or `ERROR`.
 
 These do not modify pytest results (pass, fail, xfail, skip, etc.).
 
@@ -346,8 +346,8 @@ python -m json.tool report.json
 
 ### Test Regressions
 
-pytest-services adds the ability to mark specific tests on specific resources as regressions. As with `severity`, this does
-not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
+pytest-services custom config format adds support for marking specific tests on specific resources as regressions.
+As with `severity` this does not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
 
 The config looks like:
 ```
