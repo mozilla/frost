@@ -1,0 +1,36 @@
+#
+# pytest-services config file
+#
+# Documentation on config file found in README.md
+#
+exemptions:
+  - test_name: test_ec2_instance_has_required_tags
+    test_param_id: i-0123456789f014c162
+    expiration_day: 2019-01-01
+    reason: ec2 instance has no owner
+  - test_name: test_ec2_security_group_opens_specific_ports_to_all
+    test_param_id: '*HoneyPot'
+    expiration_day: 2020-01-01
+    reason: purposefully insecure security group
+severities:
+  - test_name: test_ec2_instance_has_required_tags
+    severity: INFO
+  - test_name: '*'
+    severity: ERROR
+regressions:
+  - test_name: test_ec2_security_group_opens_all_ports_to_all
+    test_param_id: '*mycustomgroup'
+    comment: this was remediated by ops team
+aws:
+  required_tags:
+    - Name
+    - Type
+    - App
+    - Env
+  whitelisted_ports_global:
+    - 25
+  whitelisted_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222

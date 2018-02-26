@@ -62,11 +62,8 @@ and options pytest-services adds:
 * `--aws-debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--aws-regions` for selecting one or more AWS regions to fetch resources from or the default of all regions
-* `--aws-require-tag` adds Tag names to check on all EC2 instances for the `aws.ec2.test_ec2_instance_has_required_tags` test
-* `--aws-whitelisted-ports` adds ports to the whitelist for the `aws.ec2.test_ec2_security_group_opens_specific_ports_to_all` test
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
-* [`--severity-config`](#test-severity) path to a config file for marking different tests with different severities
-* [`--exemptions-config`](#test-exemptions) path to a config file for marking test name and resource IDs as expected failures
+* [`--config`](#custom-test-config) path to test custom config file
 
 and produces output like the following showing a DB instance with backups disabled:
 
@@ -176,70 +173,70 @@ head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_insta
 
 These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
 
-### Test Severity
+## Custom Test Config
 
-pytest-services adds the command line arg `--severity-config` for
-adding a severity marker to tests. A severity can be `INFO`, `WARN`,
-or `ERROR`.
+pytest-services adds a `--config` cli option for passing in a custom config file specific to tests within pytest-services.
 
-These do not modify pytest results (pass, fail, xfail, skip, etc.).
-
-The config file looks like (available in `./severity.conf.example`):
-
+The example config in repo (`config.yaml.example`):
 ```
-# pytest-sevices example severity conf
-test_ec2_instance_has_required_tags	INFO
-*  WARN
-```
-
-And results in a severity and severity marker being included in the
-json metadata:
-
-```console
-pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --severity-config severity.conf --json=report.json
-...
-```
-
-```json
-python -m json.tool report.json
-{
-    "report": {
-        "environment": {
-            "Python": "3.6.2",
-            "Platform": "Darwin-15.6.0-x86_64-i386-64bit"
-        },
-        "tests": [
-            {
-...
-                "metadata": [
-                    {
-...
-                    "markers": {
-...
-                            "severity": {
-                                "name": "severity",
-                                "args": [
-                                    "INFO"
-                                ],
-                                "kwargs": {}
-                            }
-                        },
-...
-                        "severity": "INFO",
-                        "unparametrized_name": "test_ec2_instance_has_required_tags"
-                    }
-...
+exemptions:
+  - test_name: test_ec2_instance_has_required_tags
+    test_param_id: i-0123456789f014c162
+    expiration_day: 2019-01-01
+    reason: ec2 instance has no owner
+  - test_name: test_ec2_security_group_opens_specific_ports_to_all
+    test_param_id: '*HoneyPot'
+    expiration_day: 2020-01-01
+    reason: purposefully insecure security group
+severities:
+  - test_name: test_ec2_instance_has_required_tags
+    severity: INFO
+  - test_name: '*'
+    severity: ERROR
+regressions:
+  - test_name: test_ec2_security_group_opens_all_ports_to_all
+    test_param_id: '*mycustomgroup'
+    comment: this was remediated by ops team
+aws:
+  required_tags:
+    - Name
+    - Type
+    - App
+    - Env
+  whitelisted_ports_global:
+    - 25
+  whitelisted_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222
 ```
 
 ### Test Exemptions
 
-pytest-services adds the command line arg `--exemptions-config` for
+pytest-services custom config format adds support for
 marking test and test resource IDs as expected failures.
 
-The conf file format consists of whitespace delimited columns like the
-severity config, but requires additional columns for test ID (usually
-an AWS resource ID), exception expiration day (as YYYY-MM-DD), and
-exception reason.
+The keys for each exemption rule is:
+* test_name - Name of the test
+* test_param_id - test ID (usually an AWS resource ID) (prefix with `*` to turn into a regex matcher)
+* expiration_day - exception expiration day (as YYYY-MM-DD)
+* reason - exception reason
+
+The config looks like:
+```
+...
+exemptions:
+  - test_name: test_ec2_instance_has_required_tags
+    test_param_id: i-0123456789f014c162
+    expiration_day: 2019-01-01
+    reason: ec2 instance has no owner
+  - test_name: test_ec2_security_group_opens_specific_ports_to_all
+    test_param_id: '*HoneyPot'
+    expiration_day: 2020-01-01
+    reason: purposefully insecure security group
+...
+```
 
 #### Enabling regex for test ID
 
@@ -254,24 +251,6 @@ For more information on Python's regex syntax see: [Regular Expression HOWTO](ht
 
 **Note:** All regex rules are applied first. As well, the ordering of both regex and non-regex rules is top to bottom and the first one wins.
 
-#### Exemption Config
-
-The config file looks like (available in `./exemptions.conf.example`):
-
-```
-# pytest-sevices example exemptions conf
-# columns:
-# unparametrized test name; test_param_id; expiration day; expiration comment
-test_ec2_instance_has_required_tags i-0123456789f014c162 2019-01-01 ec2 instance has no owner
-
-# uses regex matching
-test_ec2_security_group_opens_specific_ports_to_all *HoneyPot 2020-01-01 purposefully insecure security group
-```
-
-Pytest-services will mark matching test names and test IDs with
-[`xfail(reason='<conf reason>', strict=True, expiration='<conf
-expiration>')`](https://docs.pytest.org/en/latest/skipping.html) and
-`pytest.mark.services_exception(expiration='<conf expiration>')`.
 
 When a json report is generated, the exemptions will show up in the
 json metadata as serialized markers:
@@ -306,6 +285,110 @@ python -m json.tool report.json | grep -C 20 xfail
                         },
 ...
 ```
+
+
+#### Test Severity
+
+pytest-services custom config format adds support for marking the severity of a certain test. A severity can be `INFO`, `WARN`, or `ERROR`.
+
+These do not modify pytest results (pass, fail, xfail, skip, etc.).
+
+The config looks like:
+
+```
+...
+severities:
+  - test_name: test_ec2_instance_has_required_tags
+    severity: INFO
+  - test_name: '*'
+    severity: ERROR
+...
+```
+
+And results in a severity and severity marker being included in the
+json metadata:
+
+```console
+pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-regions us-east-1 --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
+...
+```
+
+```json
+python -m json.tool report.json
+{
+    "report": {
+        "environment": {
+            "Python": "3.6.2",
+            "Platform": "Darwin-15.6.0-x86_64-i386-64bit"
+        },
+        "tests": [
+            {
+...
+                "metadata": [
+                    {
+...
+                    "markers": {
+...
+                            "severity": {
+                                "name": "severity",
+                                "args": [
+                                    "INFO"
+                                ],
+                                "kwargs": {}
+                            }
+                        },
+...
+                        "severity": "INFO",
+                        "unparametrized_name": "test_ec2_instance_has_required_tags"
+                    }
+...
+```
+
+### Test Regressions
+
+pytest-services custom config format adds support for marking specific tests on specific resources as regressions.
+As with `severity` this does not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
+
+The config looks like:
+```
+...
+regressions:
+  - test_name: test_ec2_security_group_opens_all_ports_to_all
+    test_param_id: '*mycustomgroup'
+    comment: this was remediated by ops team
+...
+```
+
+### AWS Config
+
+pytest-services has a suite of AWS tests. This section of the custom config includes configuration options specific
+to these tests.
+
+The config looks like:
+```
+...
+aws:
+  # Required tags used within the test_ec2_instance_has_required_tags test
+  required_tags:
+    - Name
+    - Type
+    - App
+    - Env
+  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for all instances
+  whitelisted_ports_global:
+    - 25
+  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for specific instances. In this example, we are whitelisting ports 22
+  # and 2222 for all security groups that include the word 'bastion' in them.
+  whitelisted_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222
+...
+```
+
 
 ## Development
 

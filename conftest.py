@@ -1,5 +1,3 @@
-
-
 import argparse
 
 import pytest
@@ -8,12 +6,11 @@ from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
-import exemptions
-import severity
+
+import custom_config
 
 
 botocore_client = None
-whitelisted_ports = None
 
 
 def pytest_addoption(parser):
@@ -33,41 +30,23 @@ def pytest_addoption(parser):
                      action='store_true',
                      help='Log whether AWS API calls hit the cache. Requires -s')
 
-    parser.addoption('--aws-require-tags',
-                     nargs='*',
-                     default=[],
-                     help='EC2 instance tags for the aws.ec2.test_ec2_instance_has_required_tags test to check.')
-
-    parser.addoption('--aws-whitelisted-ports',
-                     nargs='*',
-                     default=[],
-                     help='Additional ports to whitelist for '
-                          'aws.ec2.test_ec2_security_group_opens_specific_ports_to_all test.')
-
     parser.addoption('--offline',
                      action='store_true',
                      default=False,
                      help='Instruct service clients to return empty lists and not make HTTP requests.')
 
-    parser.addoption('--severity-config',
+    parser.addoption('--config',
                      type=argparse.FileType('r'),
-                     help='Path to a config file specifying test severity levels.')
-
-    parser.addoption('--exemptions-config',
-                     type=argparse.FileType('r'),
-                     help='Path to a config file specifying test and resource exemptions.')
+                     help='Path to the config file.')
 
 
 def pytest_configure(config):
     global botocore_client
-    global whitelisted_ports
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
     profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
-
-    whitelisted_ports = frozenset([int(port) for port in config.getoption('--aws-whitelisted-ports')])
 
     botocore_client = BotocoreClient(
         profiles=profiles,
@@ -77,16 +56,19 @@ def pytest_configure(config):
         debug_cache=config.getoption('--aws-debug-cache'),
         offline=config.getoption('--offline'))
 
-    config.exemptions = exemptions.parse_conf_file(config.getoption('--exemptions-config'))
-    config.severity = severity.parse_conf_file(config.getoption('--severity-config'))
+    config.custom_config = custom_config.CustomConfig(config.getoption('--config'))
+
+
+@pytest.fixture
+def aws_config(pytestconfig):
+    return pytestconfig.custom_config.aws
 
 
 def pytest_runtest_setup(item):
     """
     """
     if not isinstance(item, DoctestItem):
-        severity.add_severity_marker(item)
-        exemptions.add_xfail_marker(item)
+        item.config.custom_config.add_markers(item)
 
 
 # Reporting
@@ -175,6 +157,7 @@ def pytest_runtest_makereport(item, call):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         severity = markers.get('severity', None) and markers.get('severity')['args'][0]
+        regression = markers.get('regression', None) and markers.get('regression')['args'][0]
         outcome, reason = get_outcome_and_reason(report, markers, call)
         rationale = markers.get('rationale', None) and \
             clean_docstring(markers.get('rationale')['args'][0])
@@ -190,5 +173,6 @@ def pytest_runtest_makereport(item, call):
             rationale=rationale,
             reason=reason,
             severity=severity,
+            regression=regression,
             unparametrized_name=item.originalname,
         )
