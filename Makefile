@@ -40,6 +40,12 @@ flake8: check_venv
 install: venv
 	( . venv/bin/activate && pip install -r requirements.txt )
 
+metatest:
+	pytest --aws-profiles example-account \
+		--aws-regions us-east-1 \
+		-o python_files=meta_test*.py \
+		-o cache_dir=./example_cache/
+
 venv:
 	python3 -m venv venv
 
