@@ -1,7 +1,8 @@
 
 
 from aws.iam.resources import (
-    iam_users
+    iam_users,
+    iam_inline_policies,
 )
 
 
@@ -23,3 +24,8 @@ def test_iam_users():
             'UserId': 'CALCIHMA0CZ0R0K0MN00C',
             'UserName': 'spacemanspiff',
             '__pytest_meta': {'profile': 'example-account', 'region': 'us-east-1'}}]
+
+
+def test_iam_inline_policies_for_user_without_policies():
+    # extracts empty 'PolicyNames'
+    assert iam_inline_policies(username='tigerone') == []
