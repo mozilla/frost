@@ -153,6 +153,53 @@ def iam_mfa_devices(users):
     ]
 
 
+def iam_roles():
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_roles"
+    return botocore_client.get(
+        'iam', 'list_roles', [], {})\
+        .extract_key('Roles')\
+        .flatten()\
+        .values()
+
+
+def iam_all_role_policies(rolename):
+    return [
+        {'PolicyName': policy_name} for policy_name
+        in iam_role_inline_policies(rolename=rolename)
+    ] + iam_role_managed_policies(rolename=rolename)
+
+
+def iam_roles_with_policies():
+    return [
+        {
+            **{'Policies': iam_all_role_policies(rolename=role['RoleName'])},
+            **role,
+        } for role in iam_roles()
+    ]
+
+
+def iam_role_inline_policies(rolename):
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_role_policies"
+    return botocore_client.get(
+        'iam', 'list_role_policies', [], {'RoleName': rolename})\
+        .extract_key('PolicyNames')\
+        .flatten()\
+        .values()
+
+
+def iam_role_managed_policies(rolename):
+    "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_role_policies"
+    return botocore_client.get(
+        'iam', 'list_attached_role_policies', [], {'RoleName': rolename})\
+        .extract_key('AttachedPolicies')\
+        .flatten()\
+        .values()
+
+
+def iam_admin_roles():
+    return [role for role in iam_roles_with_policies() if user_is_admin(role)]
+
+
 def iam_generate_credential_report():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report"
     results = botocore_client.get('iam', 'generate_credential_report', [], {}, do_not_cache=True).results
