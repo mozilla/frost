@@ -29,7 +29,7 @@ clean-cache: check_venv
 doctest: check_venv
 	pytest --doctest-modules -s --offline --aws-debug-calls
 
-doctest-coverage: check_venv
+coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --aws-debug-calls
 	pytest --cov-config .coveragerc --cov=. --cov-append \
 		--aws-profiles example-account \
