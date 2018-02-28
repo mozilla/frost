@@ -11,6 +11,9 @@ from aws.iam.resources import iam_admin_roles
 def test_iam_cross_account_admin_roles_require_mfa(iam_admin_role):
     """Test that all IAM Roles that include admin policies and have cross account
     trust relationships require MFA.
+
+    Note: Due to the naive mechanism for determing what an "admin" is, this test
+    can easily have both false positives and (more likely) false negatives.
     """
     for statement in iam_admin_role["AssumeRolePolicyDocument"]["Statement"]:
         if statement["Action"].startswith("sts") and "AWS" in statement["Principal"]:

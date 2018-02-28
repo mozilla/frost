@@ -392,6 +392,18 @@ aws:
 ...
 ```
 
+### Test Accuracy
+
+There are two important things to note about `pytest-services` tests that may be different from your expectations.
+
+First, the focus is on "actionable results". This plays out as an attempt to reduce false
+positives by trying to filter out unused resources. An example of this can be seen by looking at
+any of the security group tests, where we are skipping any security groups that are not attached to a resource.
+
+Second, there are some tests that make naive assumptions instead of trying to capture the complexities
+of the system. The current best example of this is all IAM tests that relate to "admin" users. How we
+are determining what an user or role is an admin is based simply off substring matching on the policies
+attached. This obviously has a high chance of false negatives.
 
 ## Development
 
@@ -404,6 +416,7 @@ aws:
 1. be vendor agnostic e.g. support checks across cloud providers or in hybrid environments or competing services
 1. cache and share responses to reduce third party API usage (i.e. lots of tests check AWS security groups so fetch them once)
 1. provide a way to run a single test or subset of tests
+1. focus on actionable results (see [test accuracy](#test-accuracy) for more information)
 
 ### Non-Goals
 
