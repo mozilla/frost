@@ -13,6 +13,9 @@ from aws.iam.resources import (
         ids=lambda login: login['UserName'])
 def test_iam_admin_user_without_mfa(iam_login_profile, iam_user_mfa_devices):
     """Test that all "admin" users with console access also have an MFA device.
+
+    Note: Due to the naive mechanism for determing what an "admin" is, this test
+    can easily have both false positives and (more likely) false negatives.
     """
     if bool(iam_login_profile):
         assert len(iam_user_mfa_devices) > 0, \
