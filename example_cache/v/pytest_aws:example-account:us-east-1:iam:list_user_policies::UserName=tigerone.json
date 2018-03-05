@@ -1,0 +1,7 @@
+{
+    "PolicyNames": [],
+    "__pytest_meta": {
+        "profile": "example-account",
+        "region": "us-east-1"
+    }
+}

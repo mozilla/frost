@@ -29,8 +29,13 @@ clean-cache: check_venv
 doctest: check_venv
 	pytest --doctest-modules -s --offline --aws-debug-calls
 
-doctest-coverage: check_venv
+coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --aws-debug-calls
+	pytest --cov-config .coveragerc --cov=. --cov-append \
+		--aws-profiles example-account \
+		--aws-regions us-east-1 \
+		-o python_files=meta_test*.py \
+		-o cache_dir=./example_cache/
 	coverage report -m
 	coverage html
 
@@ -39,6 +44,12 @@ flake8: check_venv
 
 install: venv
 	( . venv/bin/activate && pip install -r requirements.txt )
+
+metatest:
+	pytest --aws-profiles example-account \
+		--aws-regions us-east-1 \
+		-o python_files=meta_test*.py \
+		-o cache_dir=./example_cache/
 
 venv:
 	python3 -m venv venv
