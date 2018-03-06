@@ -49,17 +49,17 @@ class AWSConfig:
 
         return set([])
 
-    def considered_inactive(self):
-        considered_inactive = self._parse_user_is_inactive_relative_time('considered_inactive')
-        if considered_inactive is None:
+    def no_activity_since(self):
+        no_activity_since = self._parse_user_is_inactive_relative_time('no_activity_since')
+        if no_activity_since is None:
             return datetime.now(timezone.utc)-relativedelta(years=+1)
-        return considered_inactive
+        return no_activity_since
 
-    def grace_period(self):
-        grace_period = self._parse_user_is_inactive_relative_time('grace_period')
-        if grace_period is None:
+    def created_after(self):
+        created_after = self._parse_user_is_inactive_relative_time('created_after')
+        if created_after is None:
             return datetime.now(timezone.utc)-relativedelta(weeks=+1)
-        return grace_period
+        return created_after
 
     def _parse_user_is_inactive_relative_time(self, key):
         if self.user_is_inactive.get(key) is None:

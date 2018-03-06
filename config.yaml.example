@@ -23,10 +23,10 @@ regressions:
     comment: this was remediated by ops team
 aws:
   user_is_inactive:
-    considered_inactive:
+    no_activity_since:
       years: 1
       months: 0
-    grace_period:
+    created_after:
       weeks: 1
   required_tags:
     - Name
