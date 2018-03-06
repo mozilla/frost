@@ -1,6 +1,8 @@
 import re
+from datetime import datetime, timezone
 
 import yaml
+from dateutil.relativedelta import relativedelta
 
 import exemptions
 import severity
@@ -30,6 +32,7 @@ class AWSConfig:
         self.required_tags = frozenset(config.get('required_tags', []))
         self.whitelisted_ports_global = set(config.get('whitelisted_ports_global', []))
         self.whitelisted_ports = config.get('whitelisted_ports', [])
+        self.user_is_inactive = config.get('user_is_inactive', {})
 
     def get_whitelisted_ports(self, test_id):
         return self.get_whitelisted_ports_from_test_id(test_id) | self.whitelisted_ports_global
@@ -45,3 +48,25 @@ class AWSConfig:
                 return set(rule['ports'])
 
         return set([])
+
+    def considered_inactive(self):
+        considered_inactive = self._parse_user_is_inactive_relative_time('considered_inactive')
+        if considered_inactive is None:
+            return datetime.now(timezone.utc)-relativedelta(years=+1)
+        return considered_inactive
+
+    def grace_period(self):
+        grace_period = self._parse_user_is_inactive_relative_time('grace_period')
+        if grace_period is None:
+            return datetime.now(timezone.utc)-relativedelta(weeks=+1)
+        return grace_period
+
+    def _parse_user_is_inactive_relative_time(self, key):
+        if self.user_is_inactive.get(key) is None:
+            return None
+
+        return datetime.now(timezone.utc)-relativedelta(
+            years=+self.user_is_inactive[key].get('years', 0),
+            months=+self.user_is_inactive[key].get('months', 0),
+            weeks=+self.user_is_inactive[key].get('weeks', 0)
+        )

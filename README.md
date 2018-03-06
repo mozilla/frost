@@ -201,6 +201,12 @@ regressions:
     test_param_id: '*mycustomgroup'
     comment: this was remediated by ops team
 aws:
+  user_is_inactive:
+    considered_inactive:
+      years: 1
+      months: 0
+    grace_period:
+      weeks: 1
   required_tags:
     - Name
     - Type
@@ -371,6 +377,14 @@ The config looks like:
 ```
 ...
 aws:
+  # Configuration on the relative time for what is considered inactive and what the grace period is within
+  # the test_iam_user_is_inactive
+  user_is_inactive:
+    considered_inactive:
+      years: 1
+      months: 0
+    grace_period:
+      weeks: 1
   # Required tags used within the test_ec2_instance_has_required_tags test
   required_tags:
     - Name
