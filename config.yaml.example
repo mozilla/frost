@@ -22,6 +22,12 @@ regressions:
     test_param_id: '*mycustomgroup'
     comment: this was remediated by ops team
 aws:
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
+    created_after:
+      weeks: 1
   required_tags:
     - Name
     - Type

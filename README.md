@@ -201,6 +201,12 @@ regressions:
     test_param_id: '*mycustomgroup'
     comment: this was remediated by ops team
 aws:
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
+    created_after:
+      weeks: 1
   required_tags:
     - Name
     - Type
@@ -371,6 +377,16 @@ The config looks like:
 ```
 ...
 aws:
+  # Relative time delta for test_iam_user_is_inactive. no_activity_since will be used as the failure marker,
+  # so in this example any user that hasn't had any activity for a year will be marked as a "failure". created_after
+  # is used as a grace period, so in this case any user that was created within the last week will be automatically
+  # pass this test.
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
+    created_after:
+      weeks: 1
   # Required tags used within the test_ec2_instance_has_required_tags test
   required_tags:
     - Name
