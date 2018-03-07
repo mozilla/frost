@@ -153,19 +153,18 @@ class BotocoreClient:
 
     def __init__(self,
                  profiles,
-                 regions,
                  cache,
                  debug_calls,
                  debug_cache,
                  offline):
         self.profiles = profiles or [None]
-        self.regions = regions or get_available_regions()
         self.cache = cache
 
         self.debug_calls = debug_calls
         self.debug_cache = debug_cache
         self.offline = offline
 
+        self.regions = get_available_regions()
         self.results = []
 
     def get(self,
