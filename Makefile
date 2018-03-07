@@ -27,10 +27,10 @@ clean-cache: check_venv
 	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
 
 doctest: check_venv
-	pytest --doctest-modules -s --offline --aws-debug-calls
+	pytest --doctest-modules -s --offline --debug-calls
 
 coverage: check_venv
-	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --aws-debug-calls
+	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --debug-calls
 	pytest --cov-config .coveragerc --cov=. --cov-append \
 		--aws-profiles example-account \
 		--aws-regions us-east-1 \
