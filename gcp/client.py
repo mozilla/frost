@@ -6,10 +6,11 @@ def get_gcp_developer_key():
     return ""
 
 
-def cache_key(project_id, product, subproduct):
+def cache_key(project_id, version, product, subproduct):
     return ':'.join([
         'pytest_gcp',
-        str(project_id),
+        project_id,
+        version,
         product,
         subproduct
     ]) + '.json'
@@ -32,26 +33,26 @@ class GCPClient:
         # TODO: not oauth? or support for both?
         self.developer_key = get_gcp_developer_key()
 
-    def get(self, product, subproduct):
+    def get(self, product, subproduct, version="v1", call_kwargs=None):
         if self.offline:
             results = []
         else:
-            results = list(self._get(product, subproduct))
+            results = list(self._get(product, subproduct, version, call_kwargs))
         return results
 
-    def _get(self, product, subproduct, call_kwargs=None):
+    def _get(self, product, subproduct, version="v1", call_kwargs=None):
         if call_kwargs is None:
             call_kwargs = {}
 
         for project_id in self.project_ids:
             # TODO - support zones
-            ckey = cache_key(project_id, product, subproduct)
+            ckey = cache_key(project_id, version, product, subproduct)
             cached_result = self.cache.get(ckey, None)
             if cached_result is not None:
                 print('found cached value for', ckey)
                 return cached_result
 
-            service = self._service(product)
+            service = self._service(product, version)
             api_entity = getattr(service, subproduct)()
 
             if self.debug_calls:
