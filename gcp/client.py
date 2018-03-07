@@ -36,7 +36,7 @@ class GCPClient:
         if self.offline:
             results = []
         else:
-            results = sum(list(self._get(product, subproduct)), [])
+            results = list(self._get(product, subproduct))
         return results
 
     def _get(self, product, subproduct, call_kwargs=None):
@@ -57,9 +57,15 @@ class GCPClient:
             if self.debug_calls:
                 print('calling', api_entity)
 
-            # TODO - need to support looping through zones for instances
-            #   - could potentially match on instances within _get_all_items?
-            items = self._get_all_items(api_entity, {**call_kwargs, 'project': project_id})
+            if self._zone_aware(product, subproduct):
+                items = []
+                for zone in self._get_zones(project_id):
+                    items = sum(
+                        [items],
+                        self._get_all_items(api_entity, {**call_kwargs, 'project': project_id, 'zone': zone})
+                    )
+            else:
+                items = self._get_all_items(api_entity, {**call_kwargs, 'project': project_id})
 
             results = {
                 'items': items,
@@ -73,8 +79,8 @@ class GCPClient:
 
             yield results
 
-    def _get_all_items(self, api_entity):
-        request = api_entity.list(project=self.projectId)
+    def _get_all_items(self, api_entity, call_kwargs):
+        request = api_entity.list(**call_kwargs)
         items = []
         while request is not None:
             # TODO: exception handling on request.execute()
@@ -86,3 +92,14 @@ class GCPClient:
     def _service(self, product, version="v1"):
         # TODO: developer keys or oauth? or support for both?
         return build_service(product, version, developerKey=self.developer_key)
+
+    def _zone_aware(self, product, subproduct):
+        if product == "compute" and subproduct == "instances":
+            return True
+        return False
+
+    def _get_zones(self, project_id):
+        # TODO: exception handling
+        response = self._service('compute').zones().list(project=project_id).execute()['items']
+        for result in response:
+                yield result['name']
