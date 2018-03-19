@@ -8,6 +8,5 @@ from gcp.sql.resources import instances
                          instances(),
                          ids=lambda instance: instance['name'])
 def test_sql_instance_ssl_required(sql_instance):
-    """TODO
-    """
+    """Test CloudSQL Instance requires SSL"""
     assert sql_instance.get('settings').get('ipConfiguration').get('requireSsl')

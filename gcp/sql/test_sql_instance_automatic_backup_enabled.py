@@ -8,6 +8,7 @@ from gcp.sql.resources import instances
                          instances(),
                          ids=lambda instance: instance['name'])
 def test_sql_instance_automatic_backup_enabled(sql_instance):
-    """Test CloudSQL Instance has Automatic Backup Enabled
-    """
-    assert sql_instance.get('settings').get('backupConfiguration').get('binaryLogEnabled')
+    """Test CloudSQL Instance has Automatic Backup Enabled"""
+    assert sql_instance.get('settings').get('backupConfiguration').get('enabled')
+    if 'MYSQL' in sql_instance.get('databaseVersion'):
+        assert sql_instance.get('settings').get('backupConfiguration').get('binaryLogEnabled')

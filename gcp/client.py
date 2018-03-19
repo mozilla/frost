@@ -38,7 +38,6 @@ class GCPClient:
             call_kwargs = {}
 
         for project_id in self.project_ids:
-            # TODO - support zones
             ckey = cache_key(project_id, version, product, subproduct)
             cached_result = self.cache.get(ckey, None)
             if cached_result is not None:

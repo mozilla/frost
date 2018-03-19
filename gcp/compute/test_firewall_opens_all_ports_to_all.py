@@ -12,6 +12,5 @@ from gcp.compute.resources import in_use_firewalls
                          in_use_firewalls(),
                          ids=firewall_id)
 def test_firewall_opens_all_ports_to_all(firewall):
-    """Checks if firewall opens all ports to all IPs
-    """
+    """Checks if firewall opens all ports to all IPs"""
     assert not does_firewall_open_all_ports_to_all(firewall)
