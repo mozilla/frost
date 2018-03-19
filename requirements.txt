@@ -1,6 +1,7 @@
 botocore==1.8.24
 coverage==4.5
 flake8==3.5.0
+google_api_python_client==1.6.1
 PyYAML==3.12
 pygerduty==0.37.0
 pytest-cov==2.5.1

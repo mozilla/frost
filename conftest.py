@@ -6,11 +6,13 @@ from _pytest.doctest import DoctestItem
 from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
+from gcp.client import GCPClient
 
 import custom_config
 
 
 botocore_client = None
+gcp_client = None
 
 
 def pytest_addoption(parser):
@@ -18,17 +20,17 @@ def pytest_addoption(parser):
                      nargs='*',
                      help='Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].')
 
-    parser.addoption('--aws-regions',
+    parser.addoption('--gcp-project-ids',
                      nargs='*',
-                     help='Set default AWS regions to use. Defaults to all available ec2 regions')
+                     help='Set GCP projects to test. Required for GCP tests.')
 
-    parser.addoption('--aws-debug-calls',
+    parser.addoption('--debug-calls',
                      action='store_true',
-                     help='Log AWS API calls. Requires -s')
+                     help='Log API calls. Requires -s')
 
-    parser.addoption('--aws-debug-cache',
+    parser.addoption('--debug-cache',
                      action='store_true',
-                     help='Log whether AWS API calls hit the cache. Requires -s')
+                     help='Log whether API calls hit the cache. Requires -s')
 
     parser.addoption('--offline',
                      action='store_true',
@@ -42,18 +44,26 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     global botocore_client
+    global gcp_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
-    profiles, regions = config.getoption('--aws-profiles'), config.getoption('--aws-regions')
+    profiles = config.getoption('--aws-profiles')
+    project_ids = config.getoption('--gcp-project-ids')
 
     botocore_client = BotocoreClient(
         profiles=profiles,
-        regions=regions,
         cache=config.cache,
-        debug_calls=config.getoption('--aws-debug-calls'),
-        debug_cache=config.getoption('--aws-debug-cache'),
+        debug_calls=config.getoption('--debug-calls'),
+        debug_cache=config.getoption('--debug-cache'),
+        offline=config.getoption('--offline'))
+
+    gcp_client = GCPClient(
+        project_ids=project_ids,
+        cache=config.cache,
+        debug_calls=config.getoption('--debug-calls'),
+        debug_cache=config.getoption('--debug-cache'),
         offline=config.getoption('--offline'))
 
     config.custom_config = custom_config.CustomConfig(config.getoption('--config'))
