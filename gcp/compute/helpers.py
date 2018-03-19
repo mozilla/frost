@@ -8,10 +8,11 @@ def does_firewall_open_all_ports_to_all(firewall):
         return False
 
     if not firewall.get('allowed', [])[0].get('ports'):
-        return True
+        if firewall.get('allowed', [])[0].get('IPProtocol', '') != 'icmp':
+            return True
 
     for rule in firewall.get('allowed'):
-        if rule.get('ports') == '0-65535':
+        if rule.get('ports') == '0-65535' and rule.get('IPProtocol', '') != 'icmp':
             return True
 
     return False

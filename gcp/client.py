@@ -2,10 +2,6 @@
 from apiclient.discovery import build as build_service
 
 
-def get_gcp_developer_key():
-    return ""
-
-
 def cache_key(project_id, version, product, subproduct):
     return ':'.join([
         'pytest_gcp',
@@ -29,9 +25,6 @@ class GCPClient:
         self.debug_calls = debug_calls
         self.debug_cache = debug_cache
         self.offline = offline
-
-        # TODO: not oauth? or support for both?
-        self.developer_key = get_gcp_developer_key()
 
     def get(self, product, subproduct, version="v1", call_kwargs=None):
         if self.offline:
@@ -59,26 +52,21 @@ class GCPClient:
                 print('calling', api_entity)
 
             if self._zone_aware(product, subproduct):
-                items = []
+                results = []
                 for zone in self._get_zones(project_id):
-                    items = sum(
-                        [items],
+                    results = sum(
+                        [results],
                         self._get_all_items(api_entity, {**call_kwargs, 'project': project_id, 'zone': zone})
                     )
             else:
-                items = self._get_all_items(api_entity, {**call_kwargs, 'project': project_id})
-
-            results = {
-                'items': items,
-                '__pytest_meta': dict(project_id=project_id)
-            }
+                results = self._get_all_items(api_entity, {**call_kwargs, 'project': project_id})
 
             if self.debug_cache:
                 print('setting cache value for', ckey)
 
             self.cache.set(ckey, results)
 
-            yield results
+            return results
 
     def _get_all_items(self, api_entity, call_kwargs):
         request = api_entity.list(**call_kwargs)
@@ -86,13 +74,12 @@ class GCPClient:
         while request is not None:
             # TODO: exception handling on request.execute()
             resp = request.execute()
-            items = sum([items], resp["items"])
+            items = sum([items], resp.get("items", []))
             request = api_entity.list_next(request, resp)
         return items
 
     def _service(self, product, version="v1"):
-        # TODO: developer keys or oauth? or support for both?
-        return build_service(product, version, developerKey=self.developer_key)
+        return build_service(product, version)
 
     def _zone_aware(self, product, subproduct):
         if product == "compute" and subproduct == "instances":

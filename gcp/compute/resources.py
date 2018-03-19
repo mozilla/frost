@@ -18,7 +18,9 @@ def networks_with_instances():
         network['instances'] = []
         for instance in instances():
             if network['selfLink'] in [interface['network'] for interface in instance['networkInterfaces']]:
-                yield network['instances'].append(instance)
+                network['instances'].append(instance)
+        if len(network['instances']):
+            yield network
 
 
 def in_use_firewalls():
