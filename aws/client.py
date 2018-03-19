@@ -205,7 +205,7 @@ class BotocoreClient:
     def values(self):
         """Returns the wrapped value
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = []
         >>> c.values()
         []
@@ -217,14 +217,14 @@ class BotocoreClient:
         From an iterable of dicts returns the value with the given
         keys discarding other values:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {'id': 2}]
         >>> c.extract_key('id').results
         [1, 2]
 
         When the key does not exist it returns the second arg which defaults to None:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {}]
         >>> c.extract_key('id').results
         [1, None]
@@ -232,7 +232,7 @@ class BotocoreClient:
 
         Propagates the '__pytest_meta' key to dicts and lists of dicts:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'Attrs': {'Name': 'Test'}, '__pytest_meta': {'meta': 'dict'}}]
         >>> c.extract_key('Attrs').results
         [{'Name': 'Test', '__pytest_meta': {'meta': 'dict'}}]
@@ -249,7 +249,7 @@ class BotocoreClient:
 
         Errors when the outer dict is missing a meta key:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'Attrs': {'Name': 'Test'}}]
         >>> c.extract_key('Attrs')
         Traceback (most recent call last):
@@ -281,7 +281,7 @@ class BotocoreClient:
         """
         Flattens one level of a nested list:
 
-        >>> c = BotocoreClient([None], 'us-west-2', None, None, None, offline=True)
+        >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [['A', 1], ['B']]
         >>> c.flatten().values()
         ['A', 1, 'B']
