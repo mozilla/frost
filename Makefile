@@ -33,7 +33,6 @@ coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. --doctest-modules -s --offline --debug-calls
 	pytest --cov-config .coveragerc --cov=. --cov-append \
 		--aws-profiles example-account \
-		--aws-regions us-east-1 \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
 	coverage report -m
@@ -47,7 +46,6 @@ install: venv
 
 metatest:
 	pytest --aws-profiles example-account \
-		--aws-regions us-east-1 \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
 
