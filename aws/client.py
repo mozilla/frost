@@ -117,16 +117,15 @@ def get_aws_resource(service_name,
         if debug_calls:
             print('calling', call)
 
-        cached_result = None
+        result = None
         if cache is not None:
             ckey = cache_key(call)
-            cached_result = cache.get(ckey, None)
+            result = cache.get(ckey, None)
 
-            if debug_cache and cached_result is not None:
+            if debug_cache and result is not None:
                 print('found cached value for', ckey)
-                result = cached_result
 
-        if cached_result is None:
+        if result is None:
             client = get_client(call.profile, call.region, call.service)
             try:
                 result = full_results(client, call.method, call.args, call.kwargs)
