@@ -26,6 +26,11 @@ class GCPClient:
         self.debug_cache = debug_cache
         self.offline = offline
 
+    def get_project_id(self):
+        if self.offline:
+            return 'test'
+        return self.project_id
+
     def list(self, product, subproduct, version="v1", results_key='items', call_kwargs=None):
         """Public list func. See _list func docstring for more info"""
         if self.offline:
