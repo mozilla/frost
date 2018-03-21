@@ -20,9 +20,9 @@ def pytest_addoption(parser):
                      nargs='*',
                      help='Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].')
 
-    parser.addoption('--gcp-project-ids',
-                     nargs='*',
-                     help='Set GCP projects to test. Required for GCP tests.')
+    parser.addoption('--gcp-project-id',
+                     type=str,
+                     help='Set GCP project to test. Required for GCP tests.')
 
     parser.addoption('--debug-calls',
                      action='store_true',
@@ -50,7 +50,7 @@ def pytest_configure(config):
     patch_cache_set(config)
 
     profiles = config.getoption('--aws-profiles')
-    project_ids = config.getoption('--gcp-project-ids')
+    project_id = config.getoption('--gcp-project-id')
 
     botocore_client = BotocoreClient(
         profiles=profiles,
@@ -60,7 +60,7 @@ def pytest_configure(config):
         offline=config.getoption('--offline'))
 
     gcp_client = GCPClient(
-        project_ids=project_ids,
+        project_id=project_id,
         cache=config.cache,
         debug_calls=config.getoption('--debug-calls'),
         debug_cache=config.getoption('--debug-cache'),
