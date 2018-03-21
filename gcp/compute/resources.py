@@ -2,15 +2,15 @@ from conftest import gcp_client
 
 
 def firewalls():
-    return gcp_client.get("compute", "firewalls")
+    return gcp_client.list("compute", "firewalls")
 
 
 def networks():
-    return gcp_client.get("compute", "networks")
+    return gcp_client.list("compute", "networks")
 
 
 def instances():
-    return gcp_client.get("compute", "instances")
+    return gcp_client.list("compute", "instances")
 
 
 def networks_with_instances():
