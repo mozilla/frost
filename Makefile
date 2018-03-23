@@ -44,6 +44,9 @@ flake8: check_venv
 install: venv
 	( . venv/bin/activate && pip install -r requirements.txt )
 
+setup_gsuite: check_venv
+	python -m bin.auth.setup_gsuite
+
 metatest:
 	pytest --aws-profiles example-account \
 		-o python_files=meta_test*.py \
