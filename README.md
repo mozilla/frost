@@ -155,6 +155,13 @@ The below policy will allow you to run all AWS tests in pytest-services against 
 }
 ```
 
+#### Setting up GSuite tests
+
+Make sure to have an OAuth2 app created and have the `client_secret.json` file in `~/.credentials` and then run:
+```
+make setup_gsuite
+```
+
 ### Caching
 
 The AWS client will use AWS API JSON responses when available and save them using AWS profile, region, service name, service method, [botocore](http://botocore.readthedocs.io/) args and kwargs in the cache key to filenames with the format `.cache/v/pytest_aws:<aws profile>:<aws region>:<aws service>:<service method>:<args>:<kwargs>.json` e.g.
@@ -405,6 +412,26 @@ aws:
         - 22
         - 2222
 ...
+```
+
+### GSuite Config
+
+pytest-services has a suite of GSuite tests. This section of the custom config includes configuration options specific
+to these tests.
+
+**Make sure to [setup GSuite](#setting-up-gsuite-tests) before running GSuite tests**
+
+The config looks like:
+```
+gsuite:
+  # The specific GSuite domain to test.
+  domain: 'example.com'
+  # Relative time delta for test_admin_user_is_inactive. no_activity_since will be used as the failure marker,
+  # so in this example any user that hasn't had any activity for a year will be marked as a "failure".
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
 ```
 
 ### Test Accuracy
