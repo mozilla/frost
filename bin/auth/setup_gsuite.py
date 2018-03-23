@@ -11,13 +11,6 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
-
-
 APPLICATION_NAME = 'pytest-services'
 
 
@@ -31,10 +24,7 @@ def get_or_create_credentials(credential_name, scopes):
         store = Storage(get_credential_path(credential_name))
         flow = client.flow_from_clientsecrets(get_client_secret_file(), scopes)
         flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else:
-            credentials = tools.run(flow, store)
+        credentials = tools.run_flow(flow, store, None)
         print('Storing credentials to ' + get_credential_path(credential_name))
     return credentials
 

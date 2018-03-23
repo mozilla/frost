@@ -29,10 +29,12 @@ def get_credentials(credential_name):
 
 class GsuiteClient:
 
-    def __init__(self, domain):
+    def __init__(self, domain, offline):
         self.domain = domain
+        self.offline = offline
 
-        self.directory_client = self.build_directory_client()
+        if not self.offline:
+            self.directory_client = self.build_directory_client()
 
     def build_directory_client(self):
         credentials = get_credentials(ADMIN_DIRECTORY_USER_READONLY)
@@ -40,5 +42,8 @@ class GsuiteClient:
         return discovery.build('admin', 'directory_v1', http=http)
 
     def list_users(self):
+        if self.offline:
+            return []
+
         resp = self.directory_client.users().list(domain=self.domain).execute()
         return resp["users"]
