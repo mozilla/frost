@@ -1,6 +1,7 @@
 import os
 
 from gsuite.client import (
+    CREDENTIALS,
     get_credentials,
     get_credential_dir,
     get_credential_path
@@ -38,15 +39,9 @@ def get_or_create_credentials(credential_name, scopes):
     return credentials
 
 
-def get_or_create_credentials_directory_user_readonly():
-    return get_or_create_credentials(
-        'admin-directory-user-readonly',
-        'https://www.googleapis.com/auth/admin.directory.user.readonly'
-    )
-
-
 def main():
-    get_or_create_credentials_directory_user_readonly()
+    for creds in CREDENTIALS:
+        get_or_create_credentials(creds[0], creds[1])
 
 
 if __name__ == '__main__':

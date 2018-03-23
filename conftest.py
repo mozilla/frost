@@ -7,12 +7,14 @@ from _pytest.mark import MarkInfo, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
+from gsuite.client import GsuiteClient
 
 import custom_config
 
 
 botocore_client = None
 gcp_client = None
+gsuite_client = None
 
 
 def pytest_addoption(parser):
@@ -45,6 +47,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     global botocore_client
     global gcp_client
+    global gsuite_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
@@ -67,6 +70,11 @@ def pytest_configure(config):
         offline=config.getoption('--offline'))
 
     config.custom_config = custom_config.CustomConfig(config.getoption('--config'))
+
+    if any([x for x in config.args if 'gsuite' in x]):
+        gsuite_client = GsuiteClient(config.custom_config.gsuite.domain)
+    else:
+        gsuite_client = None
 
 
 @pytest.fixture

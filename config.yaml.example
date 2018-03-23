@@ -40,3 +40,9 @@ aws:
       ports:
         - 22
         - 2222
+gsuite:
+  domain: 'example.com'
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
