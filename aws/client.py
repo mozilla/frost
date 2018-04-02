@@ -21,6 +21,7 @@ def get_session(profile=None):
     # If AWS_PROFILE is set and does not match what we want, unset this variable before
     # we proceed.
     if 'AWS_PROFILE' in os.environ and os.environ['AWS_PROFILE'] != profile:
+        warnings.warn("$AWS_PROFILE and --aws-profile do not match. Using --aws-profile value {}".format(profile))
         del os.environ['AWS_PROFILE']
 
     # can raise botocore.exceptions.ProfileNotFound
