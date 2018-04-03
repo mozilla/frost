@@ -47,6 +47,24 @@ def ec2_ebs_volumes():
         .values()
 
 
+def ec2_flow_logs():
+    "https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_flow_logs"
+    return botocore_client.get(
+        'ec2', 'describe_flow_logs', [], {})\
+        .extract_key('FlowLogs')\
+        .flatten()\
+        .values()
+
+
+def ec2_vpcs():
+    "https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_vpcs"
+    return botocore_client.get(
+        'ec2', 'describe_vpcs', [], {})\
+        .extract_key('Vpcs')\
+        .flatten()\
+        .values()
+
+
 def ec2_security_groups_with_in_use_flag():
     """Returns security groups with an additional "InUse" key,
     which is True if it is associated with at least one resource.
