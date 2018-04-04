@@ -170,6 +170,11 @@ class BotocoreClient:
 
         self.results = []
 
+    def get_regions(self):
+        if self.offline:
+            return []
+        return self.regions
+
     def get(self,
             service_name,
             method_name,
