@@ -200,6 +200,22 @@ def iam_admin_roles():
     return [role for role in iam_roles_with_policies() if user_is_admin(role)]
 
 
+def iam_access_keys_for_user(username):
+    "https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_access_keys"
+    return botocore_client.get(
+        'iam', 'list_access_keys', [], {'UserName': username})\
+        .extract_key('AccessKeyMetadata')\
+        .flatten()\
+        .values()
+
+
+def iam_get_all_access_keys():
+    return sum([
+        iam_access_keys_for_user(username=user['UserName'])
+        for user in iam_users()
+    ], [])
+
+
 def iam_generate_credential_report():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report"
     results = botocore_client.get('iam', 'generate_credential_report', [], {}, do_not_cache=True).results

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dateutil.parser import parse
 
 
@@ -97,3 +99,47 @@ def user_is_inactive(iam_user, no_activity_since, created_after):
 def is_credential_active(credential_active, credential_last_used):
     return credential_active == 'true' and \
             credential_last_used not in ['N/A', 'no_information']
+
+
+def is_access_key_expired(iam_access_key, access_key_expiration_date):
+    """
+    Compares the CreateDate of the access key with the datetime object passed
+    in as `access_key_expiration_date` and returns True if the CreateDate is
+    before the `access_key_expiration_date` datetime object.
+
+    Returns False if the Status of the key is not `Active`, as though it may
+    have expired, it cannot be used.
+
+    >>> from datetime import datetime
+    >>> access_key_expiration_date = datetime(2018, 1, 8)
+
+    >>> is_access_key_expired({'Status': 'Inactive'}, access_key_expiration_date)
+    False
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2018, 1, 9)}, access_key_expiration_date)
+    False
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2020, 1, 9)}, access_key_expiration_date)
+    False
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': '2018-01-09'}, access_key_expiration_date)
+    False
+
+
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2018, 1, 7)}, access_key_expiration_date)
+    True
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2000, 1, 9)}, access_key_expiration_date)
+    True
+    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': '2017-01-09'}, access_key_expiration_date)
+    True
+    """
+
+    if iam_access_key['Status'] != 'Active':
+        return False
+
+    # This type checking is done because the caching in pytest-services will
+    # store datetime objects as strings. If the results are not from the cache,
+    # then `CreateDate` will be a datetime object, else it will be a string.
+    if isinstance(iam_access_key['CreateDate'], datetime):
+        access_key_create_date = iam_access_key['CreateDate']
+    else:
+        access_key_create_date = parse(iam_access_key['CreateDate'])
+
+    return access_key_expiration_date > access_key_create_date

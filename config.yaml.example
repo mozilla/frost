@@ -28,6 +28,9 @@ aws:
       months: 0
     created_after:
       weeks: 1
+  access_key_expires_after:
+    years: 1
+    months: 0
   required_tags:
     - Name
     - Type

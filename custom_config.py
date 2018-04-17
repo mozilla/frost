@@ -61,6 +61,7 @@ class AWSConfig(CustomConfigMixin):
         self.required_tags = frozenset(config.get('required_tags', []))
         self.whitelisted_ports_global = set(config.get('whitelisted_ports_global', []))
         self.whitelisted_ports = config.get('whitelisted_ports', [])
+        self.access_key_expires_after = config.get('access_key_expires_after', None)
         super().__init__(config)
 
     def get_whitelisted_ports(self, test_id):
@@ -77,6 +78,16 @@ class AWSConfig(CustomConfigMixin):
                 return set(rule['ports'])
 
         return set([])
+
+    def get_access_key_expiration_date(self):
+        if self.access_key_expires_after is None:
+            return datetime.now(timezone.utc)-relativedelta(years=+1)
+
+        return datetime.now(timezone.utc)-relativedelta(
+            years=+self.access_key_expires_after.get('years', 0),
+            months=+self.access_key_expires_after.get('months', 0),
+            weeks=+self.access_key_expires_after.get('weeks', 0)
+        )
 
 
 class GSuiteConfig(CustomConfigMixin):
