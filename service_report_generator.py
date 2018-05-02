@@ -7,6 +7,7 @@ Pytest Service JSON format:
   'name': 'pytest',
   'tool_url': 'https://github.com/mozilla-services/pytest-services',
   'version': 1,
+  'created_at': '2000-01-01 15:50:00.123123',
   'meanings': {
     'pass': {
       'short': 'pass',    // text that _could_ be used in a badge
@@ -56,6 +57,7 @@ service_json_template = {
     'name': 'pytest',
     'tool_url': 'https://github.com/mozilla-services/pytest-services',
     'version': 1,
+    'created_at': '',
     'meanings': {
         'pass': {
             'short': 'Pass',
@@ -318,6 +320,7 @@ def get_result_for_test(test):
 
 
 def pytest_json_to_service_json(pytest_json):
+    service_json_template['created_at'] = pytest_json['report']['created_at']
     service_json_template['results'] = []
 
     for test in pytest_json['report']['tests']:
