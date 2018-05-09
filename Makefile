@@ -20,11 +20,14 @@ ifeq ($(VIRTUAL_ENV),)
 	$(error "Run pytest-services from a virtualenv (try 'make install && source venv/bin/activate')")
 endif
 
-clean: clean-cache
+clean: clean-cache clean-python
 	rm -rf venv
 
 clean-cache: check_venv
 	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
+
+clean-python: check_venv
+	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
 doctest: check_venv
 	pytest --doctest-modules -s --offline --debug-calls
@@ -60,6 +63,7 @@ venv:
 	check_venv \
 	clean \
 	clean-cache \
+	clean-python \
 	flake8 \
 	install \
 	venv

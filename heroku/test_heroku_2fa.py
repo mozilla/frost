@@ -9,7 +9,7 @@
 
 # code for heroku/conftest.py START
 import pytest
-import resources
+from heroku import resources
 
 
 @pytest.fixture
