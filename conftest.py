@@ -8,6 +8,7 @@ from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
+from heroku.client import HerokuAdminClient
 
 import custom_config
 
@@ -15,6 +16,7 @@ import custom_config
 botocore_client = None
 gcp_client = None
 gsuite_client = None
+heroku_client = None
 
 
 def pytest_addoption(parser):
@@ -25,6 +27,10 @@ def pytest_addoption(parser):
     parser.addoption('--gcp-project-id',
                      type=str,
                      help='Set GCP project to test. Required for GCP tests.')
+
+    parser.addoption('--organization',
+                     type=str,
+                     help='Set organization to test. Used for Heroku tests.')
 
     parser.addoption('--debug-calls',
                      action='store_true',
@@ -48,12 +54,14 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
+    global heroku_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
     profiles = config.getoption('--aws-profiles')
     project_id = config.getoption('--gcp-project-id')
+    organization = config.getoption('--organization')
 
     botocore_client = BotocoreClient(
         profiles=profiles,
@@ -65,6 +73,15 @@ def pytest_configure(config):
     gcp_client = GCPClient(
         project_id=project_id,
         cache=config.cache,
+        debug_calls=config.getoption('--debug-calls'),
+        debug_cache=config.getoption('--debug-cache'),
+        offline=config.getoption('--offline'))
+
+    # import pudb; pudb.set_trace()
+    heroku_client = HerokuAdminClient(
+        organization=organization,
+        # cache=config.cache,
+        cache=None,
         debug_calls=config.getoption('--debug-calls'),
         debug_cache=config.getoption('--debug-cache'),
         offline=config.getoption('--offline'))
