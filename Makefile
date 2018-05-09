@@ -22,11 +22,12 @@ endif
 
 clean: clean-cache clean-python
 	rm -rf venv
+	# remember to deactivate your active virtual env
 
 clean-cache: check_venv
 	pytest --cache-clear --aws-profiles $(AWS_PROFILE)
 
-clean-python: check_venv
+clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
 doctest: check_venv

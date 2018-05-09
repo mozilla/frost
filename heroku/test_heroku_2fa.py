@@ -9,41 +9,41 @@
 
 # code for heroku/conftest.py START
 import pytest
-from heroku import resources
+from heroku.resources import users_no_2fa, app_users_no_2fa
 
 
 @pytest.fixture
 def affected_users():
-    roles = resources.users_no_2fa()
-    assert isinstance(roles, type([]))
+    roles = users_no_2fa()
+    # assert isinstance(roles, type([]))
     role = roles[0]
-    assert isinstance(role, type({}))
+    # assert isinstance(role, type({}))
     return role
 
 
 @pytest.fixture
 def affected_apps():
-    apps = resources.app_users_no_2fa()
-    assert isinstance(apps, type([]))
+    apps = app_users_no_2fa()
+    # assert isinstance(apps, type([]))
     app = apps[0]
-    assert isinstance(app, type({}))
+    # assert isinstance(app, type({}))
     return app
 
 
 @pytest.fixture
 def role_user():
-    l = [(role, email) for role, emails in affected_users().items()
-         for email in emails]
-    assert len(l) > 0
-    return l
+    result = [(role, email) for role, emails in affected_users().items()
+              for email in emails]
+    # assert len(result) > 0
+    return result
 
 
 @pytest.fixture
 def app_user():
-    l = [(app, email) for app, emails in affected_apps().items()
-         for email in emails]
-    assert len(l) > 0
-    return l
+    result = [(app, email) for app, emails in affected_apps().items()
+              for email in emails]
+    # assert len(result) > 0
+    return result
 
 
 # ##def pytest_generate_tests(metafunc):
