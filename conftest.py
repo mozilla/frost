@@ -28,6 +28,9 @@ def pytest_addoption(parser):
                      type=str,
                      help='Set GCP project to test. Required for GCP tests.')
 
+    # While only used for Heroku at the moment, GitHub tests are soon to be
+    # added, which will also need an "organization" option. Current plan is to
+    # reuse this one.
     parser.addoption('--organization',
                      type=str,
                      help='Set organization to test. Used for Heroku tests.')
@@ -77,7 +80,6 @@ def pytest_configure(config):
         debug_cache=config.getoption('--debug-cache'),
         offline=config.getoption('--offline'))
 
-    # import pudb; pudb.set_trace()
     heroku_client = HerokuAdminClient(
         organization=organization,
         # cache=config.cache,
