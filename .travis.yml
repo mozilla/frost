@@ -6,4 +6,4 @@ install:
   - make install
 
 script:
-  - make coverage flake8
+  - make doctest coverage flake8

@@ -34,7 +34,7 @@ doctest: check_venv
 	pytest --doctest-modules -s --offline --debug-calls
 
 coverage: check_venv
-	pytest --cov-config .coveragerc --cov=. --cov-append \
+	pytest --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
