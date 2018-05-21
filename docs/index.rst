@@ -10,7 +10,7 @@ Welcome to PyTest Services's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   NewServices.rst
 
 Indices and tables
 ==================
