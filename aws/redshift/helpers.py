@@ -1,7 +1,5 @@
-
-
 def redshift_cluster_security_group_test_id(security_group):
-    return security_group['ClusterSecurityGroupName']
+    return security_group["ClusterSecurityGroupName"]
 
 
 def redshift_cluster_security_group_is_open_to_all_ips(security_group):
@@ -24,8 +22,8 @@ def redshift_cluster_security_group_is_open_to_all_ips(security_group):
     False
 
     """
-    for ipr in security_group.get('IPRanges', []):
-        if ipr.get('CIDRIP', None) in ['0.0.0.0/0', '::/0']:
+    for ipr in security_group.get("IPRanges", []):
+        if ipr.get("CIDRIP", None) in ["0.0.0.0/0", "::/0"]:
             return True
 
     return False

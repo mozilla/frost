@@ -32,16 +32,18 @@ def affected_apps():
 
 @pytest.fixture
 def role_user():
-    result = [(role, email) for role, emails in affected_users().items()
-              for email in emails]
+    result = [
+        (role, email) for role, emails in affected_users().items() for email in emails
+    ]
     # assert len(result) > 0
     return result
 
 
 @pytest.fixture
 def app_user():
-    result = [(app, email) for app, emails in affected_apps().items()
-              for email in emails]
+    result = [
+        (app, email) for app, emails in affected_apps().items() for email in emails
+    ]
     # assert len(result) > 0
     return result
 
@@ -54,12 +56,12 @@ def app_user():
 
 # code for heroku/conftest.py END
 @pytest.mark.heroku
-@pytest.mark.parametrize('role_user', role_user())
+@pytest.mark.parametrize("role_user", role_user())
 def test_users_have_2fa_enabled(role_user):
     assert not role_user
 
 
 @pytest.mark.heroku
-@pytest.mark.parametrize('app_user', app_user())
+@pytest.mark.parametrize("app_user", app_user())
 def test_no_apps_impacted(app_user):
     assert not app_user

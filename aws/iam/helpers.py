@@ -78,27 +78,41 @@ def user_is_inactive(iam_user, no_activity_since, created_after):
     True
     """
 
-    if parse(iam_user['user_creation_time']) > created_after:
+    if parse(iam_user["user_creation_time"]) > created_after:
         return False
 
-    if is_credential_active(iam_user['access_key_1_active'], iam_user['access_key_1_last_used_date']) and \
-            parse(iam_user['access_key_1_last_used_date']) > no_activity_since:
+    if (
+        is_credential_active(
+            iam_user["access_key_1_active"], iam_user["access_key_1_last_used_date"]
+        )
+        and parse(iam_user["access_key_1_last_used_date"]) > no_activity_since
+    ):
         return False
 
-    if is_credential_active(iam_user['access_key_2_active'], iam_user['access_key_2_last_used_date']) and \
-            parse(iam_user['access_key_2_last_used_date']) > no_activity_since:
+    if (
+        is_credential_active(
+            iam_user["access_key_2_active"], iam_user["access_key_2_last_used_date"]
+        )
+        and parse(iam_user["access_key_2_last_used_date"]) > no_activity_since
+    ):
         return False
 
-    if is_credential_active(iam_user['password_enabled'], iam_user['password_last_used']) and \
-            parse(iam_user['password_last_used']) > no_activity_since:
+    if (
+        is_credential_active(
+            iam_user["password_enabled"], iam_user["password_last_used"]
+        )
+        and parse(iam_user["password_last_used"]) > no_activity_since
+    ):
         return False
 
     return True
 
 
 def is_credential_active(credential_active, credential_last_used):
-    return credential_active == 'true' and \
-            credential_last_used not in ['N/A', 'no_information']
+    return credential_active == "true" and credential_last_used not in [
+        "N/A",
+        "no_information",
+    ]
 
 
 def is_access_key_expired(iam_access_key, access_key_expiration_date):
@@ -131,15 +145,15 @@ def is_access_key_expired(iam_access_key, access_key_expiration_date):
     True
     """
 
-    if iam_access_key['Status'] != 'Active':
+    if iam_access_key["Status"] != "Active":
         return False
 
     # This type checking is done because the caching in pytest-services will
     # store datetime objects as strings. If the results are not from the cache,
     # then `CreateDate` will be a datetime object, else it will be a string.
-    if isinstance(iam_access_key['CreateDate'], datetime):
-        access_key_create_date = iam_access_key['CreateDate']
+    if isinstance(iam_access_key["CreateDate"], datetime):
+        access_key_create_date = iam_access_key["CreateDate"]
     else:
-        access_key_create_date = parse(iam_access_key['CreateDate'])
+        access_key_create_date = parse(iam_access_key["CreateDate"])
 
     return access_key_expiration_date > access_key_create_date

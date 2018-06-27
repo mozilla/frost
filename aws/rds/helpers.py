@@ -1,5 +1,3 @@
-
-
 def is_rds_db_snapshot_attr_public_access(rds_db_snapshot_attribute):
     """
     Checks whether a RDS snapshot attribute is:
@@ -30,8 +28,10 @@ def is_rds_db_snapshot_attr_public_access(rds_db_snapshot_attribute):
     ...
     TypeError: 'NoneType' object is not subscriptable
     """
-    return rds_db_snapshot_attribute['AttributeName'] == 'restore' and \
-        'any' in rds_db_snapshot_attribute['AttributeValues']
+    return (
+        rds_db_snapshot_attribute["AttributeName"] == "restore"
+        and "any" in rds_db_snapshot_attribute["AttributeValues"]
+    )
 
 
 def does_rds_db_security_group_grant_public_access(sg):
@@ -45,7 +45,10 @@ def does_rds_db_security_group_grant_public_access(sg):
     >>> does_rds_db_security_group_grant_public_access({"IPRanges": []})
     False
     """
-    return any(ipr['CIDRIP'] == '0.0.0.0/0' and ipr['Status'] == 'authorized' for ipr in sg['IPRanges'])
+    return any(
+        ipr["CIDRIP"] == "0.0.0.0/0" and ipr["Status"] == "authorized"
+        for ipr in sg["IPRanges"]
+    )
 
 
 def does_vpc_security_group_grant_public_access(sg):
@@ -62,8 +65,16 @@ def does_vpc_security_group_grant_public_access(sg):
     ... {'IpPermissions': [{'Ipv6Ranges': [], 'IpRanges': [{'CidrIp': '192.168.1.0/0'}]}]})
     False
     """
-    public_ipv4 = any(ipr['CidrIp'] == '0.0.0.0/0' for ipp in sg['IpPermissions'] for ipr in ipp['IpRanges'])
-    public_ipv6 = any(ipr['CidrIpv6'] == '::/0' for ipp in sg['IpPermissions'] for ipr in ipp['Ipv6Ranges'])
+    public_ipv4 = any(
+        ipr["CidrIp"] == "0.0.0.0/0"
+        for ipp in sg["IpPermissions"]
+        for ipr in ipp["IpRanges"]
+    )
+    public_ipv6 = any(
+        ipr["CidrIpv6"] == "::/0"
+        for ipp in sg["IpPermissions"]
+        for ipr in ipp["Ipv6Ranges"]
+    )
     return public_ipv4 or public_ipv6
 
 
@@ -88,7 +99,7 @@ def is_rds_db_instance_encrypted(rds_db_instance):
     ...
     TypeError: 'NoneType' object is not subscriptable
     """
-    return bool(rds_db_instance['StorageEncrypted'])
+    return bool(rds_db_instance["StorageEncrypted"])
 
 
 def is_rds_db_snapshot_encrypted(rds_db_snapshot):
@@ -112,4 +123,4 @@ def is_rds_db_snapshot_encrypted(rds_db_snapshot):
     ...
     TypeError: 'NoneType' object is not subscriptable
     """
-    return bool(rds_db_snapshot['Encrypted'])
+    return bool(rds_db_snapshot["Encrypted"])

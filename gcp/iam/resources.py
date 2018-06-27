@@ -6,7 +6,7 @@ def service_accounts():
         "iam",
         "projects.serviceAccounts",
         results_key="accounts",
-        call_kwargs={'name': 'projects/'+gcp_client.get_project_id()}
+        call_kwargs={"name": "projects/" + gcp_client.get_project_id()},
     )
 
 
@@ -15,7 +15,7 @@ def service_account_keys(service_account):
         "iam",
         "projects.serviceAccounts.keys",
         results_key="keys",
-        call_kwargs={'name': service_account['name']}
+        call_kwargs={"name": service_account["name"]},
     )
 
 

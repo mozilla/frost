@@ -20,9 +20,13 @@ def get_session(profile=None):
 
     # If AWS_PROFILE is set and does not match what we want, unset this variable before
     # we proceed.
-    if 'AWS_PROFILE' in os.environ and os.environ['AWS_PROFILE'] != profile:
-        warnings.warn("$AWS_PROFILE and --aws-profile do not match. Using --aws-profile value {}".format(profile))
-        del os.environ['AWS_PROFILE']
+    if "AWS_PROFILE" in os.environ and os.environ["AWS_PROFILE"] != profile:
+        warnings.warn(
+            "$AWS_PROFILE and --aws-profile do not match. Using --aws-profile value {}".format(
+                profile
+            )
+        )
+        del os.environ["AWS_PROFILE"]
 
     # can raise botocore.exceptions.ProfileNotFound
     return botocore.session.Session(profile=profile)
@@ -38,7 +42,7 @@ def get_client(profile, region, service):
     session = get_session(profile)
 
     if region not in session.get_available_regions(service):
-        warnings.warn('service {} not available in {}'.format(service, region))
+        warnings.warn("service {} not available in {}".format(service, region))
 
     return session.create_client(service, region_name=region)
 
@@ -50,7 +54,7 @@ def get_available_profiles(profile=None):
 
 @functools.lru_cache(maxsize=1)
 def get_available_regions(profile=None):
-    return get_session(profile=profile).get_available_regions('ec2')
+    return get_session(profile=profile).get_available_regions("ec2")
 
 
 @functools.lru_cache()
@@ -67,7 +71,7 @@ def full_results(client, method, args, kwargs):
         return getattr(client, method)(*args, **kwargs)
 
 
-AWSAPICall = namedtuple('AWSAPICall', 'profile region service method args kwargs')
+AWSAPICall = namedtuple("AWSAPICall", "profile region service method args kwargs")
 default_call = AWSAPICall(*[None] * (len(AWSAPICall._fields) - 2) + [[], {}])
 
 
@@ -83,40 +87,49 @@ def cache_key(call):
     ... kwargs=dict(kwarg1=True)))
     'pytest_aws:profile:region:service_name:method_name:arg1,arg2:kwarg1=True.json'
     """
-    return ':'.join([
-        'pytest_aws',
-        str(call.profile),
-        str(call.region),
-        str(call.service),
-        str(call.method),
-        ','.join(call.args),
-        ','.join('{}={}'.format(k, v) for (k, v) in call.kwargs.items()),
-    ]) + '.json'
+    return (
+        ":".join(
+            [
+                "pytest_aws",
+                str(call.profile),
+                str(call.region),
+                str(call.service),
+                str(call.method),
+                ",".join(call.args),
+                ",".join("{}={}".format(k, v) for (k, v) in call.kwargs.items()),
+            ]
+        )
+        + ".json"
+    )
 
 
-def get_aws_resource(service_name,
-                     method_name,
-                     call_args,
-                     call_kwargs,
-                     cache,
-                     profiles,
-                     regions,
-                     result_from_error=None,
-                     debug_calls=False,
-                     debug_cache=False):
+def get_aws_resource(
+    service_name,
+    method_name,
+    call_args,
+    call_kwargs,
+    cache,
+    profiles,
+    regions,
+    result_from_error=None,
+    debug_calls=False,
+    debug_cache=False,
+):
     """
     Fetches and yields AWS API JSON responses for all profiles and regions (list params)
     """
     for profile, region in itertools.product(profiles, regions):
-        call = default_call._replace(profile=profile,
-                                     region=region,
-                                     service=service_name,
-                                     method=method_name,
-                                     args=call_args,
-                                     kwargs=call_kwargs)
+        call = default_call._replace(
+            profile=profile,
+            region=region,
+            service=service_name,
+            method=method_name,
+            args=call_args,
+            kwargs=call_kwargs,
+        )
 
         if debug_calls:
-            print('calling', call)
+            print("calling", call)
 
         result = None
         if cache is not None:
@@ -124,25 +137,25 @@ def get_aws_resource(service_name,
             result = cache.get(ckey, None)
 
             if debug_cache and result is not None:
-                print('found cached value for', ckey)
+                print("found cached value for", ckey)
 
         if result is None:
             client = get_client(call.profile, call.region, call.service)
             try:
                 result = full_results(client, call.method, call.args, call.kwargs)
-                result['__pytest_meta'] = dict(profile=call.profile, region=call.region)
+                result["__pytest_meta"] = dict(profile=call.profile, region=call.region)
             except botocore.exceptions.ClientError as error:
                 if result_from_error is None:
                     raise error
                 else:
                     if debug_calls:
-                        print('error fetching resource', error, call)
+                        print("error fetching resource", error, call)
 
                     result = result_from_error(error, call)
 
             if cache is not None:
                 if debug_cache:
-                    print('setting cache value for', ckey)
+                    print("setting cache value for", ckey)
 
                 cache.set(ckey, result)
 
@@ -150,13 +163,7 @@ def get_aws_resource(service_name,
 
 
 class BotocoreClient:
-
-    def __init__(self,
-                 profiles,
-                 cache,
-                 debug_calls,
-                 debug_cache,
-                 offline):
+    def __init__(self, profiles, cache, debug_calls, debug_cache, offline):
         self.profiles = profiles or [None]
         self.cache = cache
 
@@ -165,7 +172,7 @@ class BotocoreClient:
         self.offline = offline
 
         if offline:
-            self.regions = ['us-east-1']
+            self.regions = ["us-east-1"]
         else:
             self.regions = get_available_regions()
 
@@ -176,15 +183,17 @@ class BotocoreClient:
             return []
         return self.regions
 
-    def get(self,
-            service_name,
-            method_name,
-            call_args,
-            call_kwargs,
-            profiles=None,
-            regions=None,
-            result_from_error=None,
-            do_not_cache=False):
+    def get(
+        self,
+        service_name,
+        method_name,
+        call_args,
+        call_kwargs,
+        profiles=None,
+        regions=None,
+        result_from_error=None,
+        do_not_cache=False,
+    ):
 
         # TODO:
         # For services that don't have the concept of regions,
@@ -197,17 +206,20 @@ class BotocoreClient:
         if self.offline:
             self.results = []
         else:
-            self.results = list(get_aws_resource(
-                service_name,
-                method_name,
-                call_args,
-                call_kwargs,
-                profiles=profiles or self.profiles,
-                regions=regions or self.regions,
-                cache=self.cache if not do_not_cache else None,
-                result_from_error=result_from_error,
-                debug_calls=self.debug_calls,
-                debug_cache=self.debug_cache))
+            self.results = list(
+                get_aws_resource(
+                    service_name,
+                    method_name,
+                    call_args,
+                    call_kwargs,
+                    profiles=profiles or self.profiles,
+                    regions=regions or self.regions,
+                    cache=self.cache if not do_not_cache else None,
+                    result_from_error=result_from_error,
+                    debug_calls=self.debug_calls,
+                    debug_cache=self.debug_cache,
+                )
+            )
 
         return self
 
@@ -276,9 +288,9 @@ class BotocoreClient:
                         # Added for IAM inline policies call, as it
                         # returns a list of strings.
                         if isinstance(item, dict):
-                            item['__pytest_meta'] = result['__pytest_meta']
+                            item["__pytest_meta"] = result["__pytest_meta"]
                 elif isinstance(keyed_result, dict):
-                    keyed_result['__pytest_meta'] = result['__pytest_meta']
+                    keyed_result["__pytest_meta"] = result["__pytest_meta"]
 
             # skip setting metadata for primitives
             tmp.append(keyed_result)

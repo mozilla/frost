@@ -5,8 +5,7 @@ from conftest import heroku_client
 def users_no_2fa():
     """
     """
-    raw = heroku_client.get(
-        'all', [], {})
+    raw = heroku_client.get("all", [], {})
     just_key = raw.extract_key(heroku_client.data_set_names.ROLE_USER, [])
     datum = just_key.results or [{}]
     return datum
@@ -20,8 +19,7 @@ def users_no_2fa():
 def app_users_no_2fa():
     """
     """
-    raw = heroku_client.get(
-        'all', [], {})
+    raw = heroku_client.get("all", [], {})
     just_key = raw.extract_key(heroku_client.data_set_names.APP_USER, [])
     datum = just_key.results or [{}]
     return datum

@@ -90,20 +90,22 @@ def load(rules):
         return processed_rules
 
     for rule in rules:
-        test_name, test_id = rule['test_name'], rule['test_param_id']
-        expiration, reason = rule['expiration_day'], rule['reason']
+        test_name, test_id = rule["test_name"], rule["test_param_id"]
+        expiration, reason = rule["expiration_day"], rule["reason"]
 
         if expiration < date.today():
             warnings.warn(
-                'Exemptions: test_name: {} | test_id: {} | Skipping rule with expiration day in the past {!r}'
-                .format(test_name, test_id, expiration)
+                "Exemptions: test_name: {} | test_id: {} | Skipping rule with expiration day in the past {!r}".format(
+                    test_name, test_id, expiration
+                )
             )
             continue
 
         if test_id in processed_rules[test_name]:
             warnings.warn(
-                'Exemptions: test_name: {} | test_id: {} | Skipping duplicate test name and ID'
-                .format(test_name, test_id)
+                "Exemptions: test_name: {} | test_id: {} | Skipping duplicate test name and ID".format(
+                    test_name, test_id
+                )
             )
             continue
 
@@ -116,8 +118,12 @@ def add_xfail_marker(item):
     """
     Adds xfail markers for test names and ids specified in the exemptions conf.
     """
-    if not item.get_marker('parametrize'):
-        warnings.warn('Skipping exemption checks for test without resource name {!r}'.format(item.name))
+    if not item.get_marker("parametrize"):
+        warnings.warn(
+            "Skipping exemption checks for test without resource name {!r}".format(
+                item.name
+            )
+        )
         return
 
     test_exemptions = item.config.custom_config.exemptions.get(item.originalname, None)
@@ -126,13 +132,19 @@ def add_xfail_marker(item):
     if test_exemptions:
         # Check for any substring matchers
         for exemption_test_id in test_exemptions:
-            if exemption_test_id.startswith('*'):
+            if exemption_test_id.startswith("*"):
                 substring = exemption_test_id[1:]
                 if re.search(substring, test_id):
                     expiration, reason = test_exemptions[exemption_test_id]
-                    item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
+                    item.add_marker(
+                        pytest.mark.xfail(
+                            reason=reason, strict=True, expiration=expiration
+                        )
+                    )
                     return
 
         if test_id in test_exemptions:
             expiration, reason = test_exemptions[test_id]
-            item.add_marker(pytest.mark.xfail(reason=reason, strict=True, expiration=expiration))
+            item.add_marker(
+                pytest.mark.xfail(reason=reason, strict=True, expiration=expiration)
+            )

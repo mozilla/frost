@@ -11,7 +11,7 @@ from aws.redshift.helpers import (
 
 @pytest.mark.redshift
 @pytest.mark.parametrize(
-    'security_group',
+    "security_group",
     redshift_cluster_security_groups(),
     ids=redshift_cluster_security_group_test_id,
 )

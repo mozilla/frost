@@ -3,23 +3,11 @@ from apiclient.discovery import build as build_service
 
 
 def cache_key(project_id, version, product, subproduct):
-    return ':'.join([
-        'pytest_gcp',
-        project_id,
-        version,
-        product,
-        subproduct
-    ]) + '.json'
+    return ":".join(["pytest_gcp", project_id, version, product, subproduct]) + ".json"
 
 
 class GCPClient:
-
-    def __init__(self,
-                 project_id,
-                 cache,
-                 debug_calls,
-                 debug_cache,
-                 offline):
+    def __init__(self, project_id, cache, debug_calls, debug_cache, offline):
         self.project_id = project_id
         self.cache = cache
         self.debug_calls = debug_calls
@@ -28,18 +16,24 @@ class GCPClient:
 
     def get_project_id(self):
         if self.offline:
-            return 'test'
+            return "test"
         return self.project_id
 
-    def list(self, product, subproduct, version="v1", results_key='items', call_kwargs=None):
+    def list(
+        self, product, subproduct, version="v1", results_key="items", call_kwargs=None
+    ):
         """Public list func. See _list func docstring for more info"""
         if self.offline:
             results = []
         else:
-            results = list(self._list(product, subproduct, version, results_key, call_kwargs))
+            results = list(
+                self._list(product, subproduct, version, results_key, call_kwargs)
+            )
         return results
 
-    def _list(self, product, subproduct, version="v1", results_key='items', call_kwargs=None):
+    def _list(
+        self, product, subproduct, version="v1", results_key="items", call_kwargs=None
+    ):
         """
         Internal function for calling .list() on some service's resource. Supports debug printing
         and caching of the response.
@@ -47,18 +41,20 @@ class GCPClient:
         If you want empty call kwargs, pass in `{}`.
         """
         if call_kwargs is None:
-            call_kwargs = {'project': self.project_id}
+            call_kwargs = {"project": self.project_id}
 
         ckey = cache_key(self.project_id, version, product, subproduct)
         cached_result = self.cache.get(ckey, None)
         if cached_result is not None:
-            print('found cached value for', ckey)
+            print("found cached value for", ckey)
             return cached_result
 
-        results = self._get_list_results(product, subproduct, version, results_key, call_kwargs)
+        results = self._get_list_results(
+            product, subproduct, version, results_key, call_kwargs
+        )
 
         if self.debug_cache:
-            print('setting cache value for', ckey)
+            print("setting cache value for", ckey)
 
         self.cache.set(ckey, results)
 
@@ -73,12 +69,12 @@ class GCPClient:
         """
         service = self._service(product, version)
 
-        api_entity = getattr(service, subproduct.split('.')[0])()
-        for entity in subproduct.split('.')[1:]:
+        api_entity = getattr(service, subproduct.split(".")[0])()
+        for entity in subproduct.split(".")[1:]:
             api_entity = getattr(api_entity, entity)()
 
         if self.debug_calls:
-            print('calling', api_entity)
+            print("calling", api_entity)
 
         if self._zone_aware(product, subproduct):
             results = []
@@ -86,10 +82,8 @@ class GCPClient:
                 results = sum(
                     [results],
                     self._list_all_items(
-                        api_entity,
-                        {**call_kwargs, 'zone': zone},
-                        results_key
-                    )
+                        api_entity, {**call_kwargs, "zone": zone}, results_key
+                    ),
                 )
         else:
             results = self._list_all_items(api_entity, call_kwargs, results_key)
@@ -128,6 +122,11 @@ class GCPClient:
     def _list_zones(self):
         """Internal helper for listing all zones"""
         # TODO: exception handling
-        response = self._service('compute').zones().list(project=self.project_id).execute()['items']
+        response = (
+            self._service("compute")
+            .zones()
+            .list(project=self.project_id)
+            .execute()["items"]
+        )
         for result in response:
-                yield result['name']
+            yield result["name"]
