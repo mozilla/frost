@@ -10,7 +10,7 @@ def no_activity_since(pytestconfig):
 
 
 @pytest.mark.gsuite_admin
-@pytest.mark.parametrize('user', list_users(), ids=lambda u: u['primaryEmail'])
+@pytest.mark.parametrize("user", list_users(), ids=lambda u: u["primaryEmail"])
 def test_admin_user_is_inactive(user, no_activity_since):
     """Tests whether user is active by checking lastLoginTime"""
     assert user_is_inactive(user, no_activity_since)

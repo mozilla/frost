@@ -15,16 +15,16 @@ def ip_permission_opens_all_ports(ipp):
     >>> ip_permission_opens_all_ports({'ToPort': -1})
     False
     """
-    if 'FromPort' not in ipp or 'ToPort' not in ipp:
+    if "FromPort" not in ipp or "ToPort" not in ipp:
         return False
 
-    from_port, to_port = ipp['FromPort'], ipp['ToPort']
+    from_port, to_port = ipp["FromPort"], ipp["ToPort"]
 
     # -1 indicates all ICMP/ICMPv6 codes
     if from_port == -1 or to_port == -1:
         return True
 
-    if ipp['FromPort'] <= 1 and ipp['ToPort'] >= 65535:
+    if ipp["FromPort"] <= 1 and ipp["ToPort"] >= 65535:
         return True
 
     return False
@@ -48,12 +48,12 @@ def ip_permission_cidr_allows_all_ips(ipp):
     >>> ip_permission_cidr_allows_all_ips({})
     False
     """
-    for ip_range in ipp.get('IpRanges', []):
-        if ip_range.get('CidrIp', '') == '0.0.0.0/0':
+    for ip_range in ipp.get("IpRanges", []):
+        if ip_range.get("CidrIp", "") == "0.0.0.0/0":
             return True
 
-    for ip_range in ipp.get('Ipv6Ranges', []):
-        if ip_range.get('CidrIpv6', '') == '::/0':
+    for ip_range in ipp.get("Ipv6Ranges", []):
+        if ip_range.get("CidrIpv6", "") == "::/0":
             return True
 
     return False
@@ -73,8 +73,8 @@ def ip_permission_grants_access_to_group_with_id(ipp, security_group_id):
     >>> ip_permission_grants_access_to_group_with_id({}, 'test-sgid')
     False
     """
-    for user_id_group_pair in ipp.get('UserIdGroupPairs', []):
-        if user_id_group_pair.get('GroupId', None) == security_group_id:
+    for user_id_group_pair in ipp.get("UserIdGroupPairs", []):
+        if user_id_group_pair.get("GroupId", None) == security_group_id:
             return True
 
     return False
@@ -96,11 +96,11 @@ def ec2_security_group_opens_all_ports(ec2_security_group):
     >>> ec2_security_group_opens_all_ports({})
     False
     """
-    if 'IpPermissions' not in ec2_security_group:
+    if "IpPermissions" not in ec2_security_group:
         return False
 
-    for ipp in ec2_security_group['IpPermissions']:
-        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+    for ipp in ec2_security_group["IpPermissions"]:
+        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
             continue
         if ip_permission_opens_all_ports(ipp):
             return True
@@ -146,19 +146,20 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
     >>> ec2_security_group_opens_all_ports_to_self([])
     False
     """
-    if 'GroupId' not in ec2_security_group:
+    if "GroupId" not in ec2_security_group:
         return False
 
-    self_group_id = ec2_security_group['GroupId']
+    self_group_id = ec2_security_group["GroupId"]
 
-    if 'IpPermissions' not in ec2_security_group:
+    if "IpPermissions" not in ec2_security_group:
         return False
 
-    for ipp in ec2_security_group['IpPermissions']:
-        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+    for ipp in ec2_security_group["IpPermissions"]:
+        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
             continue
-        if ip_permission_opens_all_ports(ipp) and \
-                ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
+        if ip_permission_opens_all_ports(
+            ipp
+        ) and ip_permission_grants_access_to_group_with_id(ipp, self_group_id):
             return True
 
     return False
@@ -190,19 +191,23 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
     >>> ec2_security_group_opens_all_ports_to_all([])
     False
     """
-    if 'IpPermissions' not in ec2_security_group:
+    if "IpPermissions" not in ec2_security_group:
         return False
 
-    for ipp in ec2_security_group['IpPermissions']:
-        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+    for ipp in ec2_security_group["IpPermissions"]:
+        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
             continue
-        if ip_permission_opens_all_ports(ipp) and ip_permission_cidr_allows_all_ips(ipp):
+        if ip_permission_opens_all_ports(ipp) and ip_permission_cidr_allows_all_ips(
+            ipp
+        ):
             return True
 
     return False
 
 
-def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelisted_ports=None):
+def ec2_security_group_opens_specific_ports_to_all(
+    ec2_security_group, whitelisted_ports=None
+):
     """
     Returns True if an ec2 security group includes a permission
     allowing all IPs inbound access on specific unsafe ports and False
@@ -231,18 +236,18 @@ def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelist
     if whitelisted_ports is None:
         whitelisted_ports = []
 
-    if 'IpPermissions' not in ec2_security_group:
+    if "IpPermissions" not in ec2_security_group:
         return False
 
-    for ipp in ec2_security_group['IpPermissions']:
-        if 'IpProtocol' in ipp and ipp['IpProtocol'] == "icmp":
+    for ipp in ec2_security_group["IpPermissions"]:
+        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
             continue
 
         if ip_permission_cidr_allows_all_ips(ipp):
-            if 'FromPort' not in ipp or 'ToPort' not in ipp:
+            if "FromPort" not in ipp or "ToPort" not in ipp:
                 continue
 
-            from_port, to_port = ipp['FromPort'], ipp['ToPort']
+            from_port, to_port = ipp["FromPort"], ipp["ToPort"]
             if from_port == to_port and from_port in [80, 443]:
                 continue
 
@@ -256,12 +261,12 @@ def ec2_security_group_opens_specific_ports_to_all(ec2_security_group, whitelist
 
 def ec2_instance_test_id(ec2_instance):
     """A getter fn for test ids for EC2 instances"""
-    return '{0[InstanceId]}'.format(ec2_instance)
+    return "{0[InstanceId]}".format(ec2_instance)
 
 
 def ec2_security_group_test_id(ec2_security_group):
     """A getter fn for test ids for EC2 security groups"""
-    return '{0[GroupId]} {0[GroupName]}'.format(ec2_security_group)
+    return "{0[GroupId]} {0[GroupName]}".format(ec2_security_group)
 
 
 def is_ebs_volume_encrypted(ebs):
@@ -285,7 +290,7 @@ def is_ebs_volume_encrypted(ebs):
     ...
     TypeError: 'NoneType' object is not subscriptable
     """
-    return ebs['Encrypted']
+    return ebs["Encrypted"]
 
 
 def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
@@ -298,6 +303,6 @@ def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     ... 'InstanceId': 'iid', 'Tags': [{'Key': 'Bar'}]}, frozenset(['Name']))
     frozenset({'Name'})
     """
-    tags = ec2_instance.get('Tags', [])
-    instance_tag_names = set(tag['Key'] for tag in tags if 'Key' in tag)
+    tags = ec2_instance.get("Tags", [])
+    instance_tag_names = set(tag["Key"] for tag in tags if "Key" in tag)
     return required_tag_names - instance_tag_names

@@ -73,12 +73,17 @@ def load(rules):
         return processed_rules
 
     for rule in rules:
-        test_name, test_id, comment = rule['test_name'], rule['test_param_id'], rule['comment']
+        test_name, test_id, comment = (
+            rule["test_name"],
+            rule["test_param_id"],
+            rule["comment"],
+        )
 
         if test_id in processed_rules[test_name]:
             warnings.warn(
-                'Regressions: test_name: {} | test_id: {} | Skipping duplicate test name and ID'
-                .format(test_name, test_id)
+                "Regressions: test_name: {} | test_id: {} | Skipping duplicate test name and ID".format(
+                    test_name, test_id
+                )
             )
             continue
 
@@ -92,16 +97,22 @@ def add_regression_marker(item):
     """
     Adds regression markers as specified in the config file.
     """
-    if not item.get_marker('parametrize'):
-        warnings.warn('Skipping regression checks for test without resource name {!r}'.format(item.name))
+    if not item.get_marker("parametrize"):
+        warnings.warn(
+            "Skipping regression checks for test without resource name {!r}".format(
+                item.name
+            )
+        )
         return
 
-    test_regressions = item.config.custom_config.regressions.get(item.originalname, None)
+    test_regressions = item.config.custom_config.regressions.get(
+        item.originalname, None
+    )
     test_id = item._genid
 
     if test_regressions:
         for regression_test_id in test_regressions:
-            if regression_test_id.startswith('*'):
+            if regression_test_id.startswith("*"):
                 substring = regression_test_id[1:]
                 if re.search(substring, test_id):
                     comment = test_regressions[regression_test_id]

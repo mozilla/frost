@@ -30,18 +30,15 @@ def datetime_encode_set(self, key, value):
     try:
         path.dirpath().ensure_dir()
     except (py.error.EEXIST, py.error.EACCES):
-        self.config.warn(
-            code='I9', message='could not create cache path %s' % (path,)
-            )
+        self.config.warn(code="I9", message="could not create cache path %s" % (path,))
         return
     try:
-        f = path.open('w')
+        f = path.open("w")
     except py.error.ENOTDIR:
-        self.config.warn(
-            code='I9', message='cache could not write path %s' % (path,))
+        self.config.warn(code="I9", message="cache could not write path %s" % (path,))
     else:
         with f:
-            self.trace("cache-write %s: %r" % (key, value,))
+            self.trace("cache-write %s: %r" % (key, value))
             json.dump(value, f, indent=4, sort_keys=True, default=json_iso_datetimes)
 
 
