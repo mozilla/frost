@@ -44,6 +44,9 @@ coverage: check_venv
 flake8: check_venv
 	flake8 --max-line-length 120 $(shell git ls-files | grep \.py$$)
 
+black: check_venv
+	black --check $(shell git ls-files | grep \.py$$)
+
 install: venv
 	( . venv/bin/activate && pip install -r requirements.txt )
 
