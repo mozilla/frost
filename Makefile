@@ -20,6 +20,10 @@ ifeq ($(VIRTUAL_ENV),)
 	$(error "Run pytest-services from a virtualenv (try 'make install && source venv/bin/activate')")
 endif
 
+check_conftest_imports:
+	# refs: https://github.com/mozilla-services/pytest-services/issues/119
+	rg '^import\s+conftest|^from\s+conftest\s+import\s+pytest' -g '*.py'; [ $$? -eq 1 ]
+
 clean: clean-cache clean-python
 	rm -rf venv
 	# remember to deactivate your active virtual env
@@ -64,6 +68,7 @@ venv:
 .PHONY:
 	all \
 	check_venv \
+	check_conftest_imports \
 	clean \
 	clean-cache \
 	clean-python \
