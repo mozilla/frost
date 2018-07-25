@@ -1,5 +1,5 @@
 botocore==1.10.63
-coverage==4.5
+coverage==4.5.1
 black==18.6b4
 google_api_python_client==1.6.1
 PyYAML==3.13
@@ -9,5 +9,5 @@ pytest-html==1.16.1
 pytest-json==0.4.0
 pytest-metadata==1.5.1
 pytest==3.3.2
-python-dateutil==2.6.1
+python-dateutil==2.7.3
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
