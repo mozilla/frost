@@ -1,5 +1,5 @@
 botocore==1.10.62
-coverage==4.5
+coverage==4.5.1
 black==18.6b4
 google_api_python_client==1.6.1
 PyYAML==3.13
