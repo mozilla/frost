@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from dateutil.parser import parse
 
 
@@ -133,27 +132,15 @@ def is_access_key_expired(iam_access_key, access_key_expiration_date):
     False
     >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2020, 1, 9)}, access_key_expiration_date)
     False
-    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': '2018-01-09'}, access_key_expiration_date)
-    False
-
 
     >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2018, 1, 7)}, access_key_expiration_date)
     True
     >>> is_access_key_expired({'Status': 'Active', 'CreateDate': datetime(2000, 1, 9)}, access_key_expiration_date)
-    True
-    >>> is_access_key_expired({'Status': 'Active', 'CreateDate': '2017-01-09'}, access_key_expiration_date)
     True
     """
 
     if iam_access_key["Status"] != "Active":
         return False
 
-    # This type checking is done because the caching in pytest-services will
-    # store datetime objects as strings. If the results are not from the cache,
-    # then `CreateDate` will be a datetime object, else it will be a string.
-    if isinstance(iam_access_key["CreateDate"], datetime):
-        access_key_create_date = iam_access_key["CreateDate"]
-    else:
-        access_key_create_date = parse(iam_access_key["CreateDate"])
-
-    return access_key_expiration_date > access_key_create_date
+    assert isinstance(iam_access_key["CreateDate"], datetime)
+    return access_key_expiration_date > iam_access_key["CreateDate"]
