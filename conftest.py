@@ -250,15 +250,17 @@ def pytest_runtest_makereport(item, call):
         description = item._obj.__doc__ and clean_docstring(item._obj.__doc__)
 
         # add json metadata
-        report.test_metadata = serialize_datetimes(dict(
-            description=description,
-            markers=markers,
-            metadata=metadata,
-            outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
-            parametrized_name=item.name,
-            rationale=rationale,
-            reason=reason,
-            severity=severity,
-            regression=regression,
-            unparametrized_name=item.originalname,
-        ))
+        report.test_metadata = serialize_datetimes(
+            dict(
+                description=description,
+                markers=markers,
+                metadata=metadata,
+                outcome=outcome,  # 'passed', 'failed', 'skipped', 'xfailed', 'xskipped', or 'errored'
+                parametrized_name=item.name,
+                rationale=rationale,
+                reason=reason,
+                severity=severity,
+                regression=regression,
+                unparametrized_name=item.originalname,
+            )
+        )
