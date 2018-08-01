@@ -164,6 +164,8 @@ def serialize_datetimes(obj):
     """
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
+    elif isinstance(obj, list):
+        return [serialize_datetimes(item) for item in obj]
     elif isinstance(obj, dict):
         new_obj = {}
         for k, v in obj.items():
