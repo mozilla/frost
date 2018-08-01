@@ -52,7 +52,7 @@ black: check_venv
 	black --check $(shell git ls-files | grep \.py$$)
 
 install: venv
-	( . venv/bin/activate && pip install -r requirements.txt )
+	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt )
 
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
