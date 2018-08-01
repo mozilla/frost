@@ -1,4 +1,5 @@
 import argparse
+import datetime
 
 import pytest
 
@@ -149,6 +150,29 @@ METADATA_KEYS = [
 ]
 
 
+def serialize_datetimes(obj):
+    """Serializes datetimes to ISO format strings.
+
+    Used on report test_metadata since pytest-json doesn't let us pass
+    options to the serializer.
+
+    >>> from datetime import datetime
+    >>> serialize_datetimes({datetime(2000, 1, 1): -1})
+    {'2000-01-01T00:00:00': -1}
+    >>> serialize_datetimes({'foo': datetime(2000, 1, 1)})
+    {'foo': '2000-01-01T00:00:00'}
+    """
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        new_obj = {}
+        for k, v in obj.items():
+            new_obj[serialize_datetimes(k)] = serialize_datetimes(v)
+        return new_obj
+
+    return obj
+
+
 def extract_metadata(resource):
     return {
         metadata_key: resource[metadata_key]
@@ -226,7 +250,7 @@ def pytest_runtest_makereport(item, call):
         description = item._obj.__doc__ and clean_docstring(item._obj.__doc__)
 
         # add json metadata
-        report.test_metadata = dict(
+        report.test_metadata = serialize_datetimes(dict(
             description=description,
             markers=markers,
             metadata=metadata,
@@ -237,4 +261,4 @@ def pytest_runtest_makereport(item, call):
             severity=severity,
             regression=regression,
             unparametrized_name=item.originalname,
-        )
+        ))
