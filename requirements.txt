@@ -3,7 +3,6 @@ coverage==4.5.1
 black==18.6b4
 google_api_python_client==1.6.1
 PyYAML==3.13
-pygerduty==0.37.0
 pytest-cov==2.5.1
 pytest-html==1.19.0
 pytest-json==0.4.0
