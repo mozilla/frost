@@ -16,6 +16,8 @@ class CustomConfig:
             parsed_config = yaml.load(config_fd)
         self.aws = AWSConfig(parsed_config.get("aws", {}))
         self.gsuite = GSuiteConfig(parsed_config.get("gsuite", {}))
+        self.pagerduty = PagerdutyConfig(parsed_config.get("pagerduty", {}))
+
         self.exemptions = exemptions.load(parsed_config.get("exemptions"))
         self.severities = severity.load(parsed_config.get("severities"))
         self.regressions = regressions.load(parsed_config.get("regressions"))
@@ -95,4 +97,14 @@ class AWSConfig(CustomConfigMixin):
 class GSuiteConfig(CustomConfigMixin):
     def __init__(self, config):
         self.domain = config.get("domain", "")
+        super().__init__(config)
+
+
+class PagerdutyConfig(CustomConfigMixin):
+    def __init__(self, config):
+        self.users_with_remote_access_monitoring = config.get(
+            "users_with_remote_access_monitoring", ""
+        )
+        self.bastion_users = config.get("bastion_users", "")
+        self.alternate_usernames = config.get("alternate_usernames", "")
         super().__init__(config)
