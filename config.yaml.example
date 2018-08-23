@@ -49,3 +49,7 @@ gsuite:
     no_activity_since:
       years: 1
       months: 0
+pagerduty:
+  users_with_remote_access_monitoring: 'pd_users.json'
+  bastion_users: 'hierahash/*hierahash.json'
+  alternate_usernames: 'alternate_usernames.json'

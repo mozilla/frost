@@ -229,6 +229,10 @@ aws:
       ports:
         - 22
         - 2222
+pagerduty:
+  users_with_remote_access_monitoring: 'pd_users.json'
+  bastion_users: 'hierahash/*hierahash.json'
+  alternate_usernames: 'alternate_usernames.json'
 ```
 
 ### Test Exemptions
@@ -420,8 +424,8 @@ aws:
 
 ### GSuite Config
 
-pytest-services has a suite of GSuite tests. This section of the custom config includes configuration options specific
-to these tests.
+pytest-services has a suite of GSuite tests. This section of the
+custom config includes configuration options specific to these tests.
 
 **Make sure to [setup GSuite](#setting-up-gsuite-tests) before running GSuite tests**
 
@@ -436,6 +440,75 @@ gsuite:
     no_activity_since:
       years: 1
       months: 0
+```
+
+### Pagerduty Config
+
+pytest-services does not query the pagerduty API, but can run tests against output from it.
+
+The config looks like:
+```
+pagerduty:
+  users_with_remote_access_monitoring: 'pd_users.json'
+  bastion_users: 'hierahash/*hierahash.json'
+  alternate_usernames: 'alternate_usernames.json'
+```
+
+Where `users_with_remote_access_monitoring` and `bastion_users` are
+globs for multiple files relative to the current working directory and
+`alternate_usernames` is the path to a single file.
+
+The files have examples formats as follows:
+
+* `users_with_remote_access_monitoring`:
+
+```json
+[
+  {
+    "avatar_url": "https://secure.gravatar.com/avatar/...",
+    "billed": true,
+    "color": "sea-green",
+    "contact_methods": [],
+    "description": null,
+    "email": "example@example.com",
+    "html_url": "https://example.pagerduty.com/users/AAA0999",
+    "id": "AAA0999",
+    "invitation_sent": false,
+    "job_title": null,
+    "name": "Example Examplerton",
+    "notification_rules": [],
+    "role": "user",
+    "self_": "https://api.pagerduty.com/users/AAA0999",
+    "summary": "C. Hobbes",
+    "teams": [],
+    "time_zone": "America/New_York",
+    "type": "user"
+  },
+  ...
+]
+```
+
+* `bastion_users`:
+
+```json
+{
+  "chobbes": {
+    "groups": [""],
+    "root_ssh": true
+  },
+  "movedon": {
+    "ensure": "absent"
+  },
+  ...
+}
+```
+
+* `alternate_usernames`:
+
+```json
+{
+  "chobbes": ["calvin", "spacemanspiff"]
+}
 ```
 
 ### Test Accuracy

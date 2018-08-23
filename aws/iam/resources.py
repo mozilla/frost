@@ -288,3 +288,20 @@ def user_is_admin(user):
         if isinstance(policy, dict):
             if "admin" in policy.get("PolicyName", "").lower():
                 return True
+
+
+def get_all_users_that_can_access_aws_account():
+    """
+    Returns users with console or API access to an AWS account.
+    """
+    profile_usernames = [
+        profile["UserName"]
+        for profile in iam_user_login_profiles()
+        if profile is not None
+    ]
+    access_key_usernames = [
+        akey["UserName"]
+        for akey in iam_get_all_access_keys()
+        if akey["Status"] == "Active"
+    ]
+    return set(profile_usernames + access_key_usernames)
