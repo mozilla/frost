@@ -36,6 +36,9 @@ aws:
     - Type
     - App
     - Env
+  required_amis:
+    - ami-00000000000000000
+    - ami-55555555555555555
   whitelisted_ports_global:
     - 25
   whitelisted_ports:
