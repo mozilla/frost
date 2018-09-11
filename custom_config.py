@@ -60,6 +60,7 @@ class CustomConfigMixin:
 class AWSConfig(CustomConfigMixin):
     def __init__(self, config):
         self.required_tags = frozenset(config.get("required_tags", []))
+        self.required_amis = frozenset(config.get("required_amis", []))
         self.whitelisted_ports_global = set(config.get("whitelisted_ports_global", []))
         self.whitelisted_ports = config.get("whitelisted_ports", [])
         self.access_key_expires_after = config.get("access_key_expires_after", None)
