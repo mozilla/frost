@@ -211,17 +211,27 @@ regressions:
     test_param_id: '*mycustomgroup'
     comment: this was remediated by ops team
 aws:
+  admin_groups:
+    - "Administrators"
+  admin_policies:
+    - "AWSAdminRequireMFA"
   user_is_inactive:
     no_activity_since:
       years: 1
       months: 0
     created_after:
       weeks: 1
+  access_key_expires_after:
+    years: 1
+    months: 0
   required_tags:
     - Name
     - Type
     - App
     - Env
+  required_amis:
+    - ami-00000000000000000
+    - ami-55555555555555555
   whitelisted_ports_global:
     - 25
   whitelisted_ports:
@@ -229,6 +239,12 @@ aws:
       ports:
         - 22
         - 2222
+gsuite:
+  domain: 'example.com'
+  user_is_inactive:
+    no_activity_since:
+      years: 1
+      months: 0
 pagerduty:
   users_with_remote_access_monitoring: 'pd_users.json'
   bastion_users: 'hierahash/*hierahash.json'

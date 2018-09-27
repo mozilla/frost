@@ -1,6 +1,8 @@
 import csv
 import time
 
+import pytest
+
 from conftest import botocore_client
 
 
@@ -15,7 +17,9 @@ def iam_users():
 
 
 def iam_admin_users():
-    return [user for user in iam_users_with_policies() if user_is_admin(user)]
+    return [
+        user for user in iam_users_with_policies_and_groups() if user_is_admin(user)
+    ]
 
 
 def iam_inline_policies(username):
@@ -111,6 +115,15 @@ def iam_users_with_policies():
     return [
         {**{"Policies": iam_all_user_policies(username=user["UserName"])}, **user}
         for user in iam_users()
+    ]
+
+
+def iam_users_with_policies_and_groups():
+    """Users with thier associated Policies and Groups
+    """
+    return [
+        {**{"Groups": iam_user_groups(username=user["UserName"])}, **user}
+        for user in iam_users_with_policies()
     ]
 
 
@@ -277,17 +290,24 @@ def iam_admin_users_with_credential_report():
     return admins
 
 
-# FIXME
-# Substring matching is _not_ enough of a check, but works for testing.
-# The truth is that we probably shouldn't depend too much on the concept
-# of an "admin" in AWS, since that's not how the ACL's really work. We
-# should probably move towards concepts like "has write access", "can
-# read secrets", etc.
 def user_is_admin(user):
     for policy in user["Policies"]:
         if isinstance(policy, dict):
-            if "admin" in policy.get("PolicyName", "").lower():
+            if (
+                policy.get("PolicyName", "")
+                in pytest.config.custom_config.aws.admin_policies
+            ):
                 return True
+
+    for group in user.get("Groups", []):
+        if isinstance(group, dict):
+            if (
+                group.get("GroupName", "")
+                in pytest.config.custom_config.aws.admin_groups
+            ):
+                return True
+
+    return False
 
 
 def get_all_users_that_can_access_aws_account():
