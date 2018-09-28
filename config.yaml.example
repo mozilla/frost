@@ -22,6 +22,10 @@ regressions:
     test_param_id: '*mycustomgroup'
     comment: this was remediated by ops team
 aws:
+  admin_groups:
+    - "Administrators"
+  admin_policies:
+    - "AWSAdminRequireMFA"
   user_is_inactive:
     no_activity_since:
       years: 1
