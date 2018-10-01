@@ -1,7 +1,7 @@
 import os
 import httplib2
 
-from googleapiclient import discovery
+from apiclient import discovery
 from oauth2client.file import Storage
 
 CREDS_NAME = "pytest-services-gsuite-readonly"

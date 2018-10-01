@@ -2,7 +2,7 @@ PyYAML==3.13
 black==18.6b4
 botocore==1.10.67
 coverage==4.5.1
-google-api-python-client==1.7.4
+google_api_python_client==1.6.1
 pytest-cov==2.5.1
 pytest-html==1.19.0
 pytest-json==0.4.0
