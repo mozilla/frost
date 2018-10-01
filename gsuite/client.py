@@ -1,15 +1,13 @@
 import os
 import httplib2
 
-from apiclient import discovery
+from googleapiclient import discovery
 from oauth2client.file import Storage
 
-ADMIN_DIRECTORY_USER_READONLY = "admin-directory-user-readonly"
-CREDENTIALS = [
-    (
-        ADMIN_DIRECTORY_USER_READONLY,
-        "https://www.googleapis.com/auth/admin.directory.user.readonly",
-    )
+CREDS_NAME = "pytest-services-gsuite-readonly"
+SCOPES = [
+    "https://www.googleapis.com/auth/admin.directory.user.readonly",
+    "https://www.googleapis.com/auth/admin.directory.group.readonly",
 ]
 
 
@@ -39,7 +37,8 @@ class GsuiteClient:
             self.directory_client = self.build_directory_client()
 
     def build_directory_client(self):
-        credentials = get_credentials(ADMIN_DIRECTORY_USER_READONLY)
+        # TODO: Support passing creds name as config option
+        credentials = get_credentials(CREDS_NAME)
         http = credentials.authorize(httplib2.Http())
         return discovery.build("admin", "directory_v1", http=http)
 
@@ -48,4 +47,55 @@ class GsuiteClient:
             return []
 
         resp = self.directory_client.users().list(domain=self.domain).execute()
-        return resp["users"]
+        users = resp.get("users", [])
+        if resp.get("nextPageToken", ""):
+            while True:
+                pageToken = resp["nextPageToken"]
+                resp = (
+                    self.directory_client.users()
+                    .list(domain=self.domain, pageToken=pageToken)
+                    .execute()
+                )
+                users += resp["users"]
+                if not resp.get("nextPageToken", ""):
+                    break
+        return users
+
+    def list_groups(self):
+        if self.offline:
+            return []
+
+        resp = self.directory_client.groups().list(domain=self.domain).execute()
+        groups = resp.get("groups", [])
+        if resp.get("nextPageToken", ""):
+            while True:
+                pageToken = resp["nextPageToken"]
+                resp = (
+                    self.directory_client.groups()
+                    .list(domain=self.domain, pageToken=pageToken)
+                    .execute()
+                )
+                groups += resp["groups"]
+                if not resp.get("nextPageToken", ""):
+                    break
+        return groups
+
+    def list_members_of_group(self, group):
+        if self.offline:
+            return []
+
+        resp = self.directory_client.members().list(groupKey=group).execute()
+        members = resp.get("members", [])
+        if resp.get("nextPageToken", ""):
+            while True:
+                pageToken = resp["nextPageToken"]
+                resp = (
+                    self.directory_client.members()
+                    .list(groupKey=group, pageToken=pageToken)
+                    .execute()
+                )
+                members += resp["members"]
+                if not resp.get("nextPageToken", ""):
+                    break
+
+        return members

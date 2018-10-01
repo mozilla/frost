@@ -100,6 +100,7 @@ class AWSConfig(CustomConfigMixin):
 class GSuiteConfig(CustomConfigMixin):
     def __init__(self, config):
         self.domain = config.get("domain", "")
+        self.min_number_of_owners = int(config.get("min_number_of_owners", "2"))
         super().__init__(config)
 
 
