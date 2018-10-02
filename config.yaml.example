@@ -52,6 +52,7 @@ aws:
         - 2222
 gsuite:
   domain: 'example.com'
+  min_number_of_owners: 2
   user_is_inactive:
     no_activity_since:
       years: 1

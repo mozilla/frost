@@ -4,12 +4,10 @@ import httplib2
 from apiclient import discovery
 from oauth2client.file import Storage
 
-ADMIN_DIRECTORY_USER_READONLY = "admin-directory-user-readonly"
-CREDENTIALS = [
-    (
-        ADMIN_DIRECTORY_USER_READONLY,
-        "https://www.googleapis.com/auth/admin.directory.user.readonly",
-    )
+CREDS_NAME = "pytest-services-gsuite-readonly"
+SCOPES = [
+    "https://www.googleapis.com/auth/admin.directory.user.readonly",
+    "https://www.googleapis.com/auth/admin.directory.group.readonly",
 ]
 
 
@@ -39,7 +37,8 @@ class GsuiteClient:
             self.directory_client = self.build_directory_client()
 
     def build_directory_client(self):
-        credentials = get_credentials(ADMIN_DIRECTORY_USER_READONLY)
+        # TODO: Support passing creds name as config option
+        credentials = get_credentials(CREDS_NAME)
         http = credentials.authorize(httplib2.Http())
         return discovery.build("admin", "directory_v1", http=http)
 
@@ -47,5 +46,34 @@ class GsuiteClient:
         if self.offline:
             return []
 
-        resp = self.directory_client.users().list(domain=self.domain).execute()
-        return resp["users"]
+        req = self.directory_client.users().list(domain=self.domain)
+        users = []
+        while req is not None:
+            resp = req.execute()
+            users += resp.get("users", [])
+            req = self.directory_client.users().list_next(req, resp)
+        return users
+
+    def list_groups(self):
+        if self.offline:
+            return []
+
+        req = self.directory_client.groups().list(domain=self.domain)
+        groups = []
+        while req is not None:
+            resp = req.execute()
+            groups += resp.get("groups", [])
+            req = self.directory_client.groups().list_next(req, resp)
+        return groups
+
+    def list_members_of_group(self, group):
+        if self.offline:
+            return []
+
+        req = self.directory_client.members().list(groupKey=group)
+        members = []
+        while req is not None:
+            resp = req.execute()
+            members += resp.get("members", [])
+            req = self.directory_client.members().list_next(req, resp)
+        return members

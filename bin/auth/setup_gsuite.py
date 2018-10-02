@@ -1,7 +1,8 @@
 import os
 
 from gsuite.client import (
-    CREDENTIALS,
+    CREDS_NAME,
+    SCOPES,
     get_credentials,
     get_credential_dir,
     get_credential_path,
@@ -30,8 +31,7 @@ def get_or_create_credentials(credential_name, scopes):
 
 
 def main():
-    for creds in CREDENTIALS:
-        get_or_create_credentials(creds[0], creds[1])
+    get_or_create_credentials(CREDS_NAME, SCOPES)
 
 
 if __name__ == "__main__":
