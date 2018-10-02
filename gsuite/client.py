@@ -46,56 +46,34 @@ class GsuiteClient:
         if self.offline:
             return []
 
-        resp = self.directory_client.users().list(domain=self.domain).execute()
-        users = resp.get("users", [])
-        if resp.get("nextPageToken", ""):
-            while True:
-                pageToken = resp["nextPageToken"]
-                resp = (
-                    self.directory_client.users()
-                    .list(domain=self.domain, pageToken=pageToken)
-                    .execute()
-                )
-                users += resp["users"]
-                if not resp.get("nextPageToken", ""):
-                    break
+        req = self.directory_client.users().list(domain=self.domain)
+        users = []
+        while req is not None:
+            resp = req.execute()
+            users += resp.get("users", [])
+            req = self.directory_client.users().list_next(req, resp)
         return users
 
     def list_groups(self):
         if self.offline:
             return []
 
-        resp = self.directory_client.groups().list(domain=self.domain).execute()
-        groups = resp.get("groups", [])
-        if resp.get("nextPageToken", ""):
-            while True:
-                pageToken = resp["nextPageToken"]
-                resp = (
-                    self.directory_client.groups()
-                    .list(domain=self.domain, pageToken=pageToken)
-                    .execute()
-                )
-                groups += resp["groups"]
-                if not resp.get("nextPageToken", ""):
-                    break
+        req = self.directory_client.groups().list(domain=self.domain)
+        groups = []
+        while req is not None:
+            resp = req.execute()
+            groups += resp.get("groups", [])
+            req = self.directory_client.groups().list_next(req, resp)
         return groups
 
     def list_members_of_group(self, group):
         if self.offline:
             return []
 
-        resp = self.directory_client.members().list(groupKey=group).execute()
-        members = resp.get("members", [])
-        if resp.get("nextPageToken", ""):
-            while True:
-                pageToken = resp["nextPageToken"]
-                resp = (
-                    self.directory_client.members()
-                    .list(groupKey=group, pageToken=pageToken)
-                    .execute()
-                )
-                members += resp["members"]
-                if not resp.get("nextPageToken", ""):
-                    break
-
+        req = self.directory_client.members().list(groupKey=group)
+        members = []
+        while req is not None:
+            resp = req.execute()
+            members += resp.get("members", [])
+            req = self.directory_client.members().list_next(req, resp)
         return members
