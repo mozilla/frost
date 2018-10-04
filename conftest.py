@@ -141,6 +141,7 @@ METADATA_KEYS = [
     "DBInstanceIdentifier",
     "GroupId",
     "ImageId",
+    "LaunchTime",
     "OwnerId",
     "TagList",
     "Tags",
