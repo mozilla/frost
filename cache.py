@@ -59,7 +59,7 @@ def datetime_encode_set(self, key, value):
     else:
         with f:
             json.dump(value, f, indent=2, sort_keys=True, default=json_iso_datetimes)
-            self._ensure_readme()
+            self._ensure_supporting_files()
 
 
 def datetime_encode_get(self, key, default):
