@@ -1,6 +1,6 @@
 PyYAML==3.13
 black==18.6b4
-botocore==1.12.42
+botocore==1.12.65
 coverage==4.5.1
 google_api_python_client==1.6.1
 pytest-cov==2.6.0
