@@ -4,7 +4,7 @@ import datetime
 import pytest
 
 from _pytest.doctest import DoctestItem
-from _pytest.mark import MarkInfo, MarkDecorator
+from _pytest.mark import Mark, MarkDecorator
 from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
@@ -129,11 +129,7 @@ def pytest_runtest_setup(item):
 
 
 def get_node_markers(node):
-    return {
-        k: v
-        for k, v in node.keywords.items()
-        if isinstance(v, (MarkDecorator, MarkInfo))
-    }
+    return [m for m in node.iter_markers()]
 
 
 METADATA_KEYS = [
@@ -194,7 +190,7 @@ def get_metadata_from_funcargs(funcargs):
 
 
 def serialize_marker(marker):
-    if isinstance(marker, (MarkDecorator, MarkInfo)):
+    if isinstance(marker, (MarkDecorator, Mark)):
         args = ["...skipped..."] if marker.name == "parametrize" else marker.args
         kwargs = ["...skipped..."] if marker.name == "parametrize" else marker.kwargs
         return {"name": marker.name, "args": args, "kwargs": kwargs}
@@ -242,7 +238,7 @@ def pytest_runtest_makereport(item, call):
     # only add this during call instead of during any stage
     if report.when == "call" and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
-        markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
+        markers = {n.name: serialize_marker(n) for n in get_node_markers(item)}
         severity = markers.get("severity", None) and markers.get("severity")["args"][0]
         regression = (
             markers.get("regression", None) and markers.get("regression")["args"][0]
