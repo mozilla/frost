@@ -1,4 +1,3 @@
-PyYAML==3.13
 black==18.6b4
 botocore==1.12.42
 coverage==4.5.1
@@ -10,4 +9,5 @@ pytest-metadata==1.7.0
 pytest==3.10.1
 python-dateutil==2.7.5
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
+ruamel.yaml==0.15.83
 wheel==0.32.2

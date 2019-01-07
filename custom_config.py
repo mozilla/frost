@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, timezone
 
-import yaml
+from ruamel.yaml import YAML
 from dateutil.relativedelta import relativedelta
 
 import exemptions
@@ -13,6 +13,7 @@ class CustomConfig:
     def __init__(self, config_fd):
         parsed_config = {}
         if config_fd is not None:
+            yaml = YAML()
             parsed_config = yaml.load(config_fd)
         self.aws = AWSConfig(parsed_config.get("aws", {}))
         self.gsuite = GSuiteConfig(parsed_config.get("gsuite", {}))
