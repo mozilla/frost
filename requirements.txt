@@ -1,4 +1,4 @@
-black==18.6b4
+black==18.9b0
 botocore==1.12.75
 coverage==4.5.2
 google_api_python_client==1.6.1
