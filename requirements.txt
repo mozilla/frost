@@ -1,5 +1,5 @@
 black==18.6b4
-botocore==1.12.75
+botocore==1.12.77
 coverage==4.5.2
 google_api_python_client==1.6.1
 pytest-cov==2.6.1
