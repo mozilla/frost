@@ -10,4 +10,4 @@ pytest==3.10.1
 python-dateutil==2.7.5
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
 ruamel.yaml==0.15.85
-wheel==0.32.3
+wheel==0.33.0
