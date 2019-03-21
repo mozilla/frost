@@ -20,8 +20,7 @@ def ec2_instances():
             [],
             {
                 "Filters": [
-                    {"Name": "instance-state-name",
-                        "Values": ["pending", "running"]}
+                    {"Name": "instance-state-name", "Values": ["pending", "running"]}
                 ]
             },
         )
@@ -118,8 +117,7 @@ def ec2_security_groups_with_in_use_flag():
 
     # These resources have two types of security groups, therefore
     # the Vpc ones are namespaced under "VpcSecurityGroups"
-    vpc_namespaced_resources = sum(
-        [rds_db_instances(), redshift_clusters()], [])
+    vpc_namespaced_resources = sum([rds_db_instances(), redshift_clusters()], [])
     for resource in vpc_namespaced_resources:
         for attached_sec_group in resource.get("VpcSecurityGroups", []):
             in_use_sec_group_ids[attached_sec_group["VpcSecurityGroupId"]] += 1
@@ -142,8 +140,25 @@ def ec2_security_groups_with_in_use_flag():
 def ec2_images_owned_by():
     "Returns a list of EC2 images owned by a list of provided accounts"
     return (
-        botocore_client.get("ec2", "describe_images", [],
-                            {"Filters": [{"Name": "owner-id", "Values": ["361527076523", "351644144250", "178550527431", "342354050843", "927034868273"]}]})
+        botocore_client.get(
+            "ec2",
+            "describe_images",
+            [],
+            {
+                "Filters": [
+                    {
+                        "Name": "owner-id",
+                        "Values": [
+                            "361527076523",
+                            "351644144250",
+                            "178550527431",
+                            "342354050843",
+                            "927034868273",
+                        ],
+                    }
+                ]
+            },
+        )
         .extract_key("Images")
         .flatten()
         .values()
