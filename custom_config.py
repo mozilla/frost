@@ -67,6 +67,8 @@ class AWSConfig(CustomConfigMixin):
         self.access_key_expires_after = config.get("access_key_expires_after", None)
         self.admin_policies = frozenset(config.get("admin_policies", []))
         self.admin_groups = frozenset(config.get("admin_groups", []))
+        self.owned_ami_account_ids = [str(x) for x in config.get("owned_ami_account_ids", [])]
+        self.max_ami_age_in_days = config.get("max_ami_age_in_days", 180)
         super().__init__(config)
 
     def get_whitelisted_ports(self, test_id):

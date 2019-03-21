@@ -137,27 +137,14 @@ def ec2_security_groups_with_in_use_flag():
     return sec_groups
 
 
-def ec2_images_owned_by():
-    "Returns a list of EC2 images owned by a list of provided accounts"
+def ec2_images_owned_by(account_ids):
+    "Returns a list of EC2 images owned by a list of provided account ids"
     return (
         botocore_client.get(
             "ec2",
             "describe_images",
             [],
-            {
-                "Filters": [
-                    {
-                        "Name": "owner-id",
-                        "Values": [
-                            "361527076523",
-                            "351644144250",
-                            "178550527431",
-                            "342354050843",
-                            "927034868273",
-                        ],
-                    }
-                ]
-            },
+            {"Filters": [{"Name": "owner-id", "Values": account_ids}]},
         )
         .extract_key("Images")
         .flatten()
