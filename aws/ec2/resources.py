@@ -135,3 +135,18 @@ def ec2_security_groups_with_in_use_flag():
             sec_group["InUse"] = False
 
     return sec_groups
+
+
+def ec2_images_owned_by(account_ids):
+    "Returns a list of EC2 images owned by a list of provided account ids"
+    return (
+        botocore_client.get(
+            "ec2",
+            "describe_images",
+            [],
+            {"Filters": [{"Name": "owner-id", "Values": account_ids}]},
+        )
+        .extract_key("Images")
+        .flatten()
+        .values()
+    )
