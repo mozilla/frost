@@ -104,13 +104,16 @@ def pytest_configure(config):
 
     config.custom_config = custom_config.CustomConfig(config.getoption("--config"))
 
-    if any(x for x in config.args if "gsuite" in x):
-        gsuite_client = GsuiteClient(
-            domain=config.custom_config.gsuite.domain,
-            offline=config.getoption("--offline"),
-        )
-    else:
-        gsuite_client = GsuiteClient(domain="", offline=True)
+    try:
+        if any(x for x in config.args if "gsuite" in x):
+            gsuite_client = GsuiteClient(
+                domain=config.custom_config.gsuite.domain,
+                offline=config.getoption("--offline"),
+            )
+        else:
+            gsuite_client = GsuiteClient(domain="", offline=True)
+    except AttributeError as e:
+        pass
 
 
 @pytest.fixture

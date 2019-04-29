@@ -1,4 +1,3 @@
-
 from apiclient.discovery import build as build_service
 
 
@@ -18,6 +17,16 @@ class GCPClient:
         if self.offline:
             return "test"
         return self.project_id
+
+    def get_project_iam_policy(self):
+        if self.offline:
+            return {}
+
+        service = self._service("cloudresourcemanager")
+        request = service.projects().getIamPolicy(
+            resource=self.get_project_id(), body={}
+        )
+        return request.execute()
 
     def list(
         self, product, subproduct, version="v1", results_key="items", call_kwargs=None
