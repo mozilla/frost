@@ -159,6 +159,17 @@ The below policy will allow you to run all AWS tests in pytest-services against 
 }
 ```
 
+#### Setting up GCP tests
+
+##### Enabling required API's for your project
+
+```
+gcloud [--project <project name>] services enable bigquery-json.googleapis.com
+gcloud [--project <project name>] services enable cloudresourcemanager.googleapis.com
+gcloud [--project <project name>] services enable compute.googleapis.com
+gcloud [--project <project name>] services enable sqladmin.googleapis.com
+```
+
 #### Setting up GSuite tests
 
 Make sure to have an OAuth2 app created and have the `client_secret.json` file in `~/.credentials` and then run:
