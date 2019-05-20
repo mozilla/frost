@@ -1,8 +1,13 @@
 from apiclient.discovery import build as build_service
 
 
-def cache_key(project_id, version, product, subproduct):
-    return ":".join(["pytest_gcp", project_id, version, product, subproduct]) + ".json"
+def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
+    return (
+        ":".join(
+            ["pytest_gcp", project_id, version, product, subproduct, call, id_value]
+        )
+        + ".json"
+    )
 
 
 class GCPClient:
@@ -27,6 +32,43 @@ class GCPClient:
             resource=self.get_project_id(), body={}
         )
         return request.execute()
+
+    def get(
+        self, product, subproduct, id_key, id_value, version="v1", call_kwargs=None
+    ):
+        if self.offline:
+            result = {}
+        else:
+            result = self._get(product, subproduct, id_key, id_value, version)
+        return result
+
+    def _get(
+        self, product, subproduct, id_key, id_value, version="v1", call_kwargs=None
+    ):
+        if call_kwargs is None:
+            call_kwargs = {"projectId": self.project_id}
+        call_kwargs[id_key] = id_value
+
+        ckey = cache_key(self.project_id, version, product, subproduct, "get", id_value)
+        cached_result = self.cache.get(ckey, None)
+        if cached_result is not None:
+            print("found cached value for", ckey)
+            return cached_result
+
+        service = self._service(product, version)
+
+        api_entity = getattr(service, subproduct.split(".")[0])()
+        for entity in subproduct.split(".")[1:]:
+            api_entity = getattr(api_entity, entity)()
+
+        result = api_entity.get(**call_kwargs).execute()
+
+        if self.debug_cache:
+            print("setting cache value for", ckey)
+
+        self.cache.set(ckey, result)
+
+        return result
 
     def list(
         self, product, subproduct, version="v1", results_key="items", call_kwargs=None
