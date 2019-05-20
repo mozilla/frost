@@ -148,6 +148,11 @@ METADATA_KEYS = [
     "VolumeId",
     "VpcId",
     "__pytest_meta",
+    "name",
+    "displayName",
+    "projectId",
+    "uniqueId",
+    "id",
 ]
 
 
