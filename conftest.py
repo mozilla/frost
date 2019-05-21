@@ -113,7 +113,7 @@ def pytest_configure(config):
         else:
             gsuite_client = GsuiteClient(domain="", offline=True)
     except AttributeError as e:
-        pass
+        gsuite_client = GsuiteClient(domain="", offline=True)
 
 
 @pytest.fixture
@@ -197,6 +197,13 @@ def get_metadata_from_funcargs(funcargs):
     return metadata
 
 
+def get_metadata(function_args):
+    metadata = get_metadata_from_funcargs(function_args)
+    if gcp_client.get_project_id() != "":
+        metadata["gcp_project_id"] = gcp_client.get_project_id()
+    return metadata
+
+
 def serialize_marker(marker):
     if isinstance(marker, (MarkDecorator, Mark)):
         args = ["...skipped..."] if marker.name == "parametrize" else marker.args
@@ -245,7 +252,7 @@ def pytest_runtest_makereport(item, call):
 
     # only add this during call instead of during any stage
     if report.when == "call" and not isinstance(item, DoctestItem):
-        metadata = get_metadata_from_funcargs(item.funcargs)
+        metadata = get_metadata(item.funcargs)
         markers = {n.name: serialize_marker(n) for n in get_node_markers(item)}
         severity = markers.get("severity", None) and markers.get("severity")["args"][0]
         regression = (
