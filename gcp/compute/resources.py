@@ -27,6 +27,8 @@ def networks_with_instances():
 
 def in_use_firewalls():
     for firewall in firewalls():
+        if firewall["disabled"] == True:
+            continue
         for network in networks_with_instances():
             if (
                 network["selfLink"] == firewall["network"]
