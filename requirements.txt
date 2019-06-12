@@ -11,3 +11,4 @@ pytest-metadata==1.5.1
 pytest==3.3.2
 python-dateutil==2.6.1
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
+wheel==0.33.4
