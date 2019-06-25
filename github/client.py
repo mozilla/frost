@@ -12,7 +12,7 @@ class GitHubFileNotFoundException(GitHubException):
     pass
 
 
-organization=os.environ("Organization")
+organization=os.environ["Organization"]
 
 def get_data_file(
     organization,
