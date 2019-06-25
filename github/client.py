@@ -1,3 +1,4 @@
+import os
 import json
 import tempfile
 
@@ -11,7 +12,7 @@ class GitHubFileNotFoundException(GitHubException):
     pass
 
 
-Organization=sys.environ("Organization")
+organization=os.environ("Organization")
 
 def get_data_file(
     organization,
