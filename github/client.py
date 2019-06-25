@@ -11,12 +11,14 @@ class GitHubFileNotFoundException(GitHubException):
     pass
 
 
+Organization=sys.environ("Organization")
+
 def get_data_file(
     organization,
     date,
-    method_name,
-    call_args,
-    call_kwargs,
+    method_name=None,
+    call_args=None,
+    call_kwargs=None,
     cache=None,
     result_from_error=None,
     debug_calls=False,
