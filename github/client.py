@@ -31,7 +31,7 @@ def get_data_for_org(
     debug_calls=False,
     debug_cache=False,
 ):
-    srcname = f"{results_dir}/{date}-{organization}.db.obj.json"
+    srcname = f"{date}-{organization}.db.obj.json"
     data = get_data_from_file(srcname)
     return data
 
@@ -65,8 +65,9 @@ def get_data_from_file(
     if result is None:
         # import pudb; pudb.set_trace()
         # we expect the file to already be in /results
+        full_path = f"{results_dir}/{file_name}"
         try:
-            with open(file_name, encoding="UTF-8") as f:
+            with open(full_path, encoding="UTF-8") as f:
                 result = f.read()
         except Exception as e:
             raise GitHubFileNotFoundException(str(e))
