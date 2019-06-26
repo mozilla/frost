@@ -1,6 +1,8 @@
-import os
 import json
+import os
 import tempfile
+
+results_dir = os.environ["RESULTS_DIR"]
 
 
 class GitHubException(Exception):
@@ -12,9 +14,7 @@ class GitHubFileNotFoundException(GitHubException):
     pass
 
 
-organization=os.environ["Organization"]
-
-def get_data_file(
+def get_data(
     organization,
     date,
     method_name=None,
@@ -44,7 +44,7 @@ def get_data_file(
     if result is None:
         # import pudb; pudb.set_trace()
         # we expect the file to already be in /results
-        srcname = f"/results//{date}-{organization}.db.obj.json"
+        srcname = f"{results_dir}/{date}-{organization}.db.obj.json"
         try:
             with open(srcname) as f:
                 result = f.read()
@@ -58,5 +58,3 @@ def get_data_file(
             cache.set(ckey, result)
 
     return result
-
-
