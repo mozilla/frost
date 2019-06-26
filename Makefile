@@ -1,5 +1,7 @@
 
-TODAY := $(shell date '+%Y-%m-%d')
+ifeq ($(TODAY),)
+	TODAY := $(shell date --utc '+%Y-%m-%d')
+endif
 
 .DEFAULT_GOAL := all
 

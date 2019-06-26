@@ -48,7 +48,7 @@ def get_data(
         # we expect the file to already be in /results
         srcname = f"{results_dir}/{date}-{organization}.db.obj.json"
         try:
-            with open(srcname) as f:
+            with open(srcname, encoding="UTF-8") as f:
                 result = f.read()
         except Exception as e:
             raise GitHubFileNotFoundException(str(e))
