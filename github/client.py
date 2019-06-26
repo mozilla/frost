@@ -1,6 +1,9 @@
+import io
 import json
 import os
 import tempfile
+
+import pytest
 
 # RESULTS_DIR is present for local testing, but is not passed into
 # container. Inside the container, it's hardcoded.
@@ -16,9 +19,25 @@ class GitHubFileNotFoundException(GitHubException):
     pass
 
 
-def get_data(
+@pytest.fixture(scope="session")
+def get_data_for_org(
     organization,
     date,
+    method_name=None,
+    call_args=None,
+    call_kwargs=None,
+    cache=None,
+    result_from_error=None,
+    debug_calls=False,
+    debug_cache=False,
+):
+    srcname = f"{results_dir}/{date}-{organization}.db.obj.json"
+    data = get_data_from_file(srcname)
+    return data
+
+@pytest.fixture(scope="session")
+def get_data_from_file(
+    file_name,
     method_name=None,
     call_args=None,
     call_kwargs=None,
@@ -33,11 +52,11 @@ def get_data(
     TODO: get caching working
     """
     if debug_calls:
-        print("calling", method_name, "on", organization)
+        print(f"getting data from {file_name}")
 
     result = None
     if cache is not None:
-        ckey = cache_key(organization, method_name)
+        ckey = cache_key(file_name, method_name)
         result = cache.get(ckey, None)
 
         if debug_cache and result is not None:
@@ -46,9 +65,8 @@ def get_data(
     if result is None:
         # import pudb; pudb.set_trace()
         # we expect the file to already be in /results
-        srcname = f"{results_dir}/{date}-{organization}.db.obj.json"
         try:
-            with open(srcname, encoding="UTF-8") as f:
+            with open(file_name, encoding="UTF-8") as f:
                 result = f.read()
         except Exception as e:
             raise GitHubFileNotFoundException(str(e))
@@ -59,4 +77,16 @@ def get_data(
 
             cache.set(ckey, result)
 
+    return result
+
+@pytest.fixture(scope="session")
+def parse_data_to_json(json_stream):
+    result = []
+    js = io.StringIO(json_stream)
+    while True:
+        json_object = js.readline()
+        if not json_object:
+            break
+        parsed = json.loads(json_object)
+        result.append(parsed)
     return result
