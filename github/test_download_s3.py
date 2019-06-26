@@ -6,13 +6,16 @@ import json
 import os
 
 import client
+import pyjq
 import pytest
 
 organization = os.environ["Organization"]
 today = os.environ["TODAY"]
 org_list = organization.split()
 
-aux_files = ["metadata_repos.json"]
+aux_files = {
+    "repos_of_interest": "metadata_repos.json"
+}
 
 
 @pytest.mark.parametrize(
@@ -32,7 +35,7 @@ def test_valid_org_file(org, date):
     # I'm leaning towards tinydb, or straight pyjq?
 
 
-@pytest.mark.parametrize("aux_file", aux_files)
+@pytest.mark.parametrize("aux_file", aux_files.values())
 def test_valid_aux_file(aux_file):
     data = client.get_data_from_file(aux_file)
     assert len(data) < 200_000
@@ -41,3 +44,9 @@ def test_valid_aux_file(aux_file):
     # we have to decode line by line
     decoded = client.parse_data_to_json(data)
     assert isinstance(decoded, list)
+
+def test_pyjq_working():
+    decoded = client.parse_data_to_json(client.get_data_from_file(aux_files["repos_of_interest"]))
+    data = pyjq.all(".[] | .repo", decoded)
+    assert len(data) > 2
+    assert isinstance(data[0], str)

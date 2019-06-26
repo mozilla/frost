@@ -47,6 +47,8 @@ flake8: check_venv
 	flake8 --max-line-length 120 $(shell git ls-files | grep \.py$$)
 
 install: venv
+	( . venv/bin/activate && python -V )
+	( . venv/bin/activate && pip install --upgrade pip>=10 )
 	( . venv/bin/activate && pip install wheel==0.33.4 )
 	( . venv/bin/activate && pip install -r requirements.txt )
 

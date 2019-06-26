@@ -12,4 +12,8 @@ pytest==3.3.2
 python-dateutil==2.6.1
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
 wheel==0.33.4
-pyjq==2.3.1
+# We want pyjq==2.3.1, but it can't be built in the container (we don't
+# want to load all the compilers, etc). So assume the wheel is prebuilt
+# in the RESULTS_DIR, which requires pip >= 10 per
+#   https://pip.pypa.io/en/stable/reference/pip_install/#using-environment-variables
+${RESULTS_DIR}/pyjq-2.3.1-cp36-cp36m-linux_x86_64.whl
