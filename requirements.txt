@@ -16,4 +16,4 @@ wheel==0.33.4
 # want to load all the compilers, etc). So assume the wheel is prebuilt
 # in the RESULTS_DIR, which requires pip >= 10 per
 #   https://pip.pypa.io/en/stable/reference/pip_install/#using-environment-variables
-${RESULTS_DIR}/pyjq-2.3.1-cp36-cp36m-linux_x86_64.whl
+/${RESULTS_DIR}/pyjq-2.3.1-cp36-cp36m-linux_x86_64.whl
