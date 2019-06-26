@@ -2,7 +2,9 @@ import json
 import os
 import tempfile
 
-results_dir = os.environ["RESULTS_DIR"]
+# RESULTS_DIR is present for local testing, but is not passed into
+# container. Inside the container, it's hardcoded.
+results_dir = os.environ.get("RESULTS_DIR", "/results")
 
 
 class GitHubException(Exception):

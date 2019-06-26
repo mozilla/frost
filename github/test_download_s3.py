@@ -8,7 +8,7 @@ import client
 import pytest
 
 organization = os.environ["Organization"]
-today = os.environ["Today"]
+today = os.environ["TODAY"]
 org_list = organization.split()
 
 
