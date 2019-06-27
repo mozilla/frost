@@ -4,17 +4,9 @@ import json
 import os
 import tempfile
 
+import client
 import pyjq
 import pytest
-
-results_dir = os.environ["RESULTS_DIR"]
-organization = os.environ["Organization"]
-today = os.environ["TODAY"]
-org_list = organization.split()
-
-aux_files = {
-    "repos_of_interest": "metadata_repos.json"
-}
 
 
 
@@ -27,10 +19,10 @@ class GitHubFileNotFoundException(GitHubException):
     # error downloading file
     pass
 
-@pytest.fixture(params=org_list, scope="session")
+@pytest.fixture(params=client.org_list, scope="session")
 def org_filler(request=None):
     if request is None:
-        return organization
+        return client.organization
     print(f"org: {request.param}")
     return request.param
 
@@ -69,49 +61,25 @@ def get_data_from_file(
 
     TODO: get caching working
     """
-    if debug_calls:
-        print(f"getting data from {file_name}")
-
-    result = None
-    if cache is not None:
-        ckey = cache_key(file_name, method_name)
-        result = cache.get(ckey, None)
-
-        if debug_cache and result is not None:
-            print("found cached value for", ckey)
-
-    if result is None:
-        # import pudb; pudb.set_trace()
-        # we expect the file to already be in /results
-        full_path = f"{results_dir}/{file_name}"
-        try:
-            with open(full_path, encoding="UTF-8") as f:
-                result = f.read()
-        except Exception as e:
-            raise GitHubFileNotFoundException(str(e))
-
-        if cache is not None:
-            if debug_cache:
-                print("setting cache value for", ckey)
-
-            cache.set(ckey, result)
+    result = client.get_data_from_file(
+        file_name,
+        method_name,
+        call_args,
+        call_kwargs,
+        cache,
+        result_from_error,
+        debug_calls,
+        debug_cache,
+        )
 
     return result
 
 @pytest.fixture(scope="session")
 def parse_data_to_json(json_stream):
-    result = []
-    js = io.StringIO(json_stream)
-    while True:
-        json_object = js.readline()
-        if not json_object:
-            break
-        parsed = json.loads(json_object)
-        result.append(parsed)
-    return result
+    return client.parse_data_to_json(json_stream)
 
 def get_aux_json(aux_name):
-    return parse_data_to_json(get_data_from_file(aux_files[aux_name]))
+    return parse_data_to_json(get_data_from_file(client.aux_files[aux_name]))
 
 @pytest.fixture(scope="module")
 def get_org_json(get_data_for_org):
@@ -159,13 +127,13 @@ def org_default_branches(org_filler, get_org_json, date):
     return results
 
 @pytest.fixture(scope="module",
-    params=org_default_branches(organization, get_org_json(get_data_for_org(organization, today)), today),
-    ids=[f"{x[1]}-{x[2]}" for x in org_default_branches(organization, get_org_json(get_data_for_org(organization, today)), today)],
+    params=org_default_branches(client.organization, get_org_json(get_data_for_org(client.organization, client.today)), client.today),
+    ids=[f"{x[1]}-{x[2]}" for x in org_default_branches(client.organization, get_org_json(get_data_for_org(client.organization, client.today)), client.today)],
 )
 def def_branch(request):
     return request.param
 
-@pytest.fixture(scope="session", params=[today,])
+@pytest.fixture(scope="session", params=[client.today,])
 def date(request):
     assert request.param, "TODAY not set in environment"
     return request.param
