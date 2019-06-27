@@ -7,7 +7,9 @@ endif
 
 AWS_PROFILE := default
 
-PYTEST_OPTS := ''
+# Defining here means the environment variable won't be honored unless
+# '-e' passed to make
+#PYTEST_OPTS := ''
 
 all: check_venv
 	pytest
@@ -33,7 +35,7 @@ clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
 doctest: check_venv
-	pytest --doctest-modules -s --offline --debug-calls
+	pytest --doctest-modules -s --offline --debug-calls $(PYTEST_OPTS)
 
 coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. \
