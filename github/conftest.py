@@ -11,14 +11,6 @@ import pytest
 
 
 
-class GitHubException(Exception):
-    pass
-
-
-class GitHubFileNotFoundException(GitHubException):
-    # error downloading file
-    pass
-
 @pytest.fixture(params=client.org_list, scope="session")
 def org_filler(request=None):
     if request is None:

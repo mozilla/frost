@@ -8,6 +8,14 @@ import pyjq
 import pytest
 
 
+class GitHubException(Exception):
+    pass
+
+
+class GitHubFileNotFoundException(GitHubException):
+    # error downloading file
+    pass
+
 results_dir = os.environ["RESULTS_DIR"]
 organization = os.environ["Organization"]
 today = os.environ["TODAY"]
