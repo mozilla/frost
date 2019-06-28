@@ -30,9 +30,9 @@ Pytest Service JSON format:
   'results': [
     {
        'test_name':  # unparametrized pytest test name
-       'name':
+       'name':  # fully parametrized test name
        'status':
-       'value':
+       'value':  # pytest test outcome pass/fail/xpass/xfail/skipped
        'reason':  # pytest test outcome reason if any (e.g. resource fetch failed)
        'markers':  # pytest markers on the test e.g. aws service, ruleset
        'metadata':  # additional metadata on the resource being tested
