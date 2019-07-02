@@ -126,8 +126,11 @@ METADATA_KEYS = [
     'VolumeId',
     'VpcId',
     '__pytest_meta',
-    'org', 'repo', 'branch', 'date',
-
+    # used for GitHub compliance
+    'org',
+    'repo',
+    'branch',
+    'date',
 ]
 
 
@@ -139,8 +142,13 @@ def extract_metadata(resource):
     }
 
 
+# it's only considered metadata if both:
+#  - the argument is a dictionary, AND
+#  - a key is in the list of METADATA_KEYS
 def get_metadata_from_funcargs(funcargs):
     metadata = {}
+    # also search **kwargs of calling func
+    metadata.update(**extract_metadata(funcargs))
     for k in funcargs:
         if isinstance(funcargs[k], dict):
             metadata = {**metadata, **extract_metadata(funcargs[k])}
@@ -192,8 +200,6 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
 
     # only add this during call instead of during any stage
-    print(f"in pytest_runtest_makereport, item {type(item)}; call {type(call)}")
-    print(f"  report.when={report.when}")
     if report.when == 'call' and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
