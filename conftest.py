@@ -126,6 +126,8 @@ METADATA_KEYS = [
     'VolumeId',
     'VpcId',
     '__pytest_meta',
+    'org', 'repo', 'branch', 'date',
+
 ]
 
 

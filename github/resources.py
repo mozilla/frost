@@ -16,6 +16,14 @@ aux_files = {
 }
 
 
+class GitHubException(Exception):
+    pass
+
+
+class GitHubFileNotFoundException(GitHubException):
+    # error downloading file
+    pass
+
 
 
 def cur_org():
