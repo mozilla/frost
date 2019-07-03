@@ -33,6 +33,15 @@ class GCPClient:
         )
         return request.execute()
 
+    def get_project_container_config(self):
+        if self.offline:
+            return {}
+
+        service = self._service("container")
+        name = "projects/" + self.get_project_id() + "/locations/us-west1"
+        request = service.projects().locations().getServerConfig(name=name)
+        return request.execute()
+
     def get(
         self, product, subproduct, id_key, id_value, version="v1", call_kwargs=None
     ):

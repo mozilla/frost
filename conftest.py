@@ -153,6 +153,8 @@ METADATA_KEYS = [
     "projectId",
     "uniqueId",
     "id",
+    "members",
+    "role",
 ]
 
 

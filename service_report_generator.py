@@ -126,6 +126,10 @@ class ReportGenerator:
             return "Security Group"
         if "iam" in test_name:
             return "IAM"
+        if "firewall" in test_name:
+            return "GCP Firewall"
+        if "bigquery" in test_name:
+            return "BigQuery"
         return ""
 
     def _get_resource_id(self, resource_type, resource_name, result_metadata):
@@ -155,7 +159,7 @@ class ReportGenerator:
 class CsvReportGenerator(ReportGenerator):
     def print_header(self):
         print(
-            "Test Name,Resource Type,Resource Id,Resource Name,Region,App,Owner,Assignee",
+            "Test Name,Project,Resource Type,Resource Id,Resource Name,Region,App,Owner,Assignee",
             file=self.fout,
         )
 
@@ -175,15 +179,19 @@ class CsvReportGenerator(ReportGenerator):
                 if result["status"] != status:
                     continue
 
-                resource_name = self._extract_resource_name(result["name"])
+                project = ""
+                if result["metadata"].get("gcp_project_id", None) is not None:
+                    resource_name = result["metadata"].get("name", "")
+                    rid = result["metadata"].get("id", "")
+                    project = result["metadata"]["gcp_project_id"]
+                else:
+                    resource_name = self._extract_resource_name(result["name"])
+                    rid = self._get_resource_id(rtype, resource_name, result)
 
                 rtype = self._get_resource_type(test_name)
-
                 display_resource_name = resource_name
                 if rtype == "Security Group":
                     display_resource_name = " ".join(resource_name.split(" ")[1:])
-
-                rid = self._get_resource_id(rtype, resource_name, result)
 
                 # Get App and Owner Tag
                 app = self._get_tag_value("App", result["metadata"])
@@ -193,9 +201,10 @@ class CsvReportGenerator(ReportGenerator):
                 region = self._get_region(result["metadata"])
 
                 print(
-                    "%s,%s,%s,%s,%s,%s,%s,"
+                    "%s,%s,%s,%s,%s,%s,%s,%s,"
                     % (
                         test_name,
+                        project,
                         rtype,
                         rid,
                         display_resource_name,

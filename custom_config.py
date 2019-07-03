@@ -16,6 +16,7 @@ class CustomConfig:
             yaml = YAML()
             parsed_config = yaml.load(config_fd)
         self.aws = AWSConfig(parsed_config.get("aws", {}))
+        self.gcp = GCPConfig(parsed_config.get("gcp", {}))
         self.gsuite = GSuiteConfig(parsed_config.get("gsuite", {}))
         self.pagerduty = PagerdutyConfig(parsed_config.get("pagerduty", {}))
 
@@ -100,6 +101,11 @@ class AWSConfig(CustomConfigMixin):
             months=+self.access_key_expires_after.get("months", 0),
             weeks=+self.access_key_expires_after.get("weeks", 0),
         )
+
+
+class GCPConfig:
+    def __init__(self, config):
+        self.allowed_org_domains = config.get("allowed_org_domains", [])
 
 
 class GSuiteConfig(CustomConfigMixin):

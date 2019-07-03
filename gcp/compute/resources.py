@@ -13,6 +13,16 @@ def instances():
     return gcp_client.list("compute", "instances")
 
 
+def clusters():
+    parent = "projects/" + gcp_client.get_project_id() + "/locations/-"
+    return gcp_client.list(
+        "container",
+        "projects.locations.clusters",
+        results_key="clusters",
+        call_kwargs={"parent": parent},
+    )
+
+
 def networks_with_instances():
     for network in networks():
         network["instances"] = []

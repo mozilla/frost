@@ -50,8 +50,11 @@ aws:
   max_ami_age_in_days: 90
   owned_ami_account_ids:
     - 1234567890
+gcp:
+  allowed_org_domains:
+    - mygsuiteorg.com
 gsuite:
-  domain: 'example.com'
+  domain: 'mygsuiteorg.com'
   min_number_of_owners: 2
   user_is_inactive:
     no_activity_since:
