@@ -179,6 +179,7 @@ class CsvReportGenerator(ReportGenerator):
                 if result["status"] != status:
                     continue
 
+                rtype = self._get_resource_type(test_name)
                 project = ""
                 if result["metadata"].get("gcp_project_id", None) is not None:
                     resource_name = result["metadata"].get("name", "")
@@ -188,7 +189,6 @@ class CsvReportGenerator(ReportGenerator):
                     resource_name = self._extract_resource_name(result["name"])
                     rid = self._get_resource_id(rtype, resource_name, result)
 
-                rtype = self._get_resource_type(test_name)
                 display_resource_name = resource_name
                 if rtype == "Security Group":
                     display_resource_name = " ".join(resource_name.split(" ")[1:])
