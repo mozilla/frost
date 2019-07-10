@@ -12,7 +12,8 @@ today = os.environ["TODAY"]
 org_list = organization.split()
 
 aux_files = {
-    "repos_of_interest": "metadata_repos.json"
+    "repos_of_interest": "metadata_repos.json",
+    "all_metadata": "metadata.json",
 }
 
 
@@ -44,12 +45,13 @@ def get_data_for_org(org=None, date=None):
     return data
 
 
-@functools.lru_cache()
+# Note, we don't use the LRU cache, as this function is only called by a
+# function that will both:
+#   a) have its own LRU cache
+#   b) performs the translation from JSON
 def get_data_from_file(file_name):
     """
-    Fetches and return final data
-
-    TODO: get caching working
+    Fetches and return data
     """
 
     # import pudb; pudb.set_trace()
@@ -92,25 +94,38 @@ def get_org_json(org=None, date=None):
 @functools.lru_cache()
 def repos_of_interest_for_org(org=None):
     org, _ = finalize_defaults(org)
-    of_interest = get_aux_json("repos_of_interest")
-    jq_script = f"""
+    of_interest_repos = get_aux_json("repos_of_interest")
+    all_of_interest = get_aux_json("all_metadata")
+    # originally worked with subset file metadata_repo.json
+    jq_script_repo = f"""
         .[] | # for each array element
         .repo |  # only look at repository URL
         select(startswith("https://github.com/{org}/")) # only in org
     """
-    return pyjq.all(jq_script, of_interest)
+    # now working off of all metadata, using new repo format
+    jq_script_all = f"""
+        .[] | # for each array element
+        .codeRepositories[] |  # we only want these elements
+        select(
+            (.status != "deprecated")   # eliminate archived ones
+        and
+            (.url | startswith("https://github.com/{org}/"))) | # only in org
+        [ .status, .url]  # return both status & url
+    """
+    # return pyjq.all(jq_script, of_interest_repos)
+    return pyjq.all(jq_script_all, all_of_interest)
 
 
 @functools.lru_cache()
 def org_default_branches(org=None, date=None):
     """
-    Return [(org, repo, default_branch, date)]
+    Return [(org, repo, repo_status, default_branch, date)]
     """
     org, date = finalize_defaults(org, date)
     org_json = get_org_json(org, date)
-    urls = repos_of_interest_for_org(org)
+    status_urls = repos_of_interest_for_org(org)
     results = []
-    for url in urls:
+    for repo_status, url in status_urls:
         repo = url.split('/')[-1]
         assert repo.endswith(".git")
         repo = repo[:-4]
@@ -123,7 +138,7 @@ def org_default_branches(org=None, date=None):
         if len(record):
             branch = record[0]["body"]["default_branch"]
             assert branch
-            results.append((org, repo, branch, date))
+            results.append((org, repo, repo_status, branch, date))
         else:
             # noexistant === protected, but we want to update our
             # metadata

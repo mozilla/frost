@@ -93,6 +93,7 @@ def load(rules):
         test_name, test_id = rule['test_name'], rule['test_param_id']
         expiration, reason = rule['expiration_day'], rule['reason']
 
+        # Shouldn't this test reference the input TODAY value?
         if expiration < date.today():
             warnings.warn(
                 'Exemptions: test_name: {} | test_id: {} | Skipping rule with expiration day in the past {!r}'
