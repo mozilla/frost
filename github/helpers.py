@@ -1,7 +1,7 @@
 import functools
 
 import pyjq
-import resources
+from github import resources
 
 
 @functools.lru_cache()

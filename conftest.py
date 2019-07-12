@@ -1,4 +1,5 @@
 import argparse
+import datetime
 
 import pytest
 
@@ -9,6 +10,7 @@ from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
 from heroku.client import HerokuAdminClient
+from github.client import GitHubClient
 
 import custom_config
 
@@ -17,6 +19,7 @@ botocore_client = None
 gcp_client = None
 gsuite_client = None
 heroku_client = None
+github_client = None
 
 
 def pytest_addoption(parser):
@@ -31,9 +34,15 @@ def pytest_addoption(parser):
     # While only used for Heroku at the moment, GitHub tests are soon to be
     # added, which will also need an "organization" option. Current plan is to
     # reuse this one.
-    parser.addoption('--organization',
+    parser.addoption('--heroku-organization',
+                     default="mozillacorporation",
                      type=str,
-                     help='Set organization to test. Used for Heroku tests.')
+                     help='Set Heroku organization (aka team) to test.')
+
+    parser.addoption('--github-organization',
+                     default="mozilla-services",
+                     type=str,
+                     help='Set GitHub organization to test.')
 
     parser.addoption('--debug-calls',
                      action='store_true',
@@ -53,18 +62,31 @@ def pytest_addoption(parser):
                      help='Path to the config file.')
 
 
+    parser.addoption('--date',
+                     type=str,
+                     default=datetime.datetime.utcnow().strftime('%Y-%m-%d'),
+                     help='Date to test, defaults to UTC now.')
+
+    parser.addoption('--data-dir',
+                     type=str,
+                     default=".",
+                     help='Where to expect & store files.')
+
+
 def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
     global heroku_client
+    global github_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
 
     profiles = config.getoption('--aws-profiles')
     project_id = config.getoption('--gcp-project-id')
-    organization = config.getoption('--organization')
+    heroku_organization = config.getoption('--heroku-organization')
+    github_organization = config.getoption('--github-organization')
 
     botocore_client = BotocoreClient(
         profiles=profiles,
@@ -81,7 +103,17 @@ def pytest_configure(config):
         offline=config.getoption('--offline'))
 
     heroku_client = HerokuAdminClient(
-        organization=organization,
+        organization=heroku_organization,
+        # cache=config.cache,
+        cache=None,
+        debug_calls=config.getoption('--debug-calls'),
+        debug_cache=config.getoption('--debug-cache'),
+        offline=config.getoption('--offline'))
+
+    github_client = GitHubClient(
+        organization=github_organization,
+        report_date=config.getoption('--date'),
+        data_dir=config.getoption('--data-dir'),
         # cache=config.cache,
         cache=None,
         debug_calls=config.getoption('--debug-calls'),
@@ -202,6 +234,7 @@ def pytest_runtest_makereport(item, call):
     # only add this during call instead of during any stage
     if report.when == 'call' and not isinstance(item, DoctestItem):
         metadata = get_metadata_from_funcargs(item.funcargs)
+        #import pudb; pudb.set_trace()
         markers = {k: serialize_marker(v) for (k, v) in get_node_markers(item).items()}
         severity = markers.get('severity', None) and markers.get('severity')['args'][0]
         regression = markers.get('regression', None) and markers.get('regression')['args'][0]

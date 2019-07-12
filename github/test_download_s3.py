@@ -1,25 +1,22 @@
 """
 make sure we can download a file on demand
 """
-import resources
+from github import resources
 import pyjq
 import pytest
 
 
-
+@pytest.mark.gh_framework
 @pytest.mark.github_org
 @pytest.mark.rationale(
-        """
+    """
 Sanity checks, since things are likely to change from underneath us.
 - can we still retrieve the file
 - can we still parse the file
 - is the data of a size and format we expect
 """
 )
-@pytest.mark.parametrize(
-        "org,date",
-        [(resources.cur_org(), resources.report_date()),],
-)
+@pytest.mark.parametrize("org,date", [(resources.cur_org(), resources.report_date())])
 def test_valid_org_file(org, date):
     # all the checks to see if we have sane input before proceeding
     org_data = resources.get_data_for_org(org, date)
@@ -31,19 +28,17 @@ def test_valid_org_file(org, date):
     assert isinstance(org_json, list)
 
 
+@pytest.mark.gh_framework
 @pytest.mark.github_org
 @pytest.mark.rationale(
-        """
+    """
 Sanity checks, since things are likely to change from underneath us.
 - can we still retrieve the secondary files
 - can we still parse the file
 - is the data of a size and format we expect
 """
 )
-@pytest.mark.parametrize(
-        "file_name",
-        resources.aux_files.values(),
-)
+@pytest.mark.parametrize("file_name", resources.aux_files.values())
 def test_valid_aux_file(file_name):
     data = resources.get_data_from_file(file_name)
     assert len(data) < 200_000
@@ -54,17 +49,15 @@ def test_valid_aux_file(file_name):
     assert isinstance(decoded, list)
 
 
+@pytest.mark.gh_framework
 @pytest.mark.github_org
 @pytest.mark.rationale(
-        """
+    """
 Sanity checks, since things are likely to change from underneath us.
 - is the pyjq module working okay (has binary files)
 """
 )
-@pytest.mark.parametrize(
-        "file_name",
-        [resources.aux_files["repos_of_interest"],]
-)
+@pytest.mark.parametrize("file_name", [resources.aux_files["repos_of_interest"]])
 def test_pyjq_working(file_name):
     decoded = resources.get_json_from_file(file_name)
     data = pyjq.all(".[] | .repo", decoded)
