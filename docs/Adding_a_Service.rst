@@ -46,13 +46,17 @@ files:
 +==========================================================+========+============================================================+
 | pytest-services/{NEW_SERVICE}                            | create | directory to hold the service specific files               |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
-| pytest-services/{NEW_SERVICE}/test_*.py                  | write  | your test cases                                            |
+| pytest-services/{NEW_SERVICE}/test_*.py                  | write  | your test cases. One per file is convention. Ideally       |
+|                                                          |        | very simple tests, asserting a value about a function      |
+|                                                          |        | in ``helpers.py``                                          |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
 | pytest-services/{NEW_SERVICE}/resources.py               | write  | Code to fetch & format the data you need to test           |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
-| pytest-services/{NEW_SERVICE}/helpers.py                 | write  | Code to simplify writing tests                             |
+| pytest-services/{NEW_SERVICE}/helpers.py                 | write  | Code to simplify writing tests. Typically, all the         |
+|                                                          |        | "real" logic is here, and tested via doctests.             |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
-| pytest-services/{NEW_SERVICE}/client.py                  | write  | Code to handle connection to the service                   |
+| pytest-services/{NEW_SERVICE}/client.py                  | write  | Code to handle connection to the service, and pass         |
+|                                                          |        | pytest arguements to service.                              |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
 | pytest-services/conftest.py                              | modify | add any new option flags to the pytest invocation          |
 +----------------------------------------------------------+--------+------------------------------------------------------------+
