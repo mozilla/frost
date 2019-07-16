@@ -29,7 +29,11 @@ clean: clean-cache clean-python
 	# remember to deactivate your active virtual env
 
 clean-cache: check_venv
-	pytest --cache-clear --offline
+	@# do as little work as possible to clear the cache, and guarantee success
+	pytest --cache-clear --continue-on-collection-errors \
+		--collect-only -m "no_such_marker" \
+		--noconftest --tb=no --disable-warnings --quiet \
+	    || true
 
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
@@ -49,10 +53,10 @@ flake8: check_venv
 	flake8 --max-line-length 120 $(shell git ls-files | grep \.py$$)
 
 black: check_venv
-	black --check $(shell git ls-files | grep \.py$$)
+	pre-commit run black --all-files
 
 install: venv
-	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt )
+	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt  && pre-commit install )
 
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
