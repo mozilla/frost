@@ -116,6 +116,8 @@ The below policy will allow you to run all AWS tests in pytest-services against 
         "ec2:DescribeFlowLogs",
         "ec2:DescribeInstances",
         "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSnapshotAttribute",
+        "ec2:DescribeSnapshots",
         "ec2:DescribeVolumes",
         "ec2:DescribeVpcs",
         "elasticache:DescribeCacheClusters",
