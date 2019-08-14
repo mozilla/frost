@@ -293,6 +293,27 @@ def is_ebs_volume_encrypted(ebs):
     return ebs["Encrypted"]
 
 
+def is_ebs_snapshot_public(ebs_snapshot):
+    """
+    Checks if the EBS snapshot's 'CreateVolumePermissions' attribute allows for public creation.
+
+    >>> is_ebs_snapshot_public({'CreateVolumePermissions':[{'Group': 'all'}]})
+    True
+    >>> is_ebs_snapshot_public({'CreateVolumePermissions':[{'Group': ''}]})
+    False
+    >>> is_ebs_snapshot_public({'CreateVolumePermissions':[{'foo': 'bar'}]})
+    False
+    >>> is_ebs_snapshot_public({'CreateVolumePermissions':[]})
+    False
+    >>> is_ebs_snapshot_public({})
+    False
+    """
+    for p in ebs_snapshot.get("CreateVolumePermissions", []):
+        if p.get("Group", "") == "all":
+            return True
+    return False
+
+
 def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     """
     Returns any tag names that are missing from an EC2 Instance.
