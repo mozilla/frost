@@ -1,4 +1,4 @@
-botocore==1.12.75
+botocore==1.12.208
 coverage==4.5.3
 google_api_python_client==1.6.1
 pytest-cov==2.6.1
