@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="frost",
-    version="0.3.0",
+    version="0.3.1",
     author="Firefox Operations Security Team (foxsec)",
     author_email="foxsec+frost@mozilla.com",
     description="tests for checking that third party services the Firefox Operations Security or foxsec team uses are configured correctly",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/",
+    url="https://github.com/mozilla-services/pytest-services",
     license="MPL2",
     packages=setuptools.find_packages(),
     classifiers=[
