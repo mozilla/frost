@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="frost",
-    version="0.0.1",
+    version="0.3.0",
     author="Firefox Operations Security Team (foxsec)",
     author_email="foxsec+frost@mozilla.com",
     description="tests for checking that third party services the Firefox Operations Security or foxsec team uses are configured correctly",
