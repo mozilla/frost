@@ -5,7 +5,7 @@ Pytest Service JSON format:
 
 {
   'name': 'pytest',
-  'tool_url': 'https://github.com/mozilla-services/pytest-services',
+  'tool_url': 'https://github.com/mozilla/frost',
   'version': 1,
   'created_at': '2000-01-01 15:50:00.123123',
   'meanings': {
@@ -55,7 +55,7 @@ STATUSES_TO_LIST = ["fail", "warn", "err"]
 
 service_json_template = {
     "name": "pytest",
-    "tool_url": "https://github.com/mozilla-services/pytest-services",
+    "tool_url": "https://github.com/mozilla/frost",
     "version": 1,
     "created_at": "",
     "meanings": {
@@ -218,7 +218,7 @@ class CsvReportGenerator(ReportGenerator):
 
 class MarkdownReportGenerator(ReportGenerator):
     def print_header(self):
-        print("# AWS pytest-services results\n", file=self.fout)
+        print("# AWS frost results\n", file=self.fout)
         print("#### Status Meanings: \n", file=self.fout)
         self._print_status_table()
 

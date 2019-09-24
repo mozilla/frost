@@ -17,11 +17,11 @@ awsci: check_venv
 
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
-	$(error "Run pytest-services from a virtualenv (try 'make install && source venv/bin/activate')")
+	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
 endif
 
 check_conftest_imports:
-	# refs: https://github.com/mozilla-services/pytest-services/issues/119
+	# refs: https://github.com/mozilla/frost/issues/119
 	rg '^import\s+conftest|^from\s+conftest\s+import\s+pytest' -g '*.py'; [ $$? -eq 1 ]
 
 clean: clean-cache clean-python

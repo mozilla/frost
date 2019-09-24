@@ -57,7 +57,7 @@ The options include pytest options:
 * [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
 * [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
-and options pytest-services adds:
+and options frost adds:
 
 * `--debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
@@ -71,7 +71,7 @@ and produces output like the following showing a DB instance with backups disabl
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.
 0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:
+rootdir: /Users/gguthe/mozilla/frost, inifile:
 plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
 collecting 0 items                                                                                                                        c
 alling AWSAPICall(profile='default', region='us-west-2', service='rds', method='describe_db_instances', args=[], kwargs={})
@@ -100,9 +100,9 @@ aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError
 ============================================ 1 failed, 3 passed, 72 deselected in 3.12 seconds ============================================
 ```
 
-#### IAM Policy for pytest-services
+#### IAM Policy for frost
 
-The below policy will allow you to run all AWS tests in pytest-services against all resources in your account.
+The below policy will allow you to run all AWS tests in frost against all resources in your account.
 
 ```json
 {
@@ -201,7 +201,7 @@ These files can be removed individually or all at once with [the pytest --cache-
 
 ## Custom Test Config
 
-pytest-services adds a `--config` cli option for passing in a custom config file specific to tests within pytest-services.
+frost adds a `--config` cli option for passing in a custom config file specific to tests within frost.
 
 The example config in repo (`config.yaml.example`):
 ```
@@ -266,7 +266,7 @@ pagerduty:
 
 ### Test Exemptions
 
-pytest-services custom config format adds support for
+frost custom config format adds support for
 marking test and test resource IDs as expected failures.
 
 The keys for each exemption rule is:
@@ -341,7 +341,7 @@ python -m json.tool report.json | grep -C 20 xfail
 
 #### Test Severity
 
-pytest-services custom config format adds support for marking the severity of a certain test. A severity can be `INFO`, `WARN`, or `ERROR`.
+frost custom config format adds support for marking the severity of a certain test. A severity can be `INFO`, `WARN`, or `ERROR`.
 
 These do not modify pytest results (pass, fail, xfail, skip, etc.).
 
@@ -398,7 +398,7 @@ python -m json.tool report.json
 
 ### Test Regressions
 
-pytest-services custom config format adds support for marking specific tests on specific resources as regressions.
+frost custom config format adds support for marking specific tests on specific resources as regressions.
 As with `severity` this does not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
 
 The config looks like:
@@ -413,7 +413,7 @@ regressions:
 
 ### AWS Config
 
-pytest-services has a suite of AWS tests. This section of the custom config includes configuration options specific
+frost has a suite of AWS tests. This section of the custom config includes configuration options specific
 to these tests.
 
 The config looks like:
@@ -453,7 +453,7 @@ aws:
 
 ### GSuite Config
 
-pytest-services has a suite of GSuite tests. This section of the
+frost has a suite of GSuite tests. This section of the
 custom config includes configuration options specific to these tests.
 
 **Make sure to [setup GSuite](#setting-up-gsuite-tests) before running GSuite tests**
@@ -473,7 +473,7 @@ gsuite:
 
 ### Pagerduty Config
 
-pytest-services does not query the pagerduty API, but can run tests against output from it.
+frost does not query the pagerduty API, but can run tests against output from it.
 
 The config looks like:
 ```
@@ -542,7 +542,7 @@ The files have examples formats as follows:
 
 ### Test Accuracy
 
-There are two important things to note about `pytest-services` tests that may be different from your expectations.
+There are two important things to note about `frost` tests that may be different from your expectations.
 
 First, the focus is on "actionable results". This plays out as an attempt to reduce false
 positives by trying to filter out unused resources. An example of this can be seen by looking at
@@ -600,7 +600,7 @@ Additionally we want:
 #### File Layout
 
 ```console
-pytest-services
+frost
 ...
 ├── example_cache
 │   └── v
@@ -691,7 +691,7 @@ Notes:
 pytest --ignore aws/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla-services/pytest-services, inifile:
+rootdir: /Users/gguthe/mozilla/frost, inifile:
 plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
 collected 3 items
 

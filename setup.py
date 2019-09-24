@@ -11,7 +11,7 @@ setuptools.setup(
     description="tests for checking that third party services the Firefox Operations Security or foxsec team uses are configured correctly",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/mozilla-services/pytest-services",
+    url="https://github.com/mozilla/frost",
     license="MPL2",
     packages=setuptools.find_packages(),
     classifiers=[

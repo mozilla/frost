@@ -12,7 +12,7 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-APPLICATION_NAME = "pytest-services"
+APPLICATION_NAME = "frost"
 
 
 def get_client_secret_file():

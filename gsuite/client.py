@@ -4,7 +4,7 @@ import httplib2
 from apiclient import discovery
 from oauth2client.file import Storage
 
-CREDS_NAME = "pytest-services-gsuite-readonly"
+CREDS_NAME = "frost-gsuite-readonly"
 SCOPES = [
     "https://www.googleapis.com/auth/admin.directory.user.readonly",
     "https://www.googleapis.com/auth/admin.directory.group.readonly",
