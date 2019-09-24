@@ -100,7 +100,7 @@ def ec2_security_group_opens_all_ports(ec2_security_group):
         return False
 
     for ipp in ec2_security_group["IpPermissions"]:
-        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
+        if "IpProtocol" in ipp and ipp["IpProtocol"] in ["icmp", "icmpv6"]:
             continue
         if ip_permission_opens_all_ports(ipp):
             return True
@@ -155,7 +155,7 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
         return False
 
     for ipp in ec2_security_group["IpPermissions"]:
-        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
+        if "IpProtocol" in ipp and ipp["IpProtocol"] in ["icmp", "icmpv6"]:
             continue
         if ip_permission_opens_all_ports(
             ipp
@@ -195,7 +195,7 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
         return False
 
     for ipp in ec2_security_group["IpPermissions"]:
-        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
+        if "IpProtocol" in ipp and ipp["IpProtocol"] in ["icmp", "icmpv6"]:
             continue
         if ip_permission_opens_all_ports(ipp) and ip_permission_cidr_allows_all_ips(
             ipp
@@ -240,7 +240,7 @@ def ec2_security_group_opens_specific_ports_to_all(
         return False
 
     for ipp in ec2_security_group["IpPermissions"]:
-        if "IpProtocol" in ipp and ipp["IpProtocol"] == "icmp":
+        if "IpProtocol" in ipp and ipp["IpProtocol"] in ["icmp", "icmpv6"]:
             continue
 
         if ip_permission_cidr_allows_all_ips(ipp):
