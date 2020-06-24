@@ -1,5 +1,3 @@
-
-
 from dateutil.parser import parse
 
 from aws.iam.resources import iam_users, iam_inline_policies

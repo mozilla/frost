@@ -28,6 +28,4 @@ def test_only_allowed_org_accounts(iam_binding, allowed_org_domains):
             if not member.startswith("serviceAccount"):
                 assert (
                     member.split("@")[-1] in allowed_org_domains
-                ), "{} was found and is not in the allowed_org_domains".format(
-                    member
-                )
+                ), "{} was found and is not in the allowed_org_domains".format(member)

@@ -1,5 +1,3 @@
-
-
 from collections import defaultdict
 from datetime import date
 import re

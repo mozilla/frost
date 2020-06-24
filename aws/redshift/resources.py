@@ -1,5 +1,3 @@
-
-
 from conftest import botocore_client
 
 

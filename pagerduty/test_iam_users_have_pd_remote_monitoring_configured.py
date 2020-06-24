@@ -1,10 +1,8 @@
-
-
 import pytest
 from aws.iam.resources import get_all_users_that_can_access_aws_account
 from pagerduty.helpers import alternate_names_for_user
 from pagerduty.resources import (
-    users_with_remote_access_escalation_policy_and_extension_configured
+    users_with_remote_access_escalation_policy_and_extension_configured,
 )
 
 

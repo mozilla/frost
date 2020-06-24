@@ -1,5 +1,3 @@
-
-
 from pagerduty.resources import alternate_usernames
 
 

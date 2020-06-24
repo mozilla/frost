@@ -1,5 +1,3 @@
-
-
 import pytest
 
 from aws.ec2.helpers import (

@@ -22,6 +22,4 @@ def test_sql_instance_private_ip_required(sql_instance):
     assert (
         sql_instance.get("settings").get("ipConfiguration").get("ipv4Enabled", None)
         == False
-    ), "CloudSQL Instance {0[name]} has a public IPv4 enabled.".format(
-        sql_instance
-    )
+    ), "CloudSQL Instance {0[name]} has a public IPv4 enabled.".format(sql_instance)

@@ -18,11 +18,7 @@ def test_iam_admin_user_with_access_key(iam_admin_user):
     """
     assert (
         iam_admin_user["CredentialReport"]["access_key_1_active"] != "true"
-    ), "Access key found for admin user: {}".format(
-        iam_admin_user["UserName"]
-    )
+    ), "Access key found for admin user: {}".format(iam_admin_user["UserName"])
     assert (
         iam_admin_user["CredentialReport"]["access_key_2_active"] != "true"
-    ), "Access key found for admin user: {}".format(
-        iam_admin_user["UserName"]
-    )
+    ), "Access key found for admin user: {}".format(iam_admin_user["UserName"])
