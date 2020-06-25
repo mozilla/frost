@@ -1,5 +1,3 @@
-
-
 import pytest
 
 from pagerduty.helpers import alternate_names_for_user

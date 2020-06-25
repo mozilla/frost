@@ -1,4 +1,3 @@
-
 import pytest
 
 from aws.rds.resources import rds_db_instances_with_tags

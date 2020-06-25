@@ -1,4 +1,3 @@
-
 import pytest
 
 from aws.s3.resources import s3_buckets, s3_buckets_logging

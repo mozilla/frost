@@ -1,5 +1,3 @@
-
-
 import pytest
 
 from aws.redshift.resources import redshift_cluster_security_groups

@@ -1,5 +1,3 @@
-
-
 import datetime
 from botocore.utils import parse_timestamp
 

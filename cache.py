@@ -1,4 +1,3 @@
-
 """
 Patch for pytest cache to serialize datetime.datetime
 """
