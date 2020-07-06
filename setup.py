@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
 import setuptools
+from frost import SOURCE_URL, VERSION
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="frost",
-    version="0.3.1",
+    version=VERSION,
     author="Firefox Operations Security Team (foxsec)",
     author_email="foxsec+frost@mozilla.com",
     description="tests for checking that third party services the Firefox Operations Security or foxsec team uses are configured correctly",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/mozilla/frost",
+    url=SOURCE_URL,
     license="MPL2",
     packages=setuptools.find_packages(),
     classifiers=[
