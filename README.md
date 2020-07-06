@@ -1,13 +1,12 @@
 # Frost
 
+[![PyPI version](https://badge.fury.io/py/frost.svg)](https://badge.fury.io/py/frost)
+
 ![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
 
-Clients and [pytest](https://docs.pytest.org/en/latest/index.html)
-tests for checking that third party services the @foxsec team uses are
-configured correctly.
-
-We trust third party services to return their status correctly, but
-want to answer questions whether they are configured properly such as:
+Frost (for FiRefox Operations Security Testing) is a set of API
+clients, [pytest](https://docs.pytest.org/en/latest/index.html) tests
+to verify the configuration of third party services. For example:
 
 * Are our AWS DB snapshots publicly accessible?
 * Is there a dangling DNS entry in Route53?
