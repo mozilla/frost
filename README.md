@@ -18,24 +18,35 @@ to verify the configuration of third party services. For example:
 
 ### Installing
 
-From the project root run:
-
 ```console
-make install
+pip install frost
 ```
 
-This will:
+### Usage
 
-* create a Python [virtualenv](https://docs.python.org/3/library/venv.html) to isolate it from other Python packages
-* install Python requirements in the virtualenv
+```console
+$ frost --help
+Usage: frost [OPTIONS] COMMAND [ARGS]...
+
+  FiRefox Operations Security Testing API clients and tests
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+  Commands:
+    test  Run pytest tests passing all trailing args to pytest.
+
+$ frost test --help
+Usage: frost test [OPTIONS] [PYTEST_ARGS]...
+
+  Run pytest tests passing all trailing args to pytest.
+
+Options:
+  --help  Show this message and exit.
+```
 
 ### Running
-
-Activate the venv in the project root:
-
-```console
-source venv/bin/activate
-```
 
 To fetch RDS resources from the cache or AWS API and check that
 backups are enabled for DB instances for [the configured aws
@@ -43,22 +54,21 @@ profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
 named `default` in the `us-west-2` region we can run:
 
 ```console
-pytest --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
+frost test -k test_rds_db_instance_backup_enabled --aws-profiles default --debug-calls
 ```
 
-The options include pytest options:
-
-* [`--ignore`](https://docs.pytest.org/en/latest/example/pythoncollection.html#ignore-paths-during-test-collection) to skip fetching resources for non-RDS resources
-* [`-k`](https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name) for selecting tests matching the substring `test_rds_db_instance_backup_enabled` for the one test we want to run
-* [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
-* [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
-
-and options frost adds:
+frost switches to its package directory and adds pytest options:
 
 * `--debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--config`](#custom-test-config) path to test custom config file
+
+which can be combined with the standard pytest options for selecting frost tests and other local tests:
+
+* [`-k`](https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name) to select the test matching the substring `test_rds_db_instance_backup_enabled`
+* [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
+* [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
 and produces output like the following showing a DB instance with backups disabled:
 
@@ -67,7 +77,7 @@ and produces output like the following showing a DB instance with backups disabl
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.
 0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla/frost, inifile:
+rootdir: /Users/gguthe/frost, inifile:
 plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
 collecting 0 items                                                                                                                        c
 alling AWSAPICall(profile='default', region='us-west-2', service='rds', method='describe_db_instances', args=[], kwargs={})
@@ -357,7 +367,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
+frost -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
 ...
 ```
 
@@ -687,7 +697,7 @@ Notes:
 pytest --ignore aws/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla/frost, inifile:
+rootdir: /Users/gguthe/frost, inifile:
 plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
 collected 3 items
 
