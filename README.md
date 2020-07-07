@@ -14,10 +14,7 @@ to verify the configuration of third party services. For example:
 
 ### Requirements
 
-* [GNU Make 3.81](https://www.gnu.org/software/make/)
-* [Python 3.6.2](https://www.python.org/downloads/)
-
-Note: other versions may work too these are the versions @g-k used for development
+* [Python 3.8](https://www.python.org/downloads/)
 
 ### Installing
 
