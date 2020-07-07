@@ -1,3 +1,4 @@
+import os
 import sys
 
 import click
@@ -20,6 +21,9 @@ def test(ctx, pytest_args):
     """
     Run pytest tests passing all trailing args to pytest.
     """
+    # look up frost/.. to get the repo root dir
+    frost_parent_directory = os.path.dirname(os.path.dirname(__file__))
+    os.chdir(frost_parent_directory)
     pytest.main(list(pytest_args))
 
 
