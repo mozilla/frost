@@ -13,6 +13,7 @@ from heroku.client import HerokuAdminClient
 
 import custom_config
 
+collect_ignore_glob = "*"
 
 botocore_client = None
 gcp_client = None

@@ -691,10 +691,10 @@ Notes:
 * we add markers for the services we're fetching data from
 
 
-1. Running it we see that one of the IPs is an AWS IP:
+1. Running `frost test` with the test file explicitly included we see that one of the IPs is an AWS IP:
 
 ```console
-pytest --ignore aws/
+frost test ./httpbin/test_httpbin_ip.py
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/frost, inifile:
