@@ -8,10 +8,10 @@ AWS_PROFILE := default
 PYTEST_OPTS := ''
 
 all: check_venv
-	pytest
+	frost test
 
 awsci: check_venv
-	pytest --continue-on-collection-errors aws/ \
+	frost test --continue-on-collection-errors aws/ \
 		--ignore aws/ec2/test_ec2_security_group_in_use.py \
 		--json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
@@ -30,7 +30,7 @@ clean: clean-cache clean-python
 
 clean-cache: check_venv
 	@# do as little work as possible to clear the cache, and guarantee success
-	pytest --cache-clear --continue-on-collection-errors \
+	frost test  --cache-clear --continue-on-collection-errors \
 		--collect-only -m "no_such_marker" \
 		--noconftest --tb=no --disable-warnings --quiet \
 	    || true
@@ -39,10 +39,10 @@ clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
 doctest: check_venv
-	pytest --doctest-modules -s --offline --debug-calls --ignore pagerduty/
+	frost test --doctest-modules -s --offline --debug-calls --ignore pagerduty/
 
 coverage: check_venv
-	pytest --cov-config .coveragerc --cov=. \
+	frost test --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
@@ -62,7 +62,7 @@ setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
 
 metatest:
-	pytest --aws-profiles example-account \
+	frost test --aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
 
