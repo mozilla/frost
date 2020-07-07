@@ -17,8 +17,8 @@ all: check_venv
 	frost test
 
 awsci: check_venv
-	frost test --continue-on-collection-errors aws/ \
-		--ignore aws/ec2/test_ec2_security_group_in_use.py \
+	frost test --continue-on-collection-errors -m aws \
+		-k "not test_ec2_security_group_in_use" \
 		--json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
 check_venv:
