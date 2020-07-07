@@ -1,3 +1,4 @@
+import os
 import sys
 import glob
 
@@ -59,7 +60,8 @@ def run_pytest(ctx, pytest_args):
 
     --debug-calls to print AWS API calls
     """
-    pytest.main(list(pytest_args))
+    switch_to_frost_parent_directory()
+    pytest.main(["-s", "--debug-calls"] + list(pytest_args))
 
 
 if __name__ == "__main__":
