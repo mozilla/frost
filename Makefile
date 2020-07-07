@@ -56,7 +56,7 @@ black: check_venv
 	pre-commit run black --all-files
 
 install: venv
-	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt  && pre-commit install )
+	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt && python setup.py develop && pre-commit install )
 
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
