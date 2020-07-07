@@ -14,10 +14,10 @@ PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
 		      you're running $(shell python -V))
 
 all: check_venv
-	pytest
+	frost test
 
 awsci: check_venv
-	pytest --continue-on-collection-errors aws/ \
+	frost test --continue-on-collection-errors aws/ \
 		--ignore aws/ec2/test_ec2_security_group_in_use.py \
 		--json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
@@ -38,7 +38,7 @@ clean: clean-cache clean-python
 
 clean-cache: check_venv
 	@# do as little work as possible to clear the cache, and guarantee success
-	pytest --cache-clear --continue-on-collection-errors \
+	frost test  --cache-clear --continue-on-collection-errors \
 		--collect-only -m "no_such_marker" \
 		--noconftest --tb=no --disable-warnings --quiet \
 	    || true
@@ -51,10 +51,11 @@ doc-build:
 	make -C docs html
 
 doctest: check_venv
-	pytest -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
+	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
+	 --doctest-modules -s --offline --debug-calls
 
 coverage: check_venv
-	pytest --cov-config .coveragerc --cov=. \
+	frost test --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/ \
@@ -79,7 +80,7 @@ stage-docs: docs
 	git add --all --force docs/_build/html
 
 metatest:
-	pytest --aws-profiles example-account \
+	frost test --aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
 
