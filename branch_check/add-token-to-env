@@ -1,0 +1,3 @@
+if [[ -z "$GH_TOKEN" ]]; then
+    export GH_TOKEN=$(pass show Mozilla/moz-hwine-PAT)
+fi
