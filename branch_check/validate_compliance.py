@@ -7,7 +7,7 @@
 
 from typing import List
 
-from retrieve_github_data import RepoBranchProtections, BranchProtectionRule
+from .retrieve_github_data import RepoBranchProtections, BranchProtectionRule
 
 # define the criteria we care about. Identify each critera with a string that will
 # appear in the results.
@@ -16,7 +16,7 @@ required_criteria = [
 ]
 optional_criteria = [
     "limited commiters",
-    "commit signing",  # may not be knowable
+    # "commit signing",  # may not be knowable
 ]
 warning_criteria = [
     "rule conflicts",
@@ -38,11 +38,11 @@ def find_applicable_rules(
 def meets_criteria(protections: List[BranchProtectionRule], criteria: str) -> bool:
     met = True
     # ugly implementation for now
-    if criteria is "admins restricted":
+    if criteria == "admins restricted":
         met = all(r.is_admin_enforced for r in protections)
-    elif criteria is "limited commiters":
+    elif criteria == "limited commiters":
         met = all(r.push_actor_count > 0 for r in protections)
-    elif criteria is "rule conflicts":
+    elif criteria == "rule conflicts":
         met = all(r.rule_conflict_count == 0 for r in protections)
     else:
         print(f"ERROR: no support for '{criteria}'")
@@ -60,7 +60,7 @@ def validate_branch_protections(data: RepoBranchProtections, branch: str) -> Lis
 
     # if the production branch is not specified, use the default name
     if not branch:
-        branch = data.default_branch_ref
+        branch = data.default_branch_ref.name
 
     # Multiple steps to validate - first, is the branch even covered
     active_rules = find_applicable_rules(data, branch)

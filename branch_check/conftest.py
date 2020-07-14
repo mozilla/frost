@@ -30,7 +30,7 @@ from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 # from github_schema import github_schema as schema  # noqa: I900
 
 #  import branch_check.retrieve_github_data as retrieve_github_data
-import retrieve_github_data
+from . import retrieve_github_data
 
 
 # Data to move to config
@@ -50,8 +50,8 @@ def gql_connection():
     return endpoint
 
 
-@pytest.fixture(scope="session")
-def repos_to_check() -> List[List[str]]:
+# @pytest.fixture(scope="session")
+def repos_to_check() -> List[str]:
     # just shell out for now
     meta_dir = pathlib.Path(os.path.expanduser(PATH_TO_METADATA)).resolve()
     in_files = list(meta_dir.glob("*.json"))
