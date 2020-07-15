@@ -60,12 +60,13 @@ def repos_to_check() -> List[str]:
         "jq",
         "-rc",
         """.codeRepositories[]
+                | select(.status == "active")
                 | .url as $url
                 | .branchesToProtect[] // ""
                 | [$url, . ]
                 | @csv
                 """,
-        *in_files[:3],
+        *in_files,
     ]
 
     status = subprocess.run(cmd, capture_output=True)
