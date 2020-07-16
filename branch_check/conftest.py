@@ -36,7 +36,7 @@ from . import retrieve_github_data
 # Data to move to config
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
-PATH_TO_METADATA = "~/repos/foxsec/require-branch/services/metadata"
+PATH_TO_METADATA = os.environ["PATH_TO_METADATA"]
 
 
 # Data collection routines -- these likely should be a separate python
@@ -69,7 +69,9 @@ def repos_to_check() -> List[str]:
         *in_files,
     ]
 
-    status = subprocess.run(cmd, capture_output=True)
+    # python 3.6 doesn't support capture_output
+    # status = subprocess.run(cmd, capture_output=True)
+    status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # return as array of non-empty, unquoted, "lines"
     return [
         x.translate({ord('"'): None, ord("'"): None})
