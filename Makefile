@@ -78,7 +78,7 @@ metatest:
 # that's likely to break CI.
 venv:
 	python3 -m venv venv
-	./venv/bin/python -V | grep $(PRODUCTION_PYTHON) || true; $(PYTHON_VER_ERROR)
+	./venv/bin/python -V | grep $(PRODUCTION_PYTHON) || true; $(PYTHON_VER_WARNING)
 
 .PHONY:
 	all \
