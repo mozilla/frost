@@ -37,6 +37,7 @@ from . import retrieve_github_data
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
 PATH_TO_METADATA = os.environ["PATH_TO_METADATA"]
+os.environ["GH_TOKEN"]
 
 
 # Data collection routines -- these likely should be a separate python
