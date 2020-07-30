@@ -15,30 +15,18 @@ want to answer questions whether they are configured properly such as:
 
 ### Requirements
 
-* [GNU Make 3.81](https://www.gnu.org/software/make/)
-* [Python 3.6.2](https://www.python.org/downloads/)
-
-Note: other versions may work too these are the versions @g-k used for development
+* [docker](https://docs.docker.com/get-docker/)
 
 ### Installing
 
-From the project root run:
-
 ```console
-make install
+docker pull mozilla/frost
 ```
-
-This will:
-
-* create a Python [virtualenv](https://docs.python.org/3/library/venv.html) to isolate it from other Python packages
-* install Python requirements in the virtualenv
 
 ### Running
 
-Activate the venv in the project root:
-
 ```console
-source venv/bin/activate
+docker run --rm mozilla/frost pytest -h
 ```
 
 To fetch RDS resources from the cache or AWS API and check that
@@ -47,7 +35,7 @@ profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
 named `default` in the `us-west-2` region we can run:
 
 ```console
-pytest --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
+docker run --rm mozilla/frost pytest --ignore gsuite/ --ignore heroku/ --ignore pagerduty/ --ignore gcp/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
 ```
 
 The options include pytest options:
@@ -67,37 +55,7 @@ and options frost adds:
 and produces output like the following showing a DB instance with backups disabled:
 
 ```console
-=========================================================== test session starts ===========================================================
-platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
-metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.
-0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla/frost, inifile:
-plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
-collecting 0 items                                                                                                                        c
-alling AWSAPICall(profile='default', region='us-west-2', service='rds', method='describe_db_instances', args=[], kwargs={})
-collecting 4 items
-...
-aws/rds/test_rds_db_instance_backup_enabled.py ...F                                                                                 [100%]
-
-================================================================ FAILURES =================================================================
-_______________________________________ test_rds_db_instance_backup_enabled[test-db] ________________________________________
-
-rds_db_instance = {'AllocatedStorage': 50, 'AutoMinorVersionUpgrade': True, 'AvailabilityZone': 'us-west-2c', 'BackupRetentionPeriod': 0, .
-..}
-
-    @pytest.mark.rds
-    @pytest.mark.parametrize('rds_db_instance',
-                             rds_db_instances(),
-                             ids=lambda db_instance: db_instance['DBInstanceIdentifier'])
-    def test_rds_db_instance_backup_enabled(rds_db_instance):
->       assert rds_db_instance['BackupRetentionPeriod'] > 0, \
-            'Backups disabled for {}'.format(rds_db_instance['DBInstanceIdentifier'])
-E       AssertionError: Backups disabled for test-db
-E       assert 0 > 0
-
-aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError
-=========================================================== 72 tests deselected ===========================================================
-============================================ 1 failed, 3 passed, 72 deselected in 3.12 seconds ============================================
+# TODO: add example output back
 ```
 
 #### IAM Policy for frost
@@ -361,7 +319,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
+docker run --rm mozilla/frost pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
 ...
 ```
 
@@ -688,7 +646,7 @@ Notes:
 1. Running it we see that one of the IPs is an AWS IP:
 
 ```console
-pytest --ignore aws/
+docker run --rm mozilla/frost pytest --ignore aws/ --ignore gsuite/ --ignore heroku/ --ignore pagerduty/ --ignore gcp/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/mozilla/frost, inifile:
