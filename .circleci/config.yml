@@ -1,0 +1,90 @@
+# These environment variables must be set in CircleCI UI
+#
+# DOCKERHUB_REPO - docker hub repo, format: <username>/<repo>
+# DOCKER_USER
+# DOCKER_PASS
+#
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: circleci/python:buster
+    steps:
+      - checkout
+      - run:
+          name: install python deps in venv
+          command: |
+            make install
+      - run:
+          name: run tests
+          command: |
+            make black check_conftest_imports test coverage
+
+  build-image:
+    docker:
+      - image: circleci/python:buster
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: build-image
+          command: make build-image
+      - run:
+          name: save built image to cache
+          command: docker save "localhost/frost:latest" | gzip -c > /tmp/docker.tgz
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /tmp/docker.tgz
+
+  deploy:
+    docker:
+      - image: circleci/python:buster
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: v1-{{.Branch}}
+      - run:
+          name: Restore Docker image cache
+          command: gunzip -c /tmp/docker.tgz | docker load
+      - run:
+          name: deploy to Dockerhub
+          command: |
+            # deploy master and scan envs
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:latest"
+              docker push "${DOCKERHUB_REPO}:latest"
+            elif  [ ! -z "${CIRCLE_TAG}" ]; then
+              # deploy a release tag
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              echo "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+              docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+              docker push "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+            fi
+
+workflows:
+  version: 2
+  check-readme-local-dev:
+    jobs:
+      - test:
+        filters:
+          tags:
+            only: /.*/
+
+      - build-image:
+          filters:
+            tags:
+              only: /.*/
+
+      - deploy:
+          requires:
+            - test
+            - build-image
+          filters:
+            tags:
+              # only upload the docker container on semver tags
+              only: /[0-9]\.[0-9]+\.[0-9]+/
+            branches:
+              only: master
