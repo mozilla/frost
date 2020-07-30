@@ -78,8 +78,12 @@ venv:
 	python3 -m venv venv
 	./venv/bin/python -V | grep $(PYTHON_MIN_VERSION) || true; $(PYTHON_VER_WARNING)
 
+build-image:
+	docker build -t localhost/frost:latest .
+
 .PHONY:
 	all \
+	build-image \
 	check_venv \
 	check_conftest_imports \
 	clean \
