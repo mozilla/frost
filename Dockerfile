@@ -25,6 +25,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --upgrade --no-cache-dir -r requirements.txt
 
+COPY bin bin
+COPY aws aws
+COPY gcp gcp
+COPY gsuite gsuite
+COPY heroku heroku
+COPY pagerduty pagerduty
 COPY * /app/
 
 USER app
