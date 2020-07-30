@@ -16,7 +16,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
             ca-certificates \
             curl \
             git \
-            jq
+            jq \
+	    make \
+	    ripgrep
 
 WORKDIR /app
 

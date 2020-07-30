@@ -6,20 +6,6 @@
 #
 version: 2.1
 jobs:
-  test:
-    docker:
-      - image: circleci/python:buster
-    steps:
-      - checkout
-      - run:
-          name: install python deps in venv
-          command: |
-            make install
-      - run:
-          name: run tests
-          command: |
-            make black check_conftest_imports test coverage
-
   build-image:
     docker:
       - image: circleci/python:buster
@@ -28,7 +14,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: build-image
-          command: make build-image
+          command: make build-image test-image
       - run:
           name: save built image to cache
           command: docker save "localhost/frost:latest" | gzip -c > /tmp/docker.tgz

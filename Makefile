@@ -81,6 +81,9 @@ venv:
 build-image:
 	docker build -t localhost/frost:latest .
 
+test-image:
+	docker run --rm -e VIRTUAL_ENV=1 localhost/frost:latest /bin/bash -c "make check_conftest_imports doctest coverage"
+
 .PHONY:
 	all \
 	build-image \
@@ -91,4 +94,5 @@ build-image:
 	clean-python \
 	flake8 \
 	install \
+	test-image \
 	venv
