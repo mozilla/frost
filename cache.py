@@ -7,7 +7,6 @@ import functools
 import json
 
 import py
-from _pytest.compat import _PY2 as PY2
 from dateutil.parser import parse
 
 
@@ -52,7 +51,7 @@ def datetime_encode_set(self, key, value):
         self.warn("could not create cache path {path}", path=path)
         return
     try:
-        f = path.open("wb" if PY2 else "w")
+        f = path.open("w")
     except (IOError, OSError):
         self.warn("cache could not write path {path}", path=path)
     else:
