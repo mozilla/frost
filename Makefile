@@ -82,7 +82,7 @@ build-image:
 	docker build -t localhost/frost:latest .
 
 test-image:
-	docker run --rm -e VIRTUAL_ENV=1 localhost/frost:latest /bin/bash -c "make check_conftest_imports doctest coverage"
+	docker run --rm -u 0 -e VIRTUAL_ENV=1 localhost/frost:latest /bin/bash -c "make check_conftest_imports doctest coverage"
 
 .PHONY:
 	all \
