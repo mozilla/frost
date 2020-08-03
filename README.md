@@ -35,7 +35,7 @@ profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
 named `default` in the `us-west-2` region we can run:
 
 ```console
-docker run --rm mozilla/frost pytest --ignore gsuite/ --ignore heroku/ --ignore pagerduty/ --ignore gcp/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
+docker run --rm mozilla/frost pytest --ignore gsuite/ --ignore heroku/ --ignore gcp/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
 ```
 
 The options include pytest options:
@@ -216,10 +216,6 @@ gsuite:
     no_activity_since:
       years: 1
       months: 0
-pagerduty:
-  users_with_remote_access_monitoring: 'pd_users.json'
-  bastion_users: 'hierahash/*hierahash.json'
-  alternate_usernames: 'alternate_usernames.json'
 ```
 
 ### Test Exemptions
@@ -429,75 +425,6 @@ gsuite:
       months: 0
 ```
 
-### Pagerduty Config
-
-frost does not query the pagerduty API, but can run tests against output from it.
-
-The config looks like:
-```
-pagerduty:
-  users_with_remote_access_monitoring: 'pd_users.json'
-  bastion_users: 'hierahash/*hierahash.json'
-  alternate_usernames: 'alternate_usernames.json'
-```
-
-Where `users_with_remote_access_monitoring` and `bastion_users` are
-globs for multiple files relative to the current working directory and
-`alternate_usernames` is the path to a single file.
-
-The files have examples formats as follows:
-
-* `users_with_remote_access_monitoring`:
-
-```json
-[
-  {
-    "avatar_url": "https://secure.gravatar.com/avatar/...",
-    "billed": true,
-    "color": "sea-green",
-    "contact_methods": [],
-    "description": null,
-    "email": "example@example.com",
-    "html_url": "https://example.pagerduty.com/users/AAA0999",
-    "id": "AAA0999",
-    "invitation_sent": false,
-    "job_title": null,
-    "name": "Example Examplerton",
-    "notification_rules": [],
-    "role": "user",
-    "self_": "https://api.pagerduty.com/users/AAA0999",
-    "summary": "C. Hobbes",
-    "teams": [],
-    "time_zone": "America/New_York",
-    "type": "user"
-  },
-  ...
-]
-```
-
-* `bastion_users`:
-
-```json
-{
-  "chobbes": {
-    "groups": [""],
-    "root_ssh": true
-  },
-  "movedon": {
-    "ensure": "absent"
-  },
-  ...
-}
-```
-
-* `alternate_usernames`:
-
-```json
-{
-  "chobbes": ["calvin", "spacemanspiff"]
-}
-```
-
 ### Test Accuracy
 
 There are two important things to note about `frost` tests that may be different from your expectations.
@@ -646,7 +573,7 @@ Notes:
 1. Running it we see that one of the IPs is an AWS IP:
 
 ```console
-docker run --rm mozilla/frost pytest --ignore aws/ --ignore gsuite/ --ignore heroku/ --ignore pagerduty/ --ignore gcp/
+docker run --rm mozilla/frost pytest --ignore aws/ --ignore gsuite/ --ignore heroku/ --ignore gcp/
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/mozilla/frost, inifile:
