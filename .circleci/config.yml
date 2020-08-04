@@ -20,8 +20,7 @@ jobs:
           command: |
             source venv/bin/activate
             # check_conftest_imports currently fails
-            #make black check_conftest_imports test coverage
-            make black doctest coverage
+            make black check_conftest_imports doctest coverage
 
   build-image:
     docker:
@@ -54,13 +53,13 @@ jobs:
       - run:
           name: deploy to Dockerhub
           command: |
-            # deploy master and scan envs
+            # publish docker image master and scan envs
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:latest"
               docker push "${DOCKERHUB_REPO}:latest"
             elif  [ ! -z "${CIRCLE_TAG}" ]; then
-              # deploy a release tag
+              # publish docker image a release tag
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               echo "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
               docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
@@ -88,6 +87,13 @@ workflows:
           filters:
             tags:
               # only upload the docker container on semver tags
-              only: /[0-9]\.[0-9]+\.[0-9]+/
+              only: /^v[0-9]\.[0-9]+\.[0-9]+/
             branches:
-              only: master
+              # filters appear to be OR'd together, so we can't specify just
+              # 'master' (as it tries to upload with every commit to
+              # master).
+              #
+              # Unsure why we need a branch specification at all then,
+              # but the docs show it
+              #   https://circleci.com/docs/2.0/workflows/#using-contexts-and-filtering-in-your-workflows
+              ignore: /.*/
