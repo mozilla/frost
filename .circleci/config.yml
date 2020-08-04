@@ -53,13 +53,13 @@ jobs:
       - run:
           name: deploy to Dockerhub
           command: |
-            # publish docker image master and scan envs
+            # deploy docker image master based on scan envs
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:latest"
               docker push "${DOCKERHUB_REPO}:latest"
             elif  [ ! -z "${CIRCLE_TAG}" ]; then
-              # publish docker image a release tag
+              # deploy docker image when a release tag was created
               docker login -u $DOCKER_USER -p $DOCKER_PASS
               echo "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
               docker tag "localhost/frost:latest" "${DOCKERHUB_REPO}:${CIRCLE_TAG}"
