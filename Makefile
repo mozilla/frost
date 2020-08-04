@@ -46,6 +46,10 @@ clean-cache: check_venv
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
+doc-build: 
+	type sphinx-build || { echo "please install sphinx to build docs"; false; }
+	make -C docs html
+
 doctest: check_venv
 	pytest --doctest-modules -s --offline --debug-calls
 
@@ -69,6 +73,9 @@ install: venv
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
 
+stage-docs: docs
+	git add --all --force docs/_build/html
+
 metatest:
 	pytest --aws-profiles example-account \
 		-o python_files=meta_test*.py \
@@ -89,6 +96,8 @@ build-image:
 	clean \
 	clean-cache \
 	clean-python \
+	doc-build \
 	flake8 \
 	install \
+	stage-docs \
 	venv
