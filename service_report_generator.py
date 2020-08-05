@@ -144,65 +144,6 @@ class ReportGenerator:
         return ""
 
 
-class CsvReportGenerator(ReportGenerator):
-    def print_header(self):
-        print(
-            "Test Name,Project,Resource Type,Resource Id,Resource Name,Region,App,Owner,Assignee",
-            file=self.fout,
-        )
-
-    def print_table_of_contents(self):
-        return
-
-    def print_report(self):
-        for test in self.test_results:
-            self._print_test_result_csv(test)
-
-    def _print_test_result_csv(self, test_name):
-        for status in STATUSES_TO_LIST:
-            if not self._test_results_include_status(test_name, status):
-                continue
-
-            for result in self.test_results[test_name]:
-                if result["status"] != status:
-                    continue
-
-                rtype = self._get_resource_type(test_name)
-                project = ""
-                if result["metadata"].get("gcp_project_id", None) is not None:
-                    resource_name = result["metadata"].get("name", "")
-                    rid = result["metadata"].get("id", "")
-                    project = result["metadata"]["gcp_project_id"]
-                else:
-                    resource_name = self._extract_resource_name(result["name"])
-                    rid = self._get_resource_id(rtype, resource_name, result)
-
-                display_resource_name = resource_name
-                if rtype == "Security Group":
-                    display_resource_name = " ".join(resource_name.split(" ")[1:])
-
-                # Get App and Owner Tag
-                app = self._get_tag_value("App", result["metadata"])
-                owner = self._get_tag_value("Owner", result["metadata"])
-
-                # Get Region
-                region = self._get_region(result["metadata"])
-
-                print(
-                    "%s,%s,%s,%s,%s,%s,%s,%s,"
-                    % (
-                        test_name,
-                        project,
-                        rtype,
-                        rid,
-                        display_resource_name,
-                        region,
-                        app,
-                        owner,
-                    ),
-                    file=self.fout,
-                )
-
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -212,14 +153,6 @@ def parse_args():
         default="service-report.json",
         dest="json_out",
         help="Service json output filename.",
-    )
-
-    parser.add_argument(
-        "--co",
-        "--csv-out",
-        default="service-report.csv",
-        dest="csv_out",
-        help="Service csv output filename.",
     )
 
     parser.add_argument(
@@ -293,6 +226,3 @@ if __name__ == "__main__":
 
     with open(args.json_out, "w") as fout:
         json.dump(service_json, fout, sort_keys=True, indent=4)
-
-    with open(args.csv_out, "w") as fout:
-        CsvReportGenerator(service_json, fout=fout).generate()
