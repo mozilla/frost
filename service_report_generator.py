@@ -30,6 +30,7 @@ Pytest Service JSON format:
   'results': [
     {
        'test_name':  # unparametrized pytest test name
+       'resource_name': # best effort at resource name
        'name':
        'status':
        'value':
@@ -243,10 +244,20 @@ def get_test_status(outcome):
         raise Exception("Unexpected test outcome %s" % outcome)
 
 
+def get_resource_name(name):
+    try:
+        # test_elb_instances_attached[elb-name]
+        rname = name.split("[")[1][:-1]
+        return rname
+    except:
+        return name
+
+
 def get_result_for_test(test):
     meta = test["metadata"][0]
     return {
         "test_name": meta["unparametrized_name"],
+        "resource_name": get_resource_name(meta["parametrized_name"]),
         "name": meta["parametrized_name"],
         "status": get_test_status(meta["outcome"]),
         "value": meta["outcome"],
