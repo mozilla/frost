@@ -17,7 +17,7 @@ import os
 import pathlib
 
 # import time
-from typing import List
+from typing import List, Set
 
 # import sys
 import subprocess
@@ -33,28 +33,10 @@ from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 from . import retrieve_github_data
 
 
-# Data to move to config
-DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
-EXTENSION_TO_STRIP = ".git"
-PATH_TO_METADATA = os.environ["PATH_TO_METADATA"]
-os.environ["GH_TOKEN"]
-
-
-# Data collection routines -- these likely should be a separate python
-# package, as they are useful outside of frost as written
-@pytest.fixture(scope="session", autouse=True)
-def gql_connection():
-    token = os.environ["GH_TOKEN"]
-    endpoint = HTTPEndpoint(
-        DEFAULT_GRAPHQL_ENDPOINT, {"Authorization": "bearer " + token,},
-    )
-    return endpoint
-
-
-# @pytest.fixture(scope="session")
-def repos_to_check() -> List[str]:
+def orgs_to_check() -> Set[str]:
     # just shell out for now
-    meta_dir = pathlib.Path(os.path.expanduser(PATH_TO_METADATA)).resolve()
+    path_to_metadata = os.environ["PATH_TO_METADATA"]
+    meta_dir = pathlib.Path(os.path.expanduser(path_to_metadata)).resolve()
     in_files = list(meta_dir.glob("*.json"))
 
     cmd = [
@@ -62,9 +44,7 @@ def repos_to_check() -> List[str]:
         "-rc",
         """.codeRepositories[]
                 | select(.status == "active")
-                | .url as $url
-                | .branchesToProtect[] // ""
-                | [$url, . ]
+                | [.url]
                 | @csv
                 """,
         *in_files,
@@ -73,12 +53,13 @@ def repos_to_check() -> List[str]:
     # python 3.6 doesn't support capture_output
     # status = subprocess.run(cmd, capture_output=True)
     status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert not status.stderr.decode("utf-8")
     # return as array of non-empty, unquoted, "lines"
-    return [
-        x.translate({ord('"'): None, ord("'"): None})
+    return {
+        x.split("/")[3].translate({ord('"'): None, ord("'"): None})
         for x in status.stdout.decode("utf-8").split("\n")
         if x
-    ]
+    }
 
 
 @lru_cache(maxsize=32)

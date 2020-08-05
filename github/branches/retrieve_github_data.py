@@ -8,6 +8,7 @@ protection guideline compliance.
 
 # import datetime
 import csv
+from functools import lru_cache
 import logging
 import os
 from dataclasses import dataclass, field
@@ -24,7 +25,7 @@ from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
 # from branch_check.github_schema import github_schema as schema  # noqa: I900
-from .github_schema import github_schema as schema  # noqa: I900
+from ..github_schema import github_schema as schema  # noqa: I900
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
@@ -179,7 +180,9 @@ def create_operation(owner, name):
 
     # we'll have to iterate on matching branches for this branch
     # protection rule
-    ref = node.matching_refs(first=1)
+    # Currently, we avoid iteration by tuning the value to never require
+    # multiple pages. This technique is brittle, but may be sufficient.
+    ref = node.matching_refs(first=50)
     ref.total_count()
     ref.page_info.__fields__(end_cursor=True, has_next_page=True)
     ref.nodes().__fields__(
@@ -205,7 +208,7 @@ def create_rule_query():
 # Should be able to produce iterator for lowest level data
 
 
-def test_nesting(endpoint, reponame):
+def get_nested_branch_data(endpoint, reponame):
     owner, name = reponame.split("/", 1)
     op = create_operation(owner, name)
 
@@ -353,10 +356,13 @@ def parse_args(**kwargs):
     return args
 
 
+# due to pytest parametrization, we'll call this many times for each
+# repo consecutively, so a large cache is not needed.
+@lru_cache(maxsize=2)
 def get_repo_branch_protections(endpoint, repo: str) -> RepoBranchProtections:
     if repo.endswith(EXTENSION_TO_STRIP):
         repo = repo[: -len(EXTENSION_TO_STRIP)]
-    data = test_nesting(endpoint, repo)
+    data = get_nested_branch_data(endpoint, repo)
     return data
 
 

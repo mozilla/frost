@@ -45,15 +45,18 @@ def meets_criteria(protections: List[BranchProtectionRule], criteria: str) -> bo
     elif criteria == "rule conflicts":
         met = all(r.rule_conflict_count == 0 for r in protections)
     else:
-        print(f"ERROR: no support for '{criteria}'")
+        # raising assert works best when called from pytest, as we won't
+        # _always_ be called from pytest.
+        assert False, f"ERROR: no support for '{criteria}'"
     return met
 
 
-def validate_branch_protections(data: RepoBranchProtections, branch: str) -> List[str]:
+def validate_branch_protections(
+    data: RepoBranchProtections, branch: str, criteria: str
+) -> List[str]:
     """
         Validate the protections
 
-        Returns an array of all the issues found
     """
 
     results = []
@@ -66,10 +69,15 @@ def validate_branch_protections(data: RepoBranchProtections, branch: str) -> Lis
     active_rules = find_applicable_rules(data, branch)
 
     if not active_rules:
-        results.append(
-            f"ERROR: no branch protection for '{data.name_with_owner}:{branch}'"
-        )
+        # results.append(
+        assert (
+            False
+        ), f"ERROR: no branch protection for '{data.name_with_owner}:{branch}'"
+        # )
     else:
+        # see if at least one rule matches specified criteria
+        message = f"ERROR: no {criteria} for branch '{data.name_with_owner}:{branch}'"
+        return meets_criteria(active_rules, criteria), message
         # see if at least one rule matches each criteria
         for criteria in required_criteria:
             if not meets_criteria(active_rules, criteria):
