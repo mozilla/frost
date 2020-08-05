@@ -30,7 +30,7 @@ endif
 
 check_conftest_imports:
 	# refs: https://github.com/mozilla/frost/issues/119
-	rg '^import\s+conftest|^from\s+conftest\s+import\s+pytest' -g '*.py'; [ $$? -eq 1 ]
+	grep --recursive --exclude-dir '*venv' --include '*.py' '^import\s+conftest|^from\s+conftest\s+import\s+pytest' ./ ; [ $$? -eq 1 ]
 
 clean: clean-cache clean-python
 	rm -rf venv
