@@ -108,36 +108,6 @@ class RepoBranchProtections:
         return result
 
 
-def compact_fmt(d):
-    s = []
-    for k, v in d.items():
-        if isinstance(v, dict):
-            v = compact_fmt(v)
-        elif isinstance(v, (list, tuple)):
-            lst = []
-            for e in v:
-                if isinstance(e, dict):
-                    lst.append(compact_fmt(e))
-                else:
-                    lst.append(repr(e))
-            s.append("%s=[%s]" % (k, ", ".join(lst)))
-            continue
-        s.append("%s=%r" % (k, v))
-    return "(" + ", ".join(s) + ")"
-
-
-def report_download_errors(errors):
-    logger.error("Document contain %d errors", len(errors))
-    for i, e in enumerate(errors):
-        msg = e.pop("message")
-        extra = ""
-        if e:
-            extra = " %s" % compact_fmt(e)
-        logger.error("Error #%d: %s%s", i + 1, msg, extra)
-
-    # raise SystemExit("GitHub communication failed.")
-
-
 def _add_protection_fields(node) -> None:
     """ Build in fields we want to query
 
@@ -218,7 +188,7 @@ def get_nested_branch_data(endpoint, reponame):
     d = endpoint(op)
     errors = d.get("errors")
     if errors:
-        report_download_errors(errors)
+        endpoint.report_download_errors(errors)
         return RepoBranchProtections(reponame)
 
     repodata = (op + d).repository
@@ -271,7 +241,7 @@ def get_nested_branch_data(endpoint, reponame):
         cont = endpoint(op)
         errors = cont.get("errors")
         if errors:
-            return report_download_errors(errors)
+            return endpoint.report_download_errors(errors)
 
         (op + cont).repository
 

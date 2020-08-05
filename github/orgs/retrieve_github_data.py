@@ -80,7 +80,7 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
     d = endpoint(op)
     errors = d.get("errors")
     if errors:
-        report_download_errors(errors)
+        endpoint.report_download_errors(errors)
         return OrgInfo(org)
 
     orgdata = (op + d).organization
