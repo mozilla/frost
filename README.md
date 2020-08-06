@@ -1,6 +1,6 @@
 # Frost
 
-![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
+![frost snowman logo](https://raw.githubusercontent.com/mozilla/frost/master/docs/frost-snowman-log.png)
 
 Clients and [pytest](https://docs.pytest.org/en/latest/index.html)
 tests for checking that third party services the @foxsec team uses are
