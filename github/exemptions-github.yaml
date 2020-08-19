@@ -1,0 +1,10 @@
+exemptions:
+  - test_name: "test_require_2fa"
+    test_param_id: "*-firefox-devtool"
+    reason: "transition"
+    expiration_day: 2050-01-01
+
+  - test_name: "test_require_2fa"
+    test_param_id: "*-mozilla-mobile"
+    reason: "test of xpass transition"
+    expiration_day: 2050-01-01

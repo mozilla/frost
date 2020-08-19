@@ -12,7 +12,7 @@ from .retrieve_github_data import OrgInfo
 # define the criteria we care about. Identify each critera with a string that will
 # appear in the results.
 required_criteria = [
-    "two factor required",
+    "two factor required",  # SOGH003
 ]
 optional_criteria = [
     # "commit signing",  # may not be knowable
@@ -26,9 +26,7 @@ def meets_criteria(org_info: OrgInfo, criteria: str) -> bool:
     if criteria == "two factor required":
         met = org_info.requires_two_factor_authentication
     else:
-        # raising assert works best when called from pytest, as we won't
-        # _always_ be called from pytest.
-        assert False, f"ERROR: no support for '{criteria}'"
+        met = False
     return met
 
 
@@ -42,14 +40,18 @@ def validate_org_info(data: OrgInfo, criteria: str) -> List[str]:
 
     for criteria in required_criteria:
         if not meets_criteria(data, criteria):
-            results.append(f"ERROR: no {criteria} for org '{data.name}' (required)")
-    for criteria in optional_criteria:
-        if not meets_criteria(data, criteria):
-            results.append(f"FYI: no {criteria} for org '{data.name}' (optional)")
-
-    # regardless of match, we'll also warn on conflicting rules
+            results.append(
+                f"ERROR:SOGH003:{data.login} doesn't meet {criteria} - required"
+            )
     for criteria in warning_criteria:
         if not meets_criteria(data, criteria):
-            results.append(f"WARNING: no {criteria} for org '{data.name}' (required)")
+            results.append(
+                f"Warning:SOGH003:{data.login} doesn't meet {criteria} - suggested"
+            )
+    for criteria in optional_criteria:
+        if not meets_criteria(data, criteria):
+            results.append(
+                f"FYI:SOGH003:{data.login} doesn't meet {criteria} - optional"
+            )
 
-    return len(results) == 0, results
+    return len(results) == 0, "\n".join(results)

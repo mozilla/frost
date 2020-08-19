@@ -21,6 +21,7 @@ def test_require_2fa(gql_connection: Any, org_to_check: str, criteria: str) -> N
     info = get_org_info(gql_connection, f"{org_to_check}")
     if not info:
         assert False, f"ERROR: organization '{orgs_to_check}' not accessible"
+        f"ERROR:SOGH001:{data.name_with_owner}:{branch} has no {criteria} rule"
     else:
         met, message = validate_compliance.validate_org_info(info, criteria)
         assert met, message

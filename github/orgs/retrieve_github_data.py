@@ -37,18 +37,19 @@ logger = logging.getLogger(__name__)
 @dataclass
 class OrgInfo:
     name: str
+    login: str
     requires_two_factor_authentication: bool
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Org Name", "2FA Required"]
+        return ["Org Name", "Org Slug", "2FA Required"]
 
     @classmethod
     def cvs_null(cls) -> List[str]:
-        return [None, None]
+        return [None, None, None]
 
     def csv_row(self) -> List[str]:
-        return [self.name or None, self.two_factor_required or None]
+        return [self.name or None, self.login or None, self.two_factor_required or None]
 
 
 def create_operation(owner):
@@ -67,6 +68,7 @@ def create_operation(owner):
 
     org = op.organization(login=owner)
     org.name()
+    org.login()
     org.requires_two_factor_authentication()
 
     return op
@@ -96,6 +98,7 @@ def extract_org_data(orgdata) -> OrgInfo:
     """
     org_data = OrgInfo(
         name=orgdata.name,
+        login=orgdata.login,
         requires_two_factor_authentication=orgdata.requires_two_factor_authentication,
     )
     return org_data
@@ -155,7 +158,8 @@ def main():
         csv_out = csv.writer(open(args.output, "w"))
     else:
         csv_out = csv.writer(sys.stdout)
-    endpoint = get_gql_session(args.graphql_endpoint, args.token,)
+    raise SystemExit("Not ready for CLI usage")
+    # endpoint = get_gql_session(args.graphql_endpoint, args.token,)
     csv_out.writerow(OrgInfo.csv_header())
     for org in args.orgs:
         row_data = get_org_info(endpoint, org)

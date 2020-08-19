@@ -45,9 +45,7 @@ def meets_criteria(protections: List[BranchProtectionRule], criteria: str) -> bo
     elif criteria == "rule conflicts":
         met = all(r.rule_conflict_count == 0 for r in protections)
     else:
-        # raising assert works best when called from pytest, as we won't
-        # _always_ be called from pytest.
-        assert False, f"ERROR: no support for '{criteria}'"
+        met = False
     return met
 
 
@@ -72,12 +70,15 @@ def validate_branch_protections(
         # results.append(
         assert (
             False
-        ), f"ERROR: no branch protection for '{data.name_with_owner}:{branch}'"
+        ), f"ERROR:SOGH001:{data.name_with_owner}:{branch} has no branch protection"
         # )
     else:
         # see if at least one rule matches specified criteria
-        message = f"ERROR: no {criteria} for branch '{data.name_with_owner}:{branch}'"
+        message = (
+            f"ERROR:SOGH001:{data.name_with_owner}:{branch} has no {criteria} rule"
+        )
         return meets_criteria(active_rules, criteria), message
+        # vscode correctly tells me that all code below here is unreachable
         # see if at least one rule matches each criteria
         for criteria in required_criteria:
             if not meets_criteria(active_rules, criteria):
@@ -90,6 +91,7 @@ def validate_branch_protections(
                     f"FYI: no {criteria} for branch '{data.name_with_owner}:{branch}' (optional)"
                 )
 
+    # vscode correctly tells me that all code below here is unreachable
     # regardless of match, we'll also warn on conflicting rules
     for criteria in warning_criteria:
         if not meets_criteria(active_rules, criteria):

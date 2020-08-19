@@ -29,7 +29,7 @@ def test_required_protections(
     owner, repo = url.split("/")[3:5]
     rules = get_repo_branch_protections(gql_connection, f"{owner}/{repo}")
     if not rules:
-        assert False, f"ERROR: no branch protection for '{owner}/{repo}:{branch}'"
+        assert False, f"ERROR:SOGH001:{owner}/{repo}:{branch} has no branch protection"
     else:
         met, message = validate_compliance.validate_branch_protections(
             rules, branch, criteria
