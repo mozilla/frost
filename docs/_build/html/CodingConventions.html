@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Conventions &#8212; Frost  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -43,6 +43,15 @@ have <a class="reference external" href="https://docs.python.org/3.6/library/doc
 <li><p>Frost tests are expected to support the <code class="docutils literal notranslate"><span class="pre">--json</span></code> option by ensuring ids used
 in <code class="docutils literal notranslate"><span class="pre">pytest.mark.parametrize</span></code> contain sufficient information for downstream
 processing.</p></li>
+</ul>
+<ul id="offline">
+<li><p>All data access routines should respect the <code class="docutils literal notranslate"><span class="pre">--offline</span></code> command line option
+that is a <code class="docutils literal notranslate"><span class="pre">frost</span></code> extension. The value of <code class="docutils literal notranslate"><span class="pre">--offline</span></code> is passed as a value to
+the “client” constructor.</p>
+<p>If you do not properly implement this option, you will break “<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">doctest</span></code>” for
+everything. (I.e. you’re advised to run “<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">doctest</span></code>” early &amp; often while
+implementing a new service.)</p>
+</li>
 </ul>
 </div>
 
@@ -107,7 +116,7 @@ processing.</p></li>
       &copy;2020.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
