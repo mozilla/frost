@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
 Collect Information about branches sufficient to check for all branch
 protection guideline compliance.
 
 """
 
-# import datetime
 import csv
 from functools import lru_cache
 import logging
@@ -15,20 +16,12 @@ from dataclasses import dataclass, field
 import sys
 from typing import Any, List
 
-# import re
-
-# import sys
-
-# from collections import OrderedDict
-
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
-# from branch_check.github_schema import github_schema as schema  # noqa: I900
 from ..github_schema import github_schema as schema  # noqa: I900
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
-EXTENSION_TO_STRIP = ".git"
 
 logger = logging.getLogger(__name__)
 
@@ -56,12 +49,10 @@ def create_operation(owner):
     """ Create the default Query operation
 
     We build the structure for:
-      repository:
-        0-n branch protections rules
-          flags
-          0-n conflicts with other rules (we only count)
-          0-n actors who can push (we only count)
-          0-n branches with this protection
+      organization:
+        name (may contain spaces)
+        login (no spaces)
+        requires 2fa
     """
 
     op = Operation(schema.Query)
@@ -77,7 +68,6 @@ def create_operation(owner):
 def get_org_info(endpoint: Any, org: str) -> OrgInfo:
     op = create_operation(org)
     logger.info("Downloading base information from %s", endpoint)
-    # logger.debug("Operation:\n%s", op)
 
     d = endpoint(op)
     errors = d.get("errors")
@@ -160,10 +150,10 @@ def main():
         csv_out = csv.writer(sys.stdout)
     raise SystemExit("Not ready for CLI usage")
     # endpoint = get_gql_session(args.graphql_endpoint, args.token,)
-    csv_out.writerow(OrgInfo.csv_header())
-    for org in args.orgs:
-        row_data = get_org_info(endpoint, org)
-        csv_output(row_data, csv_writer=csv_out)
+    # csv_out.writerow(OrgInfo.csv_header())
+    # for org in args.orgs:
+    #     row_data = get_org_info(endpoint, org)
+    #     csv_output(row_data, csv_writer=csv_out)
 
 
 if __name__ == "__main__":

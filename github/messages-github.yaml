@@ -23,6 +23,8 @@ Standards:
     reopen message id: SOGH001a-1
     still open message id: SOGH001a-2
     admin set: SOGH001a-3
+  - standard number: 1b
+    standard description: Admins exempted from branch protections
   - standard number: 2   # no longer used, as we don't keep history
     standard description: Regression in Production branch protection
     new message id: SOGH002-0

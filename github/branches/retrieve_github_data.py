@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """
 Collect Information about branches sufficient to check for all branch
 protection guideline compliance.
 
 """
+# TODO add doctests
 
-# import datetime
 import csv
 from functools import lru_cache
 import logging
@@ -14,12 +16,6 @@ import os
 from dataclasses import dataclass, field
 import sys
 from typing import Any, List
-
-# import re
-
-# import sys
-
-# from collections import OrderedDict
 
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
@@ -30,6 +26,7 @@ from ..github_schema import github_schema as schema  # noqa: I900
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
 
+# TODO use logger
 logger = logging.getLogger(__name__)
 
 
@@ -140,6 +137,7 @@ def create_operation(owner, name):
     # we only get one item at a time to
     # simplify getting all.
     # N.B. anything we can get multiple of, we need to gather the 'id'
+    #       as well, in case pagination is needed
     branch_protection = repo.branch_protection_rules(first=10)
     branch_protection.total_count()
     branch_protection.page_info.__fields__(end_cursor=True, has_next_page=True)
@@ -170,12 +168,11 @@ def create_rule_query():
     op = Operation(schema.Query)
 
     node = op.branch_protection_rules.nodes(cursor="$LAST_CURSOR")
-    # node.__fields__(is_admin_enforced=True, id=True, pattern=True)
     _add_protection_fields(node)
     return op
 
 
-# Should be able to produce iterator for lowest level data
+# TODO Should be able to produce iterator for lowest level data
 
 
 def get_nested_branch_data(endpoint, reponame):
@@ -183,7 +180,6 @@ def get_nested_branch_data(endpoint, reponame):
     op = create_operation(owner, name)
 
     logger.info("Downloading base information from %s", endpoint)
-    # logger.debug("Operation:\n%s", op)
 
     d = endpoint(op)
     errors = d.get("errors")
@@ -206,8 +202,10 @@ def get_nested_branch_data(endpoint, reponame):
         )
         return has_more_rules or has_more_refs
 
+    # TODO determine better way to test
     fake_next_page = False
 
+    # TODO ensure errors are reported out to pytest when invoked from there
     while _more_to_do(repodata, fake_next_page):
         fake_next_page = False
         # Need to work from inside out.
@@ -283,7 +281,7 @@ def csv_output(data, csv_writer) -> None:
         csv_writer.writerow(line)
 
 
-def parse_args(**kwargs):
+def parse_args():
     import argparse
 
     ap = argparse.ArgumentParser(description="GitHub Agile Dashboard")

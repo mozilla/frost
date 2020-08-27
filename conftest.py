@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from typing import Any
 
 import pytest
 
@@ -10,6 +11,7 @@ from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
 from heroku.client import HerokuAdminClient
+from github.client import GitHubClient
 
 import custom_config
 
@@ -18,6 +20,15 @@ botocore_client = None
 gcp_client = None
 gsuite_client = None
 heroku_client = None
+github_client = None
+
+# globals in conftest.py are hard to import from several levels down, so provide access function
+def get_client(client_name: str) -> Any:
+    # restrict to variables with defined suffix
+    suffix = "_client"
+    if client_name.endswith(suffix):
+        client_name = client_name[: -len(suffix)]
+    return globals()[f"{client_name}_client"]
 
 
 def pytest_addoption(parser):
@@ -69,6 +80,7 @@ def pytest_configure(config):
     global gcp_client
     global gsuite_client
     global heroku_client
+    global github_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
@@ -99,6 +111,11 @@ def pytest_configure(config):
         cache=None,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
+        offline=config.getoption("--offline"),
+    )
+
+    github_client = GitHubClient(
+        debug_calls=config.getoption("--debug-calls"),
         offline=config.getoption("--offline"),
     )
 

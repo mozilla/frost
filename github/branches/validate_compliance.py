@@ -5,21 +5,41 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-from typing import List
+from typing import Any, List, Optional, Tuple
+from dataclasses import dataclass
 
 from .retrieve_github_data import RepoBranchProtections, BranchProtectionRule
+
+
+@dataclass
+class Criteria:
+    standard_number: str  # as defined in messages file. alpha-numeric
+    slug: str  # id to match. alpha-numeric
+    description: str  # whatever you want
+
+    @staticmethod
+    def idfn(val: Any) -> Optional[str]:
+        """ provide ID for pytest Parametrization
+        """
+        if isinstance(val, (Criteria,)):
+            return f"{val.standard_number}-{val.slug}"
+        return None
+
+    def __str__(self: Any) -> str:
+        return f"{self.standard_number} {self.description}"
+
 
 # define the criteria we care about. Identify each critera with a string that will
 # appear in the results.
 required_criteria = [
-    "admins restricted",
+    Criteria("SOGH001b", "admins", "admins not restricted"),
 ]
 optional_criteria = [
-    "limited commiters",
+    Criteria("SOGH001c", "commiters", "allowed commiters not configured"),
     # "commit signing",  # may not be knowable
 ]
 warning_criteria = [
-    "rule conflicts",
+    Criteria("SOGH001d", "conflicts", "Conflict in Protection Rules"),
 ]
 
 
@@ -35,14 +55,14 @@ def find_applicable_rules(
     return result
 
 
-def meets_criteria(protections: List[BranchProtectionRule], criteria: str) -> bool:
+def meets_criteria(protections: List[BranchProtectionRule], criteria: Criteria) -> bool:
     met = True
     # ugly implementation for now
-    if criteria == "admins restricted":
+    if criteria.slug == "admins":
         met = all(r.is_admin_enforced for r in protections)
-    elif criteria == "limited commiters":
+    elif criteria.slug == "commiters":
         met = all(r.push_actor_count > 0 for r in protections)
-    elif criteria == "rule conflicts":
+    elif criteria.slug == "conflicts":
         met = all(r.rule_conflict_count == 0 for r in protections)
     else:
         met = False
@@ -50,7 +70,7 @@ def meets_criteria(protections: List[BranchProtectionRule], criteria: str) -> bo
 
 
 def validate_branch_protections(
-    data: RepoBranchProtections, branch: str, criteria: str
+    data: RepoBranchProtections, branch: str, criteria: Criteria,
 ) -> List[str]:
     """
         Validate the protections

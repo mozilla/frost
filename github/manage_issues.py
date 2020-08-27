@@ -12,26 +12,29 @@ import json
 import re
 from dataclasses import dataclass
 from pprint import pprint
-from typing import List
+from typing import List, Optional, Tuple
 
 import argcomplete
 
 _epilog = ""
 
 # constants
-# Sample line
+# Sample line:
+#   github/branches/test_branch_protection.py::test_required_protections[SOGH001b-admins-firefox-devtools/profiler-server.git,]
 SPEC_DECODER_RE = re.compile(
     r"""
     (?P<path>[^:]+):: # path
     (?P<method>\w+)\[ # method
+    (?P<standard>[^-]+)- # assumes no hyphen in standard
     (?P<test_name>[^-]+)- # assumes no hyphen in test_name
     (?P<param_id>[^]]+)\]
 """,
     re.VERBOSE,
 )
 
-# Sample line:
+# Sample lines:
 #  E   AssertionError: ERROR:SOGH003:firefox-devtools doesn't meet two factor required - required\n    assert False
+#  E   AssertionError: ERROR:SOGH001:firefox-devtools/profiler-server:master has no SOGH001b admins not restricted rule\n    assert False
 ASSERT_DECODER_RE = re.compile(
     r"""
     (E\s+AssertionError:)?\s*  # preamble
@@ -42,12 +45,30 @@ ASSERT_DECODER_RE = re.compile(
     re.VERBOSE | re.MULTILINE,
 )
 
+# Work on "info" section of branch. Example:
+#  firefox-devtools/profiler-server:master
+BRANCH_INFO_DECODER_RE = re.compile(
+    r"""
+    ^
+    (?P<owner>[^/]+)/   # repo owner
+    (?P<repo>[^:]+):     # repo name
+    (?P<branch>\S+)     # branch name
+    $
+    """,
+    re.VERBOSE,
+)
+
 
 @dataclass
 class Action:
-    owner: str
-    repo: str
-    branch: str
+    final_status: str = ""  # after frost exemption processing
+    base_status: str = ""  # native pytest status
+    owner: str = ""
+    repo: str = ""
+    branch: str = ""
+    standard: str = ""
+    summary: str = ""
+    messages: Optional[List[str]] = None
 
 
 def parse_action_string(name: str) -> List[str]:
@@ -72,44 +93,78 @@ def infer_resource_type(path: str) -> str:
     return resource_type
 
 
-def extract_standard(assert_msg: str) -> str:
-    """
-    pull standard(s) out of the assert string
-
-    TODO:
-    - support more than one result in string
-    """
-    for item in ASSERT_DECODER_RE.finditer(assert_msg):
-        pprint(item.groupdict()["standard"])
-
-
 def create_branch_action(action_spec: dict) -> Action:
     """Parse pytest info into information needed to open an issue against a
     specific branch"""
 
-    path, method, test_name, param_id = parse_action_string(action_spec["full_name"])
-    standard = extract_standard(action_spec["longrepr"])
-    url, branch = param_id.split(",")
-    owner, repo = url.split("/")[3:5]
+    # most information comes from the (parametrized) name of the test
+    test_info = action_spec["name"]
+    *_, standard, test_name, param_id = parse_action_string(test_info)
+    owner, repo = param_id.split("/")
+
+    # details for branches come from the assertion text
+    branch_details = action_spec["call"]["longrepr"]
+    errors = []
+    branch = "BoGuS"
+    for item in ASSERT_DECODER_RE.finditer(branch_details):
+        info = item.groupdict()["info"]
+        # further parse info
+        branch = "BoGuS"
+        matches = BRANCH_INFO_DECODER_RE.match(info)
+        if matches:
+            owner, repo, branch = matches.groups()
+        errors.append(
+            f"Branch {branch} of {owner}/{repo} failed {standard} {test_name}"
+        )
+
+    summary = f"{len(errors)} for {owner}/{repo}:{branch}"
+    final_status, base_status = get_status(action_spec)
+    action = Action(
+        final_status=final_status,
+        base_status=base_status,
+        owner=owner,
+        repo=repo,
+        branch=branch,
+        standard=standard,
+        summary=summary,
+        messages=errors,
+    )
+    return action
+
+
+def get_status(action_spec: dict) -> Tuple[str, str]:
+    final_status = action_spec["call"]["outcome"]
+    base_status = action_spec["metadata"][0]["outcome"]
+    return final_status, base_status
 
 
 def create_org_action(action_spec: dict) -> Action:
     """
     Break out the org info from the json
     """
-    found = False
-    for item in ASSERT_DECODER_RE.finditer(action_spec["longrepr"]):
-        pprint(item.groupdict())
-        found = True
-    if not found:
-        raise KeyError(f"Malformed json {repr(action_spec)}")
+    # TODO check for outcome of xfailed (means exemption no longer needed)
+    # most information comes from the (parametrized) name of the test
+    test_info = action_spec["name"]
+    path, method, standard, test_name, param_id = parse_action_string(test_info)
+    org_full_name = param_id
+    summary = f"Org {org_full_name} failed {standard} {test_name}"
+    final_status, base_status = get_status(action_spec)
+    action = Action(
+        final_status=final_status,
+        base_status=base_status,
+        owner=org_full_name,
+        standard=standard,
+        summary=summary,
+    )
+    return action
 
 
 def create_action_spec(action_spec: dict) -> Action:
     # for now, just return Action -- later decode may involve inferring what to
-    # do ("xpass" detection)
-    name = action_spec["full_name"]
-    path, _, _, _ = parse_action_string(name)
+    # do ("xpass" detection -- see GH-325)
+    # full name is file_path::method[test_name-parametrize_id]
+    name = action_spec["name"]
+    path, *_ = parse_action_string(name)
     resource_type = infer_resource_type(path)
     if resource_type == "orgs":
         action = create_org_action(action_spec)
@@ -118,28 +173,11 @@ def create_action_spec(action_spec: dict) -> Action:
     else:
         raise TypeError(f"unknown resource type '{resource_type}' from '{name}")
 
-    # full name is file_path::method[test_name-parametrize_id]
-    pprint(action_spec)
     return action
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, epilog=_epilog)
-    # parser.add_argument(
-    #     "--debug", action="store_true", help="include dump of all data returned"
-    # )
-    # parser.add_argument("--owners", action="store_true", help="Also show owners")
-    # parser.add_argument("--email", action="store_true", help="include owner email")
-    # parser.add_argument(
-    #     "--all-my-orgs",
-    #     action="store_true",
-    #     help="act on all orgs for which you're an owner",
-    # )
-    # parser.add_argument(
-    #     "--names-only",
-    #     action="store_true",
-    #     help="Only output your org names for which you're an owner",
-    # )
     parser.add_argument("json_file", help="frost json output")
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
@@ -150,8 +188,13 @@ if __name__ == "__main__":
     args = parse_args()
 
     with open(args.json_file, "r") as jf:
-        issue_actions = json.loads(jf.read())
+        pytest_report = json.loads(jf.read())
 
-    print(f"Processing {len(issue_actions)}")
+    issue_actions = pytest_report["report"]["tests"]
+    print(f"Processing {len(issue_actions)} test results")
     for action_spec in issue_actions:
+        if action_spec["call"]["outcome"] == "passed":
+            continue
         action = create_action_spec(action_spec)
+        # TODO integrate actual issue handling
+        print(action)

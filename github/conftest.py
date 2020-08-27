@@ -7,42 +7,44 @@
 
 # Fixtures to fetch data for the various GitHub branch checks
 
-# TODO:
-# - convert to logger output
-# - add sleep_* for 'core' functionality
+# TODO: add doctests
+# TODO: convert to logger output
+# TODO: add sleep_* for 'core' functionality
 
+from conftest import github_client
 from functools import lru_cache
 import logging
 import os
-import pathlib
-
 from typing import List
-
-import subprocess
 
 import pytest
 
-# from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
+import conftest
 
 logger = logging.getLogger(__name__)
 # Data to move to config
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
-EXTENSION_TO_STRIP = ".git"
-
-# check for all required environment variables so we can fail fast
-os.environ["PATH_TO_METADATA"]
-os.environ["GH_TOKEN"]
-
 
 # Data collection routines -- these likely should be a separate python
 # package, as they are useful outside of frost as written
 @pytest.fixture(scope="session", autouse=True)
 def gql_connection():
-    token = os.environ["GH_TOKEN"]
-    endpoint = HTTPEndpoint(
-        DEFAULT_GRAPHQL_ENDPOINT, {"Authorization": "bearer " + token,},
-    )
+    # Frost integration -- this routine controls all of our real system access,
+    # so we must honor the --offline option to support doctests
+    if not conftest.github_client.is_offline():
+        # check for all required environment variables so we can fail fast
+        # however, we only check once inside a session. This allows import
+        # of this module in other contexts, such as running doctests,
+        # without irrelevant configuration
+        os.environ["PATH_TO_METADATA"]
+
+        token = os.environ["GH_TOKEN"]
+        endpoint = HTTPEndpoint(
+            DEFAULT_GRAPHQL_ENDPOINT, {"Authorization": "bearer " + token,},
+        )
+    else:
+        endpoint = {}
     # tack on error reporting so it's available everywhere needed
     endpoint.report_download_errors = _report_download_errors
     return endpoint
@@ -80,6 +82,3 @@ def _report_download_errors(errors):
 if __name__ == "__main__":
     if os.environ.get("DEBUG"):
         print(repos_to_check())
-        # for name in sys.argv[1:]:
-        #     data = get_branch_info(gql_connection(), name)
-        #     print(data)

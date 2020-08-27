@@ -5,36 +5,33 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-# Fixtures to fetch data for the various GitHub branch checks
+# PyTest support for the various GitHub organization checks
 
-# TODO:
-# - convert to logger output
-# - add sleep_* for 'core' functionality
+# TODO: convert to logger output
+# TODO: add sleep_* for 'core' functionality
 
-# from datetime import datetime
 from functools import lru_cache
 import os
 import pathlib
 
-# import time
 from typing import List, Set
 
-# import sys
 import subprocess
 
-import pytest
-
-# from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
-# from github_schema import github_schema as schema  # noqa: I900
 
-#  import branch_check.retrieve_github_data as retrieve_github_data
 from . import retrieve_github_data
+import conftest
 
 
 def orgs_to_check() -> Set[str]:
     # just shell out for now
+    #   While there is no network operation done here, we don't want to go
+    #   poking around the file system if we're in "--offline" mode
+    #   (aka doctest mode)
+    if conftest.get_client("github_client").is_offline():
+        return []
     path_to_metadata = os.environ["PATH_TO_METADATA"]
     meta_dir = pathlib.Path(os.path.expanduser(path_to_metadata)).resolve()
     in_files = list(meta_dir.glob("*.json"))
@@ -73,6 +70,3 @@ def get_branch_info(gql_connection, repo_full_name: str) -> str:
 if __name__ == "__main__":
     if os.environ.get("DEBUG"):
         print(repos_to_check())
-        # for name in sys.argv[1:]:
-        #     data = get_branch_info(gql_connection(), name)
-        #     print(data)
