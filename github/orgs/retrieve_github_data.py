@@ -14,12 +14,12 @@ import logging
 import os
 from dataclasses import dataclass, field
 import sys
-from typing import Any, List
+from typing import Any, List, Optional
 
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
-from ..github_schema import github_schema as schema  # noqa: I900
+from github import github_schema as schema  # noqa: I900
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 
@@ -38,11 +38,15 @@ class OrgInfo:
         return ["Org Name", "Org Slug", "2FA Required"]
 
     @classmethod
-    def cvs_null(cls) -> List[str]:
+    def cvs_null(cls) -> List[Optional[str]]:
         return [None, None, None]
 
-    def csv_row(self) -> List[str]:
-        return [self.name or None, self.login or None, self.two_factor_required or None]
+    def csv_row(self) -> List[Optional[str]]:
+        return [
+            self.name or None,
+            self.login or None,
+            str(self.requires_two_factor_authentication) or None,
+        ]
 
 
 def create_operation(owner):
@@ -95,11 +99,10 @@ def extract_org_data(orgdata) -> OrgInfo:
 
 
 def csv_output(data, csv_writer) -> None:
-    for line in data.csv_row():
-        csv_writer.writerow(line)
+    csv_writer.writerow(data.csv_row())
 
 
-def parse_args(**kwargs):
+def parse_args(*args):
     import argparse
 
     ap = argparse.ArgumentParser(description="GitHub Agile Dashboard")
@@ -142,18 +145,20 @@ def parse_args(**kwargs):
     return args
 
 
-def main():
-    args = parse_args()
+def main(*args) -> int:
+    args = parse_args(*args)
     if args.output:
         csv_out = csv.writer(open(args.output, "w"))
     else:
         csv_out = csv.writer(sys.stdout)
-    raise SystemExit("Not ready for CLI usage")
-    # endpoint = get_gql_session(args.graphql_endpoint, args.token,)
-    # csv_out.writerow(OrgInfo.csv_header())
-    # for org in args.orgs:
-    #     row_data = get_org_info(endpoint, org)
-    #     csv_output(row_data, csv_writer=csv_out)
+    # raise SystemExit("Not ready for CLI usage")
+    endpoint = HTTPEndpoint(
+        args.graphql_endpoint, {"Authorization": "bearer " + args.token,}
+    )
+    csv_out.writerow(OrgInfo.csv_header())
+    for org in args.orgs:
+        row_data = get_org_info(endpoint, org)
+        csv_output(row_data, csv_writer=csv_out)
 
 
 if __name__ == "__main__":
