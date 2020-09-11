@@ -7,7 +7,7 @@ import functools
 import json
 
 import py
-from dateutil.parser import parse
+from dateutil.parser import isoparse
 
 
 def json_iso_datetimes(obj):
@@ -28,7 +28,7 @@ def json_iso_datetime_string_to_datetime(obj):
             continue
 
         try:
-            obj[k] = parse(v, ignoretz=True)
+            obj[k] = isoparse(v)
         except (OverflowError, ValueError):
             pass
 
