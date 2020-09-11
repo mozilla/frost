@@ -13,8 +13,10 @@ from functools import lru_cache
 import logging
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
+import subprocess
 import sys
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Set
 
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
@@ -32,20 +34,32 @@ class OrgInfo:
     name: str
     login: str
     requires_two_factor_authentication: bool
+    id_: str
+    database_id: str
+
+    @staticmethod
+    def idfn(val: Any) -> Optional[str]:
+        """ provide ID for pytest Parametrization
+        """
+        if isinstance(val, (OrgInfo,)):
+            return f"{val.id_}-{val.login}"
+        return None
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Org Name", "Org Slug", "2FA Required"]
+        return ["Org Name", "Org Slug", "2FA Required", "id", "db id"]
 
     @classmethod
     def cvs_null(cls) -> List[Optional[str]]:
-        return [None, None, None]
+        return [None, None, None, None, None]
 
     def csv_row(self) -> List[Optional[str]]:
         return [
             self.name or None,
             self.login or None,
             str(self.requires_two_factor_authentication) or None,
+            self.id_ or None,
+            self.database_id or None,
         ]
 
 
@@ -65,6 +79,8 @@ def create_operation(owner):
     org.name()
     org.login()
     org.requires_two_factor_authentication()
+    org.id()
+    org.database_id()
 
     return op
 
@@ -77,7 +93,13 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
     errors = d.get("errors")
     if errors:
         endpoint.report_download_errors(errors)
-        return OrgInfo(org)
+        return OrgInfo(
+            name="",
+            login=org,
+            requires_two_factor_authentication=False,
+            id_=None,
+            database_id=None,
+        )
 
     orgdata = (op + d).organization
 
@@ -94,6 +116,8 @@ def extract_org_data(orgdata) -> OrgInfo:
         name=orgdata.name,
         login=orgdata.login,
         requires_two_factor_authentication=orgdata.requires_two_factor_authentication,
+        id_=orgdata.id,
+        database_id=orgdata.database_id,
     )
     return org_data
 
@@ -123,10 +147,10 @@ def parse_args(*args):
         "--verbose", "-v", help="Increase verbosity", action="count", default=0
     )
     ap.add_argument(
-        "orgs", nargs="+", help='Organization slug name, such as "mozilla".'
+        "orgs", nargs="*", help='Organization slug name, such as "mozilla".'
     )
 
-    args = ap.parse_args()
+    args = ap.parse_args(args)
 
     endpoint_loglevel = max(10, 40 - ((args.verbose - 3) * 10))
     logfmt = "%(levelname)s: %(message)s"
@@ -145,20 +169,120 @@ def parse_args(*args):
     return args
 
 
+def _in_offline_mode() -> bool:
+    is_offline = False
+    try:
+        # if we're running under pytest, we need to fetch the value from
+        # the current configuration
+        import conftest
+
+        is_offline = conftest.get_client("github_client").is_offline()
+    except ImportError:
+        pass
+
+    return is_offline
+
+
+def _orgs_to_check() -> Set[str]:
+    # just shell out for now
+    #   While there is no network operation done here, we don't want to go
+    #   poking around the file system if we're in "--offline" mode
+    #   (aka doctest mode)
+    if _in_offline_mode():
+        return []
+    path_to_metadata = os.environ.get(
+        "PATH_TO_METADATA", "~/repos/foxsec/master/services/metadata"
+    )
+    meta_dir = Path(os.path.expanduser(path_to_metadata)).resolve()
+    in_files = list(meta_dir.glob("*.json"))
+
+    cmd = [
+        "jq",
+        "-rc",
+        """.codeRepositories[]
+                | select(.status == "active")
+                | [.url]
+                | @csv
+                """,
+        *in_files,
+    ]
+
+    # python 3.6 doesn't support capture_output
+    # status = subprocess.run(cmd, capture_output=True)
+    status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert not status.stderr.decode("utf-8")
+    # return as array of non-empty, unquoted, "lines"
+    return {
+        x.split("/")[3].translate({ord('"'): None, ord("'"): None})
+        for x in status.stdout.decode("utf-8").split("\n")
+        if x
+    }
+
+
+def get_all_org_data(endpoint: Any = None, orgs: List[str] = None) -> List[OrgInfo]:
+    """ Generator of org data """
+    if not endpoint:
+        # if we're creating the endpoint, then arguments must already be
+        # in environment variables.
+        endpoint = get_connection(DEFAULT_GRAPHQL_ENDPOINT, os.environ.get("GH_TOKEN"))
+    if not orgs:
+        orgs = _orgs_to_check()
+    for org in orgs:
+        data = get_org_info(endpoint, org)
+        yield data
+
+
+# helper classes for graph errors
+def _compact_fmt(d):
+    s = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = _compact_fmt(v)
+        elif isinstance(v, (list, tuple)):
+            lst = []
+            for e in v:
+                if isinstance(e, dict):
+                    lst.append(_compact_fmt(e))
+                else:
+                    lst.append(repr(e))
+            s.append("%s=[%s]" % (k, ", ".join(lst)))
+            continue
+        s.append("%s=%r" % (k, v))
+    return "(" + ", ".join(s) + ")"
+
+
+def _report_download_errors(errors):
+    """ error handling for graphql comms """
+    logger.error("Document contain %d errors", len(errors))
+    for i, e in enumerate(errors):
+        msg = e.pop("message")
+        extra = ""
+        if e:
+            extra = " %s" % _compact_fmt(e)
+        logger.error("Error #%d: %s%s", i + 1, msg, extra)
+
+
+def get_connection(base_url: str, token: str) -> Any:
+    endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + token,})
+    endpoint.report_download_errors = _report_download_errors
+    return endpoint
+
+
 def main(*args) -> int:
     args = parse_args(*args)
     if args.output:
         csv_out = csv.writer(open(args.output, "w"))
     else:
         csv_out = csv.writer(sys.stdout)
-    # raise SystemExit("Not ready for CLI usage")
-    endpoint = HTTPEndpoint(
-        args.graphql_endpoint, {"Authorization": "bearer " + args.token,}
-    )
+    endpoint = get_connection(args.graphql_endpoint, args.token)
     csv_out.writerow(OrgInfo.csv_header())
-    for org in args.orgs:
-        row_data = get_org_info(endpoint, org)
-        csv_output(row_data, csv_writer=csv_out)
+    for row in get_all_org_data(endpoint, args.orgs):
+        csv_output(row, csv_writer=csv_out)
+
+    ## csv_out.writerow(OrgInfo.csv_header())
+    ## for org in args.orgs:
+    ##     row_data = get_org_info(endpoint, org)
+    ##     csv_output(row_data, csv_writer=csv_out)
 
 
 if __name__ == "__main__":
