@@ -115,6 +115,12 @@ def pytest_configure(config):
     except AttributeError as e:
         gsuite_client = GsuiteClient(domain="", offline=True)
 
+    # register custom marker for rationale (used in report)
+    config.addinivalue_line(
+        "markers",
+        "rationale(reason): (optional) rationale behind the test. (null if not set)",
+    )
+
 
 @pytest.fixture
 def aws_config(pytestconfig):
@@ -122,8 +128,7 @@ def aws_config(pytestconfig):
 
 
 def pytest_runtest_setup(item):
-    """
-    """
+    """"""
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 

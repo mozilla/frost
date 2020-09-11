@@ -498,6 +498,7 @@ frost
 ...
 ├── <third party service A>
 │   ├── client.py
+│   ├── conftest.py
 │   ├── meta_test_client.py
 │   ├── <subservice A (optional)>
 │   │   ├── __init__.py
@@ -512,6 +513,7 @@ frost
 │   │   └─ test_s3_bucket_web_hosting_disabled.py
 └── <third party service B>
     ├── __init__.py
+    ├── conftest.py
     ├── helpers.py
     ├── resources.py
     └── test_user_has_escalation_policy.py
@@ -623,3 +625,4 @@ As we add more tests we can:
 
 1. Move the JSON fetching functions to `<service name>/resources.py` files and import them into the test
 1. Move the fetching logic to a shared library `<service name>/client.py` and save to the pytest cache
+1. Add a `<service name>/conftest.py` and register the service's marks in a `pytest_configure` to resolve some warnings
