@@ -96,7 +96,7 @@ def add_regression_marker(item):
     """
     Adds regression markers as specified in the config file.
     """
-    if not item.get_marker("parametrize"):
+    if not item.get_closest_marker("parametrize"):
         warnings.warn(
             "Skipping regression checks for test without resource name {!r}".format(
                 item.name

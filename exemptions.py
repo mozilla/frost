@@ -116,7 +116,7 @@ def add_xfail_marker(item):
     """
     Adds xfail markers for test names and ids specified in the exemptions conf.
     """
-    if not item.get_marker("parametrize"):
+    if not item.get_closest_marker("parametrize"):
         warnings.warn(
             "Skipping exemption checks for test without resource name {!r}".format(
                 item.name
