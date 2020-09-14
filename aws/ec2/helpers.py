@@ -292,6 +292,7 @@ def is_ebs_volume_encrypted(ebs):
     """
     return ebs["Encrypted"]
 
+
 def is_ebs_volume_piops(ebs):
     """
     Checks if the EBS volume type is provisioned iops
