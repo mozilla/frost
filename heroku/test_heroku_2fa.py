@@ -12,7 +12,6 @@ import pytest
 from heroku.resources import users_no_2fa, app_users_no_2fa
 
 
-@pytest.fixture
 def affected_users():
     roles = users_no_2fa()
     # assert isinstance(roles, type([]))
@@ -21,7 +20,6 @@ def affected_users():
     return role
 
 
-@pytest.fixture
 def affected_apps():
     apps = app_users_no_2fa()
     # assert isinstance(apps, type([]))
@@ -30,8 +28,7 @@ def affected_apps():
     return app
 
 
-@pytest.fixture
-def role_user():
+def role_users():
     result = [
         (role, email) for role, emails in affected_users().items() for email in emails
     ]
@@ -39,8 +36,7 @@ def role_user():
     return result
 
 
-@pytest.fixture
-def app_user():
+def app_users():
     result = [
         (app, email) for app, emails in affected_apps().items() for email in emails
     ]
@@ -56,12 +52,12 @@ def app_user():
 
 # code for heroku/conftest.py END
 @pytest.mark.heroku
-@pytest.mark.parametrize("role_user", role_user())
+@pytest.mark.parametrize("role_user", role_users())
 def test_users_have_2fa_enabled(role_user):
     assert not role_user
 
 
 @pytest.mark.heroku
-@pytest.mark.parametrize("app_user", app_user())
+@pytest.mark.parametrize("app_user", app_users())
 def test_no_apps_impacted(app_user):
     assert not app_user

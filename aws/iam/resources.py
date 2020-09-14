@@ -119,8 +119,7 @@ def iam_users_with_policies():
 
 
 def iam_users_with_policies_and_groups():
-    """Users with thier associated Policies and Groups
-    """
+    """Users with their associated Policies and Groups"""
     return [
         {**{"Groups": iam_user_groups(username=user["UserName"])}, **user}
         for user in iam_users_with_policies()
