@@ -11,7 +11,7 @@ import botocore.exceptions
 import botocore.session
 
 
-SERVICES_WITHOUT_REGIONS = ["iam", "s3"]
+SERVICES_WITHOUT_REGIONS = ["iam", "s3", "route53"]
 
 
 @functools.lru_cache()
