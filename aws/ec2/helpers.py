@@ -269,6 +269,11 @@ def ec2_security_group_test_id(ec2_security_group):
     return "{0[GroupId]} {0[GroupName]}".format(ec2_security_group)
 
 
+def ec2_address_id(ec2_address):
+    """Format an Elastic IP address."""
+    return ec2_address["PublicIp"]
+
+
 def is_ebs_volume_encrypted(ebs):
     """
     Checks the EBS volume 'Encrypted' value.
