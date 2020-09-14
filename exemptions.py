@@ -125,7 +125,9 @@ def add_xfail_marker(item):
         return
 
     test_exemptions = item.config.custom_config.exemptions.get(item.originalname, None)
-    test_id = item._genid
+    # item is a _pytest.python.Function
+    # e.g. gsuite/admin/test_admin_user_is_inactive.py::test_admin_user_is_inactive[gsuiteuser@example.com]
+    test_id = item.nodeid
 
     if test_exemptions:
         # Check for any substring matchers
