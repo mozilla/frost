@@ -5,7 +5,7 @@ from aws.elb.resources import elbs
 
 @pytest.mark.elb
 @pytest.mark.parametrize(
-    "elb", elbs(), ids=lambda e: e["LoadBalancerName"],
+    "elb", elbs(), ids=lambda e: e["LoadBalancerName"] if isinstance(e, dict) else None,
 )
 def test_elb_instances_attached(elb):
     """
