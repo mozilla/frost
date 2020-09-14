@@ -102,6 +102,16 @@ def ec2_vpcs():
     )
 
 
+def ec2_addresses():
+    "https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_addresses"
+    return (
+        botocore_client.get("ec2", "describe_addresses", [], {})
+        .extract_key("Addresses")
+        .flatten()
+        .values()
+    )
+
+
 def ec2_security_groups_with_in_use_flag():
     """Returns security groups with an additional "InUse" key,
     which is True if it is associated with at least one resource.
