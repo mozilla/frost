@@ -1,6 +1,8 @@
 from datetime import datetime
 from dateutil.parser import parse
 
+from helpers import get_param_id
+
 
 def user_is_inactive(iam_user, no_activity_since, created_after):
     """
@@ -144,3 +146,7 @@ def is_access_key_expired(iam_access_key, access_key_expiration_date):
 
     assert isinstance(iam_access_key["CreateDate"], datetime)
     return access_key_expiration_date > iam_access_key["CreateDate"]
+
+
+def get_iam_user_name(login):
+    return get_param_id(login, "UserName")

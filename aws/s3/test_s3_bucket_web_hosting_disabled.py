@@ -1,5 +1,6 @@
 import pytest
 
+from aws.s3.helpers import get_s3_bucket_name
 from aws.s3.resources import s3_buckets, s3_buckets_website
 
 
@@ -7,7 +8,7 @@ from aws.s3.resources import s3_buckets, s3_buckets_website
 @pytest.mark.parametrize(
     ["s3_bucket", "s3_bucket_website"],
     zip(s3_buckets(), s3_buckets_website()),
-    ids=lambda bucket: bucket["Name"],
+    ids=get_s3_bucket_name,
 )
 def test_s3_bucket_web_hosting_disabled(s3_bucket, s3_bucket_website):
     """

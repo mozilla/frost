@@ -4,14 +4,17 @@ from aws.rds.resources import (
     rds_db_instances_with_tags,
     rds_db_instances_vpc_security_groups,
 )
-from aws.rds.helpers import does_vpc_security_group_grant_public_access
+from aws.rds.helpers import (
+    does_vpc_security_group_grant_public_access,
+    get_db_instance_id,
+)
 
 
 @pytest.mark.rds
 @pytest.mark.parametrize(
     ["rds_db_instance", "ec2_security_groups"],
     zip(rds_db_instances_with_tags(), rds_db_instances_vpc_security_groups()),
-    ids=lambda db_instance: db_instance["DBInstanceIdentifier"],
+    ids=get_db_instance_id,
 )
 def test_rds_db_instance_not_publicly_accessible_by_vpc_security_group(
     rds_db_instance, ec2_security_groups

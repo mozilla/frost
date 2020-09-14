@@ -1,11 +1,13 @@
 import pytest
 
+from helpers import get_param_id
+
 from aws.elb.resources import elbs
 
 
 @pytest.mark.elb
 @pytest.mark.parametrize(
-    "elb", elbs(), ids=lambda e: e["LoadBalancerName"] if isinstance(e, dict) else None,
+    "elb", elbs(), ids=lambda e: get_param_id(e, "LoadBalancerName"),
 )
 def test_elb_instances_attached(elb):
     """

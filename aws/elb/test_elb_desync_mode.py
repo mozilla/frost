@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 
+from _pytest.compat import NOTSET
 import pytest
+
+from helpers import get_param_id
 
 from aws.elb.resources import elbs_with_attributes
 
@@ -9,7 +12,7 @@ from aws.elb.resources import elbs_with_attributes
 @pytest.mark.parametrize(
     "elb_with_attrs",
     elbs_with_attributes(),
-    ids=lambda e: e["LoadBalancerName"] if isinstance(e, dict) else None,
+    ids=lambda e: get_param_id(e[0], "LoadBalancerName") if e != NOTSET else None,
 )
 def test_elb_instance_desync_mode(elb_with_attrs):
     """

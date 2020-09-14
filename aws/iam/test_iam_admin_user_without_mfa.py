@@ -1,5 +1,6 @@
 import pytest
 
+from aws.iam.helpers import get_iam_user_name
 from aws.iam.resources import iam_admin_login_profiles, iam_admin_mfa_devices
 
 
@@ -7,7 +8,7 @@ from aws.iam.resources import iam_admin_login_profiles, iam_admin_mfa_devices
 @pytest.mark.parametrize(
     ["iam_login_profile", "iam_user_mfa_devices"],
     zip(iam_admin_login_profiles(), iam_admin_mfa_devices()),
-    ids=lambda login: login["UserName"],
+    ids=get_iam_user_name,
 )
 def test_iam_admin_user_without_mfa(iam_login_profile, iam_user_mfa_devices):
     """Test that all "admin" users with console access also have an MFA device.
