@@ -298,6 +298,30 @@ def is_ebs_volume_encrypted(ebs):
     return ebs["Encrypted"]
 
 
+def is_ebs_volume_piops(ebs):
+    """
+    Checks if the EBS volume type is provisioned iops
+
+    >>> is_ebs_volume_piops({'VolumeType': 'io1'})
+    True
+    >>> is_ebs_volume_piops({'VolumeType': 'standard'})
+    False
+    >>> is_ebs_volume_piops({})
+    Traceback (most recent call last):
+    ...
+    KeyError: 'VolumeType'
+    >>> is_ebs_volume_piops(0)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'int' object is not subscriptable
+    >>> is_ebs_volume_piops(None)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'NoneType' object is not subscriptable
+    """
+    return ebs["VolumeType"].startswith("io")
+
+
 def is_ebs_snapshot_public(ebs_snapshot):
     """
     Checks if the EBS snapshot's 'CreateVolumePermissions' attribute allows for public creation.
