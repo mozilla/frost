@@ -11,10 +11,13 @@ import argparse
 import json
 import re
 from dataclasses import dataclass
+import logging
 from pprint import pprint
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
-import argcomplete
+import argcomplete  # type: ignore
+
+logger = logging.getLogger(__name__)
 
 _epilog = ""
 
@@ -71,12 +74,12 @@ class Action:
     messages: Optional[List[str]] = None
 
 
-def parse_action_string(name: str) -> List[str]:
+def parse_action_string(name: str) -> Optional[Sequence[str]]:
     """
     comment
     """
     matches = SPEC_DECODER_RE.match(name)
-    return matches.groups()
+    return matches.groups() if matches else None
 
 
 def infer_resource_type(path: str) -> str:
@@ -176,6 +179,66 @@ def create_action_spec(action_spec: dict) -> Action:
     return action
 
 
+def _open_issue(action: Action) -> bool:
+    """ Report status via a GitHub issue
+
+    Used for actions which relate to a specific repository
+    TODO support grouping actions for same main issue.
+        i.e. SOGH001[abc] should all report under same issue
+
+    Args:
+        action (Action): Information about the type of problem
+
+    Returns:
+        bool: True if processed successfully
+    """
+    logger.info(
+        f"GitHub issue regarding {action.standard} relating to {action.owner}/{action.repo}"
+    )
+    return True
+
+
+def _alert_owners(action: Action) -> bool:
+    """ Contact org owners
+
+    Unsure how to do this - may be slack or email to secops. There is no good native way in GitHub.
+
+    Args:
+        action (Action): Information about the type of problem
+
+    Returns:
+        bool: True if processed successfully
+    """
+    logger.info(
+        f"Contacting owners regarding {action.standard} relating to org {action.owner}."
+    )
+    return True
+
+
+dispatch_table = {
+    "SOGH001": _open_issue,
+    "SOGH001b": _open_issue,
+    "SOGH002": _open_issue,
+    "SOGH003": _alert_owners,
+}
+
+
+def perform_action(action: Action) -> bool:
+    """ Initiate the appropriate action
+
+    Args:
+        action (Action): All the data needed to perform the action
+
+    Returns:
+        bool: True if action completed successfully
+    """
+    if action.standard in dispatch_table:
+        return dispatch_table[action.standard](action)
+    else:
+        logger.error(f"No action defined for standard '{action.standard}'")
+        return False
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, epilog=_epilog)
     parser.add_argument("json_file", help="frost json output")
@@ -185,6 +248,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     args = parse_args()
 
     with open(args.json_file, "r") as jf:
@@ -197,4 +261,5 @@ if __name__ == "__main__":
             continue
         action = create_action_spec(action_spec)
         # TODO integrate actual issue handling
-        print(action)
+        # print(action)
+        perform_action(action)
