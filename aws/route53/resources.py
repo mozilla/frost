@@ -11,14 +11,15 @@ def zones():
         .values()
     )
 
-def names_in_zone(zone_id):
-    """
-    """
-    records = botocore_client.get(
-                "route53",
-                "list_resource_record_sets",
-                [],
-                {"HostedZoneId": zone_id, "StartRecordType": "CNAME"}).extract("ResourceRecordSets").flatten().values()
+def cnames():
+    zone_list = zones()
+    print(zone_list)
+    for zone in zone_list:
+        zone_id = zone['Id'].split('/')[2]
 
-    for record in records:
-        print("found record {}".format(record))
+        records = botocore_client.get("route53", "list_resource_record_sets", [], {"HostedZoneId": zone_id}).extract("ResourceRecordSets").flatten().values()
+
+        for record in records:
+            print("record: {}".format(record))
+
+    return records
