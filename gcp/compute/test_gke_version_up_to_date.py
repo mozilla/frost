@@ -13,9 +13,7 @@ def server_config():
 
 @pytest.mark.gcp_compute
 @pytest.mark.parametrize(
-    "cluster",
-    clusters(),
-    ids=lambda c: get_param_id(c, "name"),
+    "cluster", clusters(), ids=lambda c: get_param_id(c, "name"),
 )
 def test_gke_version_up_to_date(cluster, server_config):
     """
