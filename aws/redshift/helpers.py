@@ -1,9 +1,8 @@
+from helpers import get_param_id
+
+
 def redshift_cluster_security_group_test_id(security_group):
-    return (
-        security_group["ClusterSecurityGroupName"]
-        if isinstance(security_group, dict)
-        else None
-    )
+    return get_param_id(security_group, "ClusterSecurityGroupName")
 
 
 def redshift_cluster_security_group_is_open_to_all_ips(security_group):

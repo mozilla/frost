@@ -9,4 +9,6 @@ def is_service_account_key_old(service_account_key):
         service_account_key["validAfterTime"][:10], "%Y-%m-%d"
     )
     # TODO: Make configurable
-    return creation_date > datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=90)
+    return creation_date > datetime.datetime.now(
+        datetime.timezone.utc
+    ) - datetime.timedelta(days=90)
