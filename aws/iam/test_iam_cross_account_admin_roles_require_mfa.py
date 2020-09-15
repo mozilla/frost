@@ -1,11 +1,15 @@
 import pytest
 
+from helpers import get_param_id
+
 from aws.iam.resources import iam_admin_roles
 
 
 @pytest.mark.iam
 @pytest.mark.parametrize(
-    "iam_admin_role", iam_admin_roles(), ids=lambda role: role["RoleName"]
+    "iam_admin_role",
+    iam_admin_roles(),
+    ids=lambda role: get_param_id(role, "RoleName"),
 )
 def test_iam_cross_account_admin_roles_require_mfa(iam_admin_role):
     """Test that all IAM Roles that include admin policies and have cross account

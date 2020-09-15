@@ -1,5 +1,7 @@
 import pytest
 
+from helpers import get_param_id
+
 from aws.ec2.resources import ec2_flow_logs, ec2_vpcs
 
 
@@ -9,7 +11,9 @@ def all_flow_logs():
 
 
 @pytest.mark.ec2
-@pytest.mark.parametrize("ec2_vpc", ec2_vpcs(), ids=lambda vpc: vpc["VpcId"])
+@pytest.mark.parametrize(
+    "ec2_vpc", ec2_vpcs(), ids=lambda vpc: get_param_id(vpc, "VpcId"),
+)
 def test_ec2_vpc_flow_log_enabled(ec2_vpc, all_flow_logs):
     """
     Checks that each VPC has VPC Flow Logs enabled.
