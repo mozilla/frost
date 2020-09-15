@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from conftest import botocore_client
+from conftest import botocore_client, custom_config_global
 
 
 def iam_users():
@@ -292,18 +292,12 @@ def iam_admin_users_with_credential_report():
 def user_is_admin(user):
     for policy in user["Policies"]:
         if isinstance(policy, dict):
-            if (
-                policy.get("PolicyName", "")
-                in pytest.config.custom_config.aws.admin_policies
-            ):
+            if policy.get("PolicyName", "") in custom_config_global.aws.admin_policies:
                 return True
 
     for group in user.get("Groups", []):
         if isinstance(group, dict):
-            if (
-                group.get("GroupName", "")
-                in pytest.config.custom_config.aws.admin_groups
-            ):
+            if group.get("GroupName", "") in custom_config_global.aws.admin_groups:
                 return True
 
     return False

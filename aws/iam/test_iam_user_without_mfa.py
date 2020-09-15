@@ -1,6 +1,6 @@
 import pytest
 
-from aws.iam.helpers import get_iam_user_name
+from aws.iam.helpers import get_iam_user_name_only
 from aws.iam.resources import iam_user_login_profiles, iam_user_mfa_devices
 
 
@@ -8,7 +8,7 @@ from aws.iam.resources import iam_user_login_profiles, iam_user_mfa_devices
 @pytest.mark.parametrize(
     ["iam_login_profile", "iam_user_mfa_devices"],
     zip(iam_user_login_profiles(), iam_user_mfa_devices()),
-    ids=get_iam_user_name,
+    ids=get_iam_user_name_only,
 )
 def test_iam_user_without_mfa(iam_login_profile, iam_user_mfa_devices):
     """Test that all users with console access also have an MFA device."""

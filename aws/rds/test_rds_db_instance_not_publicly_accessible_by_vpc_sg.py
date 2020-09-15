@@ -14,7 +14,9 @@ from aws.rds.helpers import (
 @pytest.mark.parametrize(
     ["rds_db_instance", "ec2_security_groups"],
     zip(rds_db_instances_with_tags(), rds_db_instances_vpc_security_groups()),
-    ids=get_db_instance_id,
+    ids=lambda db: get_db_instance_id(db)
+    if "DBInstanceIdentifier" in db and isinstance(db, dict)
+    else None,
 )
 def test_rds_db_instance_not_publicly_accessible_by_vpc_security_group(
     rds_db_instance, ec2_security_groups

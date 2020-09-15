@@ -150,3 +150,9 @@ def is_access_key_expired(iam_access_key, access_key_expiration_date):
 
 def get_iam_user_name(login):
     return get_param_id(login, "UserName")
+
+
+def get_iam_user_name_only(user):
+    if isinstance(user, dict) and "UserName" in user:
+        return get_iam_user_name(user)
+    return None
