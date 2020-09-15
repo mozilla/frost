@@ -51,6 +51,7 @@ and options frost adds:
 
 * `--debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
+* `--gcp-project-id` for selecting the GCP project to test. **Required for GCP tests**
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--config`](#custom-test-config) path to test custom config file
 
