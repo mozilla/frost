@@ -53,6 +53,11 @@ aws:
 gcp:
   allowed_org_domains:
     - mygsuiteorg.com
+  allowed_gke_versions:
+    - 1.15.12-gke.20
+    - 1.16.13-gke.401
+    - 1.17.9-gke.1504
+    - 1.18.6-gke.3504
 gsuite:
   domain: 'mygsuiteorg.com'
   min_number_of_owners: 2
