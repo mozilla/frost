@@ -13,7 +13,9 @@ def server_config():
 
 @pytest.mark.gcp_compute
 @pytest.mark.parametrize(
-    "cluster", clusters(), ids=lambda c: get_param_id(c, "name"),
+    "cluster",
+    clusters(),
+    ids=lambda c: get_param_id(c, "name"),
 )
 def test_gke_version_up_to_date(cluster, server_config):
     """
@@ -27,7 +29,7 @@ def test_gke_version_up_to_date(cluster, server_config):
         cluster["currentMasterVersion"]
     )
     assert (
-        cluster["currentNodeVersion"] in server_config["validNodeVersions"]
-    ), "Current GKE node version ({}) is not in the list of valid node versions.".format(
-        cluster["currentNodeVersion"]
+        cluster["currentNodeVersion"] == cluster["currentMasterVersion"]
+    ), "Current GKE node version ({}) is not the same as the master version ({}).".format(
+        cluster["currentNodeVersion"], cluster["currentMasterVersion"]
     )
