@@ -31,21 +31,36 @@ logger = logging.getLogger(__name__)
 
 
 # Collect and return information about branch protections
+# The relationships are (mermaid syntax):
+#   erDiagram
+#       Repo ||--|{ Branch : belongs-to
+#       Repo ||--o{ BranchProtectionRule : may-have
+#       Branch }o--o{ BranchProtectionRule: matches-pattern-of-bpr
+#
+# For processing, we flatten to BranchProtectionRule-Branch for every
+# BPR that actually matches a current branch.
 @dataclass
 class BranchName:
     name: str
     prefix: str
+    repo_id: str = None  # only available in the top level query
+    owner_id: str = None
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Branch Name", "Ref Prefix"]
+        return ["Branch Name", "Ref Prefix", "Repo_id", "Owner_id"]
 
     @classmethod
     def cvs_null(cls) -> List[str]:
-        return [None, None]
+        return [None, None, None, None]
 
     def csv_row(self) -> List[str]:
-        return [self.name or None, self.prefix or None]
+        return [
+            self.name or None,
+            self.prefix or None,
+            self.repo_id or None,
+            self.owner_id or None,
+        ]
 
 
 @dataclass
@@ -71,7 +86,7 @@ class BranchProtectionRule:
 
     def csv_row(self) -> List[str]:
         my_info = [
-            self.isAdminEnforced,
+            self.is_admin_enforced,
             self.push_actor_count,
             self.rule_conflict_count,
             self.pattern,
@@ -132,6 +147,9 @@ def create_operation(owner, name):
     repo = op.repository(owner=owner, name=name)
     repo.default_branch_ref.__fields__(name=True)
     repo.name_with_owner()
+    repo.id()
+    repo.owner().id()
+    repo.owner().login()
 
     # now specify which fields we care about
     # we only get one item at a time to
@@ -190,6 +208,12 @@ def get_nested_branch_data(endpoint, reponame):
     repodata = (op + d).repository
 
     def _more_to_do(cur_result, fake_new_page=False):
+        """ Determine if we need another query
+
+        There are two nested repeating elements in the query - if either
+        is not yet exhausted, we have to do another query
+        """
+        # for hacky testing
         if fake_new_page:
             cur_result.branch_protection_rules.nodes[
                 0

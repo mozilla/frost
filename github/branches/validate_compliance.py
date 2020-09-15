@@ -15,7 +15,7 @@ from .retrieve_github_data import RepoBranchProtections, BranchProtectionRule
 class Criteria:
     standard_number: str  # as defined in messages file. alpha-numeric
     slug: str  # id to match. alpha-numeric
-    description: str  # whatever you want
+    description: str  # Description of invalid
 
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
@@ -32,10 +32,11 @@ class Criteria:
 # define the criteria we care about. Identify each critera with a string that will
 # appear in the results.
 required_criteria = [
-    Criteria("SOGH001b", "admins", "admins not restricted"),
+    Criteria("SOGH001", "rules", "active rules"),
+    Criteria("SOGH001b", "admins", "admins restricted"),
 ]
 optional_criteria = [
-    Criteria("SOGH001c", "commiters", "allowed commiters not configured"),
+    Criteria("SOGH001c", "commiters", "allowed commiters configured"),
     # "commit signing",  # may not be knowable
 ]
 warning_criteria = [
@@ -58,7 +59,9 @@ def find_applicable_rules(
 def meets_criteria(protections: List[BranchProtectionRule], criteria: Criteria) -> bool:
     met = True
     # ugly implementation for now
-    if criteria.slug == "admins":
+    if criteria.slug == "rules":
+        met = len(protections) > 0
+    elif criteria.slug == "admins":
         met = all(r.is_admin_enforced for r in protections)
     elif criteria.slug == "commiters":
         met = all(r.push_actor_count > 0 for r in protections)
