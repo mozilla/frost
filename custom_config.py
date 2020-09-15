@@ -105,6 +105,7 @@ class AWSConfig(CustomConfigMixin):
 class GCPConfig:
     def __init__(self, config):
         self.allowed_org_domains = config.get("allowed_org_domains", [])
+        self.allowed_gke_versions = config.get("allowed_gke_versions", [])
 
 
 class GSuiteConfig(CustomConfigMixin):
