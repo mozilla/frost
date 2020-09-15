@@ -46,18 +46,20 @@ clean-cache: check_venv
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
-doc-build: 
+doc-build:
 	type sphinx-build || { echo "please install sphinx to build docs"; false; }
 	make -C docs html
 
 doctest: check_venv
-	pytest --doctest-modules -s --offline --debug-calls
+	pytest -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
 
 coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
-		-o cache_dir=./example_cache/
+		-o cache_dir=./example_cache/ \
+		--offline \
+		$(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
 	coverage report -m
 	coverage html
 

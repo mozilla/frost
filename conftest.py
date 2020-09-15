@@ -14,6 +14,8 @@ from heroku.client import HerokuAdminClient
 import custom_config
 
 
+collect_ignore_glob = ["*.py"]
+
 botocore_client = None
 gcp_client = None
 gsuite_client = None
