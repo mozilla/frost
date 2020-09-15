@@ -21,7 +21,7 @@ from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
 # from branch_check.github_schema import github_schema as schema  # noqa: I900
-from ..github_schema import github_schema as schema  # noqa: I900
+from github import github_schema as schema  # noqa: I900
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
@@ -334,20 +334,52 @@ def get_repo_branch_protections(endpoint, repo: str) -> RepoBranchProtections:
     return data
 
 
-def get_gql_session(endpoint: str, token: str) -> Any:
-    """
-    Get a real session object
-    """
-    return HTTPEndpoint(endpoint, {"Authorization": "bearer " + token,})
+# helper classes for graph errors
+def _compact_fmt(d):
+    s = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = _compact_fmt(v)
+        elif isinstance(v, (list, tuple)):
+            lst = []
+            for e in v:
+                if isinstance(e, dict):
+                    lst.append(_compact_fmt(e))
+                else:
+                    lst.append(repr(e))
+            s.append("%s=[%s]" % (k, ", ".join(lst)))
+            continue
+        s.append("%s=%r" % (k, v))
+    return "(" + ", ".join(s) + ")"
 
 
-def main():
+def _report_download_errors(errors):
+    """ error handling for graphql comms """
+    logger.error("Document contain %d errors", len(errors))
+    for i, e in enumerate(errors):
+        msg = e.pop("message")
+        extra = ""
+        if e:
+            extra = " %s" % _compact_fmt(e)
+        logger.error("Error #%d: %s%s", i + 1, msg, extra)
+
+
+def get_connection(base_url: str, token: str) -> Any:
+    endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + token,})
+    endpoint.report_download_errors = _report_download_errors
+    return endpoint
+
+
+def main(*args: List[str]) -> int:
+    # hack to support doctests
+    if "pytest" in sys.modules:
+        return
     args = parse_args()
     if args.output:
         csv_out = csv.writer(open(args.output, "w"))
     else:
         csv_out = csv.writer(sys.stdout)
-    endpoint = get_gql_session(args.graphql_endpoint, args.token,)
+    endpoint = get_connection(args.graphql_endpoint, args.token)
     csv_out.writerow(RepoBranchProtections.csv_header())
     for repo in args.repo:
         row_data = get_repo_branch_protections(endpoint, repo)
