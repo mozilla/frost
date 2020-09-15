@@ -29,7 +29,7 @@ def test_gke_version_up_to_date(cluster, server_config):
         cluster["currentMasterVersion"]
     )
     assert (
-        cluster["currentNodeVersion"] == cluster["currentMasterVersion"]
-    ), "Current GKE node version ({}) is not the same as the master version ({}).".format(
-        cluster["currentNodeVersion"], cluster["currentMasterVersion"]
+        cluster["currentNodeVersion"] in server_config["validMasterVersions"]
+    ), "Current GKE node version ({}) is not in the list of valid master versions.".format(
+        cluster["currentNodeVersion"]
     )
