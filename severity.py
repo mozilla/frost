@@ -85,7 +85,7 @@ def add_severity_marker(item):
 
     if test_name_for_matching in item.config.custom_config.severities:
         conf_severity = item.config.custom_config.severities[test_name_for_matching]
-        test_severity = item.get_marker("severity")
+        test_severity = item.get_closest_marker("severity")
         if test_severity and test_severity.args[0] != conf_severity:
             warnings.warn(
                 "Overriding existing severity {} for test {}".format(

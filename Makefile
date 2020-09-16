@@ -7,6 +7,12 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
+PYTHON_MIN_VERSION := 3.6
+PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSION), \
+		      you're running $(shell python -V))
+PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
+		      you're running $(shell python -V))
+
 all: check_venv
 	pytest
 
@@ -18,11 +24,13 @@ awsci: check_venv
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
 	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
+else
+	python -V | grep $(PYTHON_MIN_VERSION) || true ; $(PYTHON_VER_WARNING)
 endif
 
 check_conftest_imports:
 	# refs: https://github.com/mozilla/frost/issues/119
-	rg '^import\s+conftest|^from\s+conftest\s+import\s+pytest' -g '*.py'; [ $$? -eq 1 ]
+	grep --recursive --exclude-dir '*venv' --include '*.py' '^import\s+conftest|^from\s+conftest\s+import\s+pytest' ./ ; [ $$? -eq 1 ]
 
 clean: clean-cache clean-python
 	rm -rf venv
@@ -38,14 +46,20 @@ clean-cache: check_venv
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
+doc-build:
+	type sphinx-build || { echo "please install sphinx to build docs"; false; }
+	make -C docs html
+
 doctest: check_venv
-	pytest --doctest-modules -s --offline --debug-calls --ignore pagerduty/
+	pytest -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
 
 coverage: check_venv
 	pytest --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
-		-o cache_dir=./example_cache/
+		-o cache_dir=./example_cache/ \
+		--offline \
+		$(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
 	coverage report -m
 	coverage html
 
@@ -61,6 +75,9 @@ install: venv
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
 
+stage-docs: docs
+	git add --all --force docs/_build/html
+
 metatest:
 	pytest --aws-profiles example-account \
 		-o python_files=meta_test*.py \
@@ -68,14 +85,21 @@ metatest:
 
 venv:
 	python3 -m venv venv
+	./venv/bin/python -V | grep $(PYTHON_MIN_VERSION) || true; $(PYTHON_VER_WARNING)
+
+build-image:
+	docker build -t localhost/frost:latest .
 
 .PHONY:
 	all \
+	build-image \
 	check_venv \
 	check_conftest_imports \
 	clean \
 	clean-cache \
 	clean-python \
+	doc-build \
 	flake8 \
 	install \
+	stage-docs \
 	venv

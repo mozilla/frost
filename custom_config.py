@@ -18,7 +18,6 @@ class CustomConfig:
         self.aws = AWSConfig(parsed_config.get("aws", {}))
         self.gcp = GCPConfig(parsed_config.get("gcp", {}))
         self.gsuite = GSuiteConfig(parsed_config.get("gsuite", {}))
-        self.pagerduty = PagerdutyConfig(parsed_config.get("pagerduty", {}))
 
         self.exemptions = exemptions.load(parsed_config.get("exemptions"))
         self.severities = severity.load(parsed_config.get("severities"))
@@ -106,6 +105,7 @@ class AWSConfig(CustomConfigMixin):
 class GCPConfig:
     def __init__(self, config):
         self.allowed_org_domains = config.get("allowed_org_domains", [])
+        self.allowed_gke_versions = config.get("allowed_gke_versions", [])
 
 
 class GSuiteConfig(CustomConfigMixin):

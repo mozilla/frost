@@ -43,6 +43,9 @@ class GsuiteClient:
         return discovery.build("admin", "directory_v1", http=http)
 
     def list_users(self):
+        """
+        https://developers.google.com/admin-sdk/directory/v1/reference/users#resource
+        """
         if self.offline:
             return []
 
@@ -55,6 +58,9 @@ class GsuiteClient:
         return users
 
     def list_groups(self):
+        """
+        https://developers.google.com/admin-sdk/directory/v1/reference/groups
+        """
         if self.offline:
             return []
 

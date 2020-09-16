@@ -14,10 +14,13 @@ from heroku.client import HerokuAdminClient
 import custom_config
 
 
+collect_ignore_glob = ["*.py"]
+
 botocore_client = None
 gcp_client = None
 gsuite_client = None
 heroku_client = None
+custom_config_global = None
 
 
 def pytest_addoption(parser):
@@ -69,6 +72,7 @@ def pytest_configure(config):
     global gcp_client
     global gsuite_client
     global heroku_client
+    global custom_config_global
 
     # monkeypatch cache.set to serialize datetime.datetime's
     patch_cache_set(config)
@@ -102,7 +106,8 @@ def pytest_configure(config):
         offline=config.getoption("--offline"),
     )
 
-    config.custom_config = custom_config.CustomConfig(config.getoption("--config"))
+    custom_config_global = custom_config.CustomConfig(config.getoption("--config"))
+    config.custom_config = custom_config_global
 
     try:
         if any(x for x in config.args if "gsuite" in x):
@@ -115,6 +120,12 @@ def pytest_configure(config):
     except AttributeError as e:
         gsuite_client = GsuiteClient(domain="", offline=True)
 
+    # register custom marker for rationale (used in report)
+    config.addinivalue_line(
+        "markers",
+        "rationale(reason): (optional) rationale behind the test. (null if not set)",
+    )
+
 
 @pytest.fixture
 def aws_config(pytestconfig):
@@ -122,8 +133,7 @@ def aws_config(pytestconfig):
 
 
 def pytest_runtest_setup(item):
-    """
-    """
+    """"""
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 

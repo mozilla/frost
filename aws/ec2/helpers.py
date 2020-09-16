@@ -1,3 +1,6 @@
+from helpers import get_param_id
+
+
 def ip_permission_opens_all_ports(ipp):
     """
     Returns True if an EC2 security group IP permission opens all
@@ -261,12 +264,25 @@ def ec2_security_group_opens_specific_ports_to_all(
 
 def ec2_instance_test_id(ec2_instance):
     """A getter fn for test ids for EC2 instances"""
-    return "{0[InstanceId]}".format(ec2_instance)
+    return (
+        "{0[InstanceId]}".format(ec2_instance)
+        if isinstance(ec2_instance, dict)
+        else None
+    )
 
 
 def ec2_security_group_test_id(ec2_security_group):
     """A getter fn for test ids for EC2 security groups"""
-    return "{0[GroupId]} {0[GroupName]}".format(ec2_security_group)
+    return (
+        "{0[GroupId]} {0[GroupName]}".format(ec2_security_group)
+        if isinstance(ec2_security_group, dict)
+        else None
+    )
+
+
+def ec2_address_id(ec2_address):
+    """Format an Elastic IP address."""
+    return get_param_id(ec2_address, "PublicIp")
 
 
 def is_ebs_volume_encrypted(ebs):
@@ -291,6 +307,30 @@ def is_ebs_volume_encrypted(ebs):
     TypeError: 'NoneType' object is not subscriptable
     """
     return ebs["Encrypted"]
+
+
+def is_ebs_volume_piops(ebs):
+    """
+    Checks if the EBS volume type is provisioned iops
+
+    >>> is_ebs_volume_piops({'VolumeType': 'io1'})
+    True
+    >>> is_ebs_volume_piops({'VolumeType': 'standard'})
+    False
+    >>> is_ebs_volume_piops({})
+    Traceback (most recent call last):
+    ...
+    KeyError: 'VolumeType'
+    >>> is_ebs_volume_piops(0)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'int' object is not subscriptable
+    >>> is_ebs_volume_piops(None)
+    Traceback (most recent call last):
+    ...
+    TypeError: 'NoneType' object is not subscriptable
+    """
+    return ebs["VolumeType"].startswith("io")
 
 
 def is_ebs_snapshot_public(ebs_snapshot):

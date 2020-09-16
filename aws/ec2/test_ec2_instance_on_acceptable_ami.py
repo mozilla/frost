@@ -3,7 +3,7 @@ import pytest
 from aws.ec2.helpers import ec2_instance_test_id
 from aws.ec2.resources import ec2_instances, ec2_images_owned_by
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def test_ec2_instance_on_acceptable_ami(ec2_instance, owned_amis, max_ami_age):
         if tag["Key"] == "Name":
             instanceName = tag["Value"]
 
-    minAge = datetime.now() - timedelta(days=max_ami_age)
+    minAge = datetime.now(timezone.utc) - timedelta(days=max_ami_age)
     foundAmi = False
     for ami in owned_amis:
         if ami["ImageId"] == ec2_instance["ImageId"]:
