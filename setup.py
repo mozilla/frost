@@ -6,6 +6,10 @@ from frost import SOURCE_URL, VERSION
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+install_requires = [
+    line.split("==")[0] for line in open("requirements.txt", "r") if ".git" not in line
+]
+
 setuptools.setup(
     name="frost",
     version=VERSION,
@@ -17,6 +21,7 @@ setuptools.setup(
     url=SOURCE_URL,
     license="MPL2",
     packages=setuptools.find_packages(),
+    install_requires=install_requires,
     classifiers=[
         "Natural Language :: English",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
