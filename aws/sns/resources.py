@@ -17,7 +17,10 @@ def sns_subscription_attributes():
             method_name="get_subscription_attributes",
             call_args=[],
             call_kwargs={"SubscriptionArn": subscription["SubscriptionArn"]},
+            profiles=[subscription["__pytest_meta"]["profile"]],
+            regions=[subscription["__pytest_meta"]["region"]],
         )
         .extract_key("Attributes")
+        .values()[0]
         for subscription in sns_subscriptions()
     ]
