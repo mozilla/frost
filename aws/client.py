@@ -103,6 +103,64 @@ def cache_key(call):
     )
 
 
+def get_single_region(
+    service_name,
+    method_name,
+    call_args,
+    call_kwargs,
+    cache,
+    profile,
+    region,
+    result_from_error=None,
+    debug_calls=False,
+    debug_cache=False,
+):
+    """
+    Fetches AWS API JSON responses for a single profile and region.
+    """
+    call = default_call._replace(
+        profile=profile,
+        region=region,
+        service=service_name,
+        method=method_name,
+        args=call_args,
+        kwargs=call_kwargs,
+    )
+
+    if debug_calls:
+        print("calling", call)
+
+    result = None
+    if cache is not None:
+        ckey = cache_key(call)
+        result = cache.get(ckey, None)
+
+        if debug_cache and result is not None:
+            print("found cached value for", ckey)
+
+    if result is None:
+        client = get_client(call.profile, call.region, call.service)
+        try:
+            result = full_results(client, call.method, call.args, call.kwargs)
+            result["__pytest_meta"] = dict(profile=call.profile, region=call.region)
+        except botocore.exceptions.ClientError as error:
+            if result_from_error is None:
+                raise error
+            else:
+                if debug_calls:
+                    print("error fetching resource", error, call)
+
+                result = result_from_error(error, call)
+
+        if cache is not None:
+            if debug_cache:
+                print("setting cache value for", ckey)
+
+            cache.set(ckey, result)
+
+    return result
+
+
 def get_aws_resource(
     service_name,
     method_name,
@@ -118,48 +176,20 @@ def get_aws_resource(
     """
     Fetches and yields AWS API JSON responses for all profiles and regions (list params)
     """
-    for profile, region in itertools.product(profiles, regions):
-        call = default_call._replace(
-            profile=profile,
-            region=region,
-            service=service_name,
-            method=method_name,
-            args=call_args,
-            kwargs=call_kwargs,
-        )
-
-        if debug_calls:
-            print("calling", call)
-
-        result = None
-        if cache is not None:
-            ckey = cache_key(call)
-            result = cache.get(ckey, None)
-
-            if debug_cache and result is not None:
-                print("found cached value for", ckey)
-
-        if result is None:
-            client = get_client(call.profile, call.region, call.service)
-            try:
-                result = full_results(client, call.method, call.args, call.kwargs)
-                result["__pytest_meta"] = dict(profile=call.profile, region=call.region)
-            except botocore.exceptions.ClientError as error:
-                if result_from_error is None:
-                    raise error
-                else:
-                    if debug_calls:
-                        print("error fetching resource", error, call)
-
-                    result = result_from_error(error, call)
-
-            if cache is not None:
-                if debug_cache:
-                    print("setting cache value for", ckey)
-
-                cache.set(ckey, result)
-
-        yield result
+    for profile in profiles:
+        for region in regions:
+            yield get_single_region(
+                service_name,
+                method_name,
+                call_args,
+                call_kwargs,
+                cache,
+                profile,
+                region,
+                result_from_error=None,
+                debug_calls=False,
+                debug_cache=False,
+            )
 
 
 class BotocoreClient:
@@ -175,8 +205,6 @@ class BotocoreClient:
             self.regions = ["us-east-1"]
         else:
             self.regions = get_available_regions()
-
-        self.results = []
 
     def get_regions(self):
         if self.offline:
@@ -204,9 +232,9 @@ class BotocoreClient:
             regions = ["us-east-1"]
 
         if self.offline:
-            self.results = []
+            results = []
         else:
-            self.results = list(
+            results = list(
                 get_aws_resource(
                     service_name,
                     method_name,
@@ -221,7 +249,41 @@ class BotocoreClient:
                 )
             )
 
-        return self
+        return BotocoreClientResult(results)
+
+    def get_details(
+        self,
+        resource,
+        service_name,
+        method_name,
+        call_args,
+        call_kwargs,
+        result_from_error=None,
+        do_not_cache=False,
+    ):
+        if self.offline:
+            return None
+        return get_single_region(
+            service_name,
+            method_name,
+            call_args,
+            call_kwargs,
+            profile=resource["__pytest_meta"]["profile"],
+            region=resource["__pytest_meta"]["region"],
+            cache=self.cache if not do_not_cache else None,
+            result_from_error=result_from_error,
+            debug_calls=self.debug_calls,
+            debug_cache=self.debug_cache,
+        )
+
+
+class BotocoreClientResult:
+    """
+    A result list returned by BotocoreClient.get().
+    """
+
+    def __init__(self, results):
+        self.results = results
 
     def values(self):
         """Returns the wrapped value
@@ -315,7 +377,7 @@ class BotocoreClient:
         ...
         TypeError: can only concatenate list (not "dict") to list
         """
-        self.results = sum(self.results, [])
+        self.results = list(itertools.chain.from_iterable(self.results))
         return self
 
     def debug(self):

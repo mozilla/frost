@@ -2,11 +2,12 @@ import pytest
 
 from aws.sns.resources import sns_subscription_attributes
 
+
 @pytest.mark.sns
 @pytest.mark.parametrize(
-    "pending_verification", 
-    sns_subscription_attributes(), 
-    ids=lambda subscription: subscription["PendingVerification"],
+    "subscription_attrs",
+    sns_subscription_attributes(),
+    ids=lambda subscription: subscription["SubscriptionArn"],
 )
-def test_sns_pending_verified(pending_verification):
-    assert pending_verification == "false"
+def test_sns_pending_verified(subscription_attrs):
+    assert subscription_attrs["PendingConfirmation"] == "false"
