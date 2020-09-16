@@ -64,22 +64,19 @@ def ec2_ebs_snapshots():
 
 def ec2_ebs_snapshots_create_permission():
     "https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshot_attribute"
-    return sum(
-        [
-            botocore_client.get(
-                service_name="ec2",
-                method_name="describe_snapshot_attribute",
-                call_args=[],
-                call_kwargs={
-                    "Attribute": "createVolumePermission",
-                    "SnapshotId": snapshot["SnapshotId"],
-                },
-                regions=[snapshot["__pytest_meta"]["region"]],
-            ).values()
-            for snapshot in ec2_ebs_snapshots()
-        ],
-        [],
-    )
+    return [
+        botocore_client.get_details(
+            resource=snapshot,
+            service_name="ec2",
+            method_name="describe_snapshot_attribute",
+            call_args=[],
+            call_kwargs={
+                "Attribute": "createVolumePermission",
+                "SnapshotId": snapshot["SnapshotId"],
+            },
+        )
+        for snapshot in ec2_ebs_snapshots()
+    ]
 
 
 def ec2_flow_logs():

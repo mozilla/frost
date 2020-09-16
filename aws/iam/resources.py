@@ -1,4 +1,5 @@
 import csv
+import itertools
 import time
 
 import pytest
@@ -22,65 +23,52 @@ def iam_admin_users():
     ]
 
 
-def iam_inline_policies(username):
+def iam_inline_policies(user):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_user_policies"
-    return (
-        botocore_client.get("iam", "list_user_policies", [], {"UserName": username})
-        .extract_key("PolicyNames")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        user, "iam", "list_user_policies", [], {"UserName": user["UserName"]}
+    )["PolicyNames"]
 
 
-def iam_managed_policies(username):
+def iam_managed_policies(user):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_user_policies"
-    return (
-        botocore_client.get(
-            "iam", "list_attached_user_policies", [], {"UserName": username}
-        )
-        .extract_key("AttachedPolicies")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        user, "iam", "list_attached_user_policies", [], {"UserName": user["UserName"]}
+    )["AttachedPolicies"]
 
 
-def iam_user_groups(username):
+def iam_user_groups(user):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user"
-    return (
-        botocore_client.get("iam", "list_groups_for_user", [], {"UserName": username})
-        .extract_key("Groups")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        user, "iam", "list_groups_for_user", [], {"UserName": user["UserName"]}
+    )["Groups"]
 
 
-def iam_user_group_inline_policies(username):
+def iam_user_group_inline_policies(user):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_group_policies"
     return [
-        botocore_client.get(
-            "iam", "list_group_policies", [], {"GroupName": group["GroupName"]}
-        )
-        .extract_key("PolicyNames")
-        .flatten()
-        .values()
-        for group in iam_user_groups(username)
+        botocore_client.get_details(
+            group, "iam", "list_group_policies", [], {"GroupName": group["GroupName"]}
+        )["PolicyNames"]
+        for group in iam_user_groups(user)
     ]
 
 
-def iam_user_group_managed_policies(username):
+def iam_user_group_managed_policies(user):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_group_policies"
     return [
-        botocore_client.get(
-            "iam", "list_attached_group_policies", [], {"GroupName": group["GroupName"]}
-        )
-        .extract_key("AttachedPolicies")
-        .flatten()
-        .values()
-        for group in iam_user_groups(username)
+        botocore_client.get_details(
+            group,
+            "iam",
+            "list_attached_group_policies",
+            [],
+            {"GroupName": group["GroupName"]},
+        )["AttachedPolicies"]
+        for group in iam_user_groups(user)
     ]
 
 
-def iam_all_user_policies(username):
+def iam_all_user_policies(user):
     """
     Gets all policies that can be attached to a user. This includes:
         - Inline policies on the user
@@ -92,19 +80,16 @@ def iam_all_user_policies(username):
     allow for standard access to the policy name ({'PolicyName': policy_name})
     """
     inline = []
-    inline_policies = [
-        iam_inline_policies(username=username)
-        + iam_user_group_inline_policies(username=username)
-    ]
+    inline_policies = [iam_inline_policies(user) + iam_user_group_inline_policies(user)]
     for policies in inline_policies:
         for policy_name in policies:
             if isinstance(policy_name, str):
-                inline += {"PolicyName": policy_name}
+                inline.append({"PolicyName": policy_name})
 
     managed = [
         policy
-        for policies in iam_managed_policies(username=username)
-        + iam_user_group_managed_policies(username=username)
+        for policies in iam_managed_policies(user)
+        + iam_user_group_managed_policies(user)
         for policy in policies
     ]
 
@@ -112,17 +97,13 @@ def iam_all_user_policies(username):
 
 
 def iam_users_with_policies():
-    return [
-        {**{"Policies": iam_all_user_policies(username=user["UserName"])}, **user}
-        for user in iam_users()
-    ]
+    return [{"Policies": iam_all_user_policies(user), **user} for user in iam_users()]
 
 
 def iam_users_with_policies_and_groups():
     """Users with their associated Policies and Groups"""
     return [
-        {**{"Groups": iam_user_groups(username=user["UserName"])}, **user}
-        for user in iam_users_with_policies()
+        {"Groups": iam_user_groups(user), **user} for user in iam_users_with_policies()
     ]
 
 
@@ -138,26 +119,25 @@ def iam_admin_mfa_devices():
 
 def iam_user_login_profiles():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
-    return iam_login_profiles([user for user in iam_users()])
+    return iam_login_profiles(user for user in iam_users())
 
 
 def iam_user_mfa_devices():
     "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
-    return iam_mfa_devices([user for user in iam_users()])
+    return iam_mfa_devices(user for user in iam_users())
 
 
 def iam_login_profiles(users):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
     return [
-        botocore_client.get(
+        botocore_client.get_details(
+            user,
             "iam",
             "get_login_profile",
             [],
             {"UserName": user["UserName"]},
             result_from_error=lambda error, call: {"LoginProfile": None},
-        )
-        .extract_key("LoginProfile")
-        .values()[0]
+        )["LoginProfile"]
         for user in users
     ]
 
@@ -165,11 +145,9 @@ def iam_login_profiles(users):
 def iam_mfa_devices(users):
     "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
     return [
-        botocore_client.get(
-            "iam", "list_mfa_devices", [], {"UserName": user["UserName"]}
-        )
-        .extract_key("MFADevices")
-        .values()[0]
+        botocore_client.get_details(
+            user, "iam", "list_mfa_devices", [], {"UserName": user["UserName"]}
+        )["MFADevices"]
         for user in users
     ]
 
@@ -184,60 +162,44 @@ def iam_roles():
     )
 
 
-def iam_all_role_policies(rolename):
+def iam_all_role_policies(role):
     return [
-        {"PolicyName": policy_name}
-        for policy_name in iam_role_inline_policies(rolename=rolename)
-    ] + iam_role_managed_policies(rolename=rolename)
+        {"PolicyName": policy_name} for policy_name in iam_role_inline_policies(role)
+    ] + iam_role_managed_policies(role)
 
 
 def iam_roles_with_policies():
-    return [
-        {**{"Policies": iam_all_role_policies(rolename=role["RoleName"])}, **role}
-        for role in iam_roles()
-    ]
+    return [{"Policies": iam_all_role_policies(role), **role} for role in iam_roles()]
 
 
-def iam_role_inline_policies(rolename):
+def iam_role_inline_policies(role):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_role_policies"
-    return (
-        botocore_client.get("iam", "list_role_policies", [], {"RoleName": rolename})
-        .extract_key("PolicyNames")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        role, "iam", "list_role_policies", [], {"RoleName": role["RoleName"]}
+    )["PolicyNames"]
 
 
-def iam_role_managed_policies(rolename):
+def iam_role_managed_policies(role):
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_role_policies"
-    return (
-        botocore_client.get(
-            "iam", "list_attached_role_policies", [], {"RoleName": rolename}
-        )
-        .extract_key("AttachedPolicies")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        role, "iam", "list_attached_role_policies", [], {"RoleName": role["RoleName"]}
+    )["AttachedPolicies"]
 
 
 def iam_admin_roles():
     return [role for role in iam_roles_with_policies() if user_is_admin(role)]
 
 
-def iam_access_keys_for_user(username):
+def iam_access_keys_for_user(user):
     "https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_access_keys"
-    return (
-        botocore_client.get("iam", "list_access_keys", [], {"UserName": username})
-        .extract_key("AccessKeyMetadata")
-        .flatten()
-        .values()
-    )
+    return botocore_client.get_details(
+        user, "iam", "list_access_keys", [], {"UserName": user["UserName"]}
+    )["AccessKeyMetadata"]
 
 
 def iam_get_all_access_keys():
-    return sum(
-        [iam_access_keys_for_user(username=user["UserName"]) for user in iam_users()],
-        [],
+    return itertools.chain.from_iterable(
+        iam_access_keys_for_user(user) for user in iam_users()
     )
 
 
@@ -245,8 +207,8 @@ def iam_generate_credential_report():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report"
     results = botocore_client.get(
         "iam", "generate_credential_report", [], {}, do_not_cache=True
-    ).results
-    if len(results):
+    ).values()
+    if results:
         return results[0].get("State")
     return ""
 
@@ -263,8 +225,8 @@ def iam_get_credential_report():
     # We want this to blow up if it can't get the "Content"
     results = botocore_client.get(
         "iam", "get_credential_report", [], {}, do_not_cache=True
-    ).results
-    if not len(results):
+    ).values()
+    if not results:
         return []
     content = results[0]["Content"]
     decoded_content = content.decode("utf-8")
