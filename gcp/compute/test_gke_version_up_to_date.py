@@ -27,7 +27,7 @@ def test_gke_version_up_to_date(cluster, server_config):
         cluster["currentMasterVersion"]
     )
     assert (
-        cluster["currentNodeVersion"] in server_config["validNodeVersions"]
-    ), "Current GKE node version ({}) is not in the list of valid node versions.".format(
+        cluster["currentNodeVersion"] in server_config["validMasterVersions"]
+    ), "Current GKE node version ({}) is not in the list of valid master versions.".format(
         cluster["currentNodeVersion"]
     )
