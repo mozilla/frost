@@ -1,7 +1,7 @@
 from conftest import botocore_client
 
 
-def elbs():
+def elbs(with_tags=True):
     """
     http://botocore.readthedocs.io/en/latest/reference/services/elb.html#ElasticLoadBalancing.Client.describe_load_balancers
     """
@@ -11,6 +11,9 @@ def elbs():
         .flatten()
         .values()
     )
+
+    if not with_tags:
+        return elbs
 
     elbs_with_tags = []
     for elb in elbs:
@@ -46,3 +49,25 @@ def elbs_v2():
         .flatten()
         .values()
     )
+
+
+def elb_attributes(elb):
+    """
+    https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/elb.html#ElasticLoadBalancing.Client.describe_load_balancer_attributes
+    """
+    return (
+        botocore_client.get(
+            "elb",
+            "describe_load_balancer_attributes",
+            [],
+            call_kwargs={"LoadBalancerName": elb["LoadBalancerName"]},
+            regions=[elb["__pytest_meta"]["region"]],
+        )
+        .extract_key("LoadBalancerAttributes")
+        .debug()
+        .values()
+    )[0]
+
+
+def elbs_with_attributes():
+    return [(elb, elb_attributes(elb),) for elb in elbs(with_tags=False)]

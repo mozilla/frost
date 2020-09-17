@@ -1,5 +1,7 @@
 import pytest
 
+from helpers import get_param_id
+
 from gcp.iam.resources import project_iam_bindings
 
 
@@ -12,7 +14,9 @@ EXCLUDED_ROLES = ["roles/logging.viewer"]
 
 
 @pytest.mark.gcp_iam
-@pytest.mark.parametrize("iam_binding", project_iam_bindings(), ids=lambda r: r["role"])
+@pytest.mark.parametrize(
+    "iam_binding", project_iam_bindings(), ids=lambda r: get_param_id(r, "role"),
+)
 def test_only_allowed_org_accounts(iam_binding, allowed_org_domains):
     """
     Only allow specified org domains as members within this project, with a few exceptions.

@@ -34,23 +34,21 @@ docker run --rm mozilla/frost pytest -h
 To fetch RDS resources from the cache or AWS API and check that
 backups are enabled for DB instances for [the configured aws
 profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
-named `default` in the `us-west-2` region we can run:
+named `default` in the `us-west-2` region run:
 
 ```console
-docker run --rm mozilla/frost pytest --ignore gsuite/ --ignore heroku/ --ignore gcp/ --ignore aws/s3 --ignore aws/ec2 -k test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
+docker run --rm mozilla/frost pytest aws/rds/test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
 ```
 
-The options include pytest options:
+The options include the pytest option:
 
-* [`--ignore`](https://docs.pytest.org/en/latest/example/pythoncollection.html#ignore-paths-during-test-collection) to skip fetching resources for non-RDS resources
-* [`-k`](https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name) for selecting tests matching the substring `test_rds_db_instance_backup_enabled` for the one test we want to run
-* [`-m`](https://docs.pytest.org/en/latest/example/markers.html#marking-test-functions-and-selecting-them-for-a-run) not used but the marker filter can be useful for selecting all tests for specific services (e.g. `-m rds`)
 * [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
 
-and options frost adds:
+Frost adds the options:
 
 * `--debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
+* `--gcp-project-id` for selecting the GCP project to test. **Required for GCP tests**
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--config`](#custom-test-config) path to test custom config file
 
@@ -317,7 +315,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-docker run --rm mozilla/frost pytest --ignore aws/s3 --ignore aws/rds --ignore aws/iam -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
+docker run --rm mozilla/frost pytest -s --aws-profiles stage --aws-require-tags Name Type App Stack aws/ec2/test_ec2_instance_has_required_tags.py --config config.yaml.example --json=report.json
 ...
 ```
 
@@ -498,6 +496,7 @@ frost
 ...
 ├── <third party service A>
 │   ├── client.py
+│   ├── conftest.py
 │   ├── meta_test_client.py
 │   ├── <subservice A (optional)>
 │   │   ├── __init__.py
@@ -512,6 +511,7 @@ frost
 │   │   └─ test_s3_bucket_web_hosting_disabled.py
 └── <third party service B>
     ├── __init__.py
+    ├── conftest.py
     ├── helpers.py
     ├── resources.py
     └── test_user_has_escalation_policy.py
@@ -575,7 +575,7 @@ Notes:
 1. Running it we see that one of the IPs is an AWS IP:
 
 ```console
-docker run --rm mozilla/frost pytest --ignore aws/ --ignore gsuite/ --ignore heroku/ --ignore gcp/
+docker run --rm mozilla/frost pytest httpbin/test_httpbin_ip_in_aws.py
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
 rootdir: /Users/gguthe/mozilla/frost, inifile:
@@ -623,3 +623,4 @@ As we add more tests we can:
 
 1. Move the JSON fetching functions to `<service name>/resources.py` files and import them into the test
 1. Move the fetching logic to a shared library `<service name>/client.py` and save to the pytest cache
+1. Add a `<service name>/conftest.py` and register the service's marks in a `pytest_configure` to resolve some warnings

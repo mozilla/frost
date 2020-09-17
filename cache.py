@@ -7,7 +7,7 @@ import functools
 import json
 
 import py
-from dateutil.parser import parse
+from dateutil.parser import isoparse
 
 
 def json_iso_datetimes(obj):
@@ -28,7 +28,7 @@ def json_iso_datetime_string_to_datetime(obj):
             continue
 
         try:
-            obj[k] = parse(v, ignoretz=True)
+            obj[k] = isoparse(v)
         except (OverflowError, ValueError):
             pass
 
@@ -36,7 +36,7 @@ def json_iso_datetime_string_to_datetime(obj):
 
 
 def datetime_encode_set(self, key, value):
-    """ save value for the given key.
+    """save value for the given key.
 
     :param key: must be a ``/`` separated value. Usually the first
          name is the name of your plugin or your application.
@@ -61,7 +61,7 @@ def datetime_encode_set(self, key, value):
 
 
 def datetime_encode_get(self, key, default):
-    """ return cached value for the given key.  If no value
+    """return cached value for the given key.  If no value
     was yet cached or the value cannot be read, the specified
     default is returned.
 

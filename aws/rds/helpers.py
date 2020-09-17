@@ -1,3 +1,6 @@
+from helpers import get_param_id
+
+
 def is_rds_db_snapshot_attr_public_access(rds_db_snapshot_attribute):
     """
     Checks whether a RDS snapshot attribute is:
@@ -124,3 +127,15 @@ def is_rds_db_snapshot_encrypted(rds_db_snapshot):
     TypeError: 'NoneType' object is not subscriptable
     """
     return bool(rds_db_snapshot["Encrypted"])
+
+
+def get_db_instance_id(db_instance):
+    return get_param_id(db_instance, "DBInstanceIdentifier")
+
+
+def get_db_snapshot_arn(snapshot):
+    return get_param_id(snapshot, "DBSnapshotArn")
+
+
+def get_db_security_group_arn(sg):
+    return get_param_id(sg, "DBSecurityGroupArn")
