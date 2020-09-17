@@ -15,9 +15,8 @@ def zones():
 
 def cnames():
     records = []
-    zone_list = zones()
 
-    for zone in zone_list:
+    for zone in zones():
         zone_id = zone["Id"].split("/")[2]
         zone_records = (
             botocore_client.get(
