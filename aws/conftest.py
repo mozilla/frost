@@ -10,6 +10,7 @@ def pytest_configure(config):
         "rds",
         "redshift",
         "s3",
+        "sns",
     ]:
         config.addinivalue_line(
             "markers", "{}: mark tests against {}".format(svc_name, svc_name)
