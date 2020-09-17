@@ -262,11 +262,10 @@ def _report_download_errors(errors):
         logger.error("Error #%d: %s%s", i + 1, msg, extra)
 
 
-def get_connection(base_url: str, token: str) -> Any:
-    # hack to support doctests
-    if "pytest" in sys.modules:
-        return
-    endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + token,})
+def get_connection(base_url: str, token: Optional[str]) -> Any:
+    # corner case -- we come through here during CI when there is no
+    # token and doctests are running, so token is None
+    endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + (token or ""),})
     endpoint.report_download_errors = _report_download_errors
     return endpoint
 
