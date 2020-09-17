@@ -2,6 +2,7 @@ import pytest
 
 from aws.sns.resources import sns_subscription_attributes
 
+
 @pytest.mark.sns
 @pytest.mark.parametrize(
     "subscription_attrs",
