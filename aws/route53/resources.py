@@ -1,5 +1,6 @@
 from conftest import botocore_client
 
+
 def zones():
     """
     https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/route53.html#Route53.Client.list_hosted_zones
@@ -11,15 +12,21 @@ def zones():
         .values()
     )
 
+
 def cnames():
+    records = []
     zone_list = zones()
-    print(zone_list)
+
     for zone in zone_list:
-        zone_id = zone['Id'].split('/')[2]
-
-        records = botocore_client.get("route53", "list_resource_record_sets", [], {"HostedZoneId": zone_id}).extract("ResourceRecordSets").flatten().values()
-
-        for record in records:
-            print("record: {}".format(record))
+        zone_id = zone["Id"].split("/")[2]
+        zone_records = (
+            botocore_client.get(
+                "route53", "list_resource_record_sets", [], {"HostedZoneId": zone_id}
+            )
+            .extract_key("ResourceRecordSets")
+            .flatten()
+            .values()
+        )
+        records.extend([record for record in zone_records if record["Type"] == "CNAME"])
 
     return records
