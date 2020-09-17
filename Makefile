@@ -7,12 +7,6 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
-PYTHON_MIN_VERSION := 3.6
-PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
-PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
-
 all: check_venv
 	frost test
 
@@ -24,8 +18,6 @@ awsci: check_venv
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
 	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
-else
-	python -V | grep $(PYTHON_MIN_VERSION) || true ; $(PYTHON_VER_WARNING)
 endif
 
 check_conftest_imports:
@@ -86,7 +78,6 @@ metatest:
 
 venv:
 	python3 -m venv venv
-	./venv/bin/python -V | grep $(PYTHON_MIN_VERSION) || true; $(PYTHON_VER_WARNING)
 
 build-image:
 	docker build -t localhost/frost:latest .
