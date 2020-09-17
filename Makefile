@@ -7,25 +7,17 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
-PYTHON_MIN_VERSION := 3.6
-PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
-PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
-
 all: check_venv
-	pytest
+	frost test
 
 awsci: check_venv
-	pytest --continue-on-collection-errors aws/ \
-		--ignore aws/ec2/test_ec2_security_group_in_use.py \
+	frost test --continue-on-collection-errors -m aws aws/**/*.py \
+		-k "not test_ec2_security_group_in_use" \
 		--json=results-$(AWS_PROFILE)-$(TODAY).json $(PYTEST_OPTS)
 
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
 	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
-else
-	python -V | grep $(PYTHON_MIN_VERSION) || true ; $(PYTHON_VER_WARNING)
 endif
 
 check_conftest_imports:
@@ -38,7 +30,7 @@ clean: clean-cache clean-python
 
 clean-cache: check_venv
 	@# do as little work as possible to clear the cache, and guarantee success
-	pytest --cache-clear --continue-on-collection-errors \
+	frost test  --cache-clear --continue-on-collection-errors \
 		--collect-only -m "no_such_marker" \
 		--noconftest --tb=no --disable-warnings --quiet \
 	    || true
@@ -51,10 +43,11 @@ doc-build:
 	make -C docs html
 
 doctest: check_venv
-	pytest -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
+	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
+	 --doctest-modules -s --offline --debug-calls
 
 coverage: check_venv
-	pytest --cov-config .coveragerc --cov=. \
+	frost test --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/ \
@@ -70,7 +63,7 @@ black: check_venv
 	pre-commit run black --all-files
 
 install: venv
-	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt  && pre-commit install )
+	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt && python setup.py develop && pre-commit install )
 
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
@@ -79,13 +72,12 @@ stage-docs: docs
 	git add --all --force docs/_build/html
 
 metatest:
-	pytest --aws-profiles example-account \
+	frost test --aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/
 
 venv:
 	python3 -m venv venv
-	./venv/bin/python -V | grep $(PYTHON_MIN_VERSION) || true; $(PYTHON_VER_WARNING)
 
 build-image:
 	docker build -t localhost/frost:latest .

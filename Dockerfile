@@ -20,10 +20,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --upgrade --no-cache-dir -r requirements.txt
 
+COPY frost/* frost/
 COPY * ./
+RUN python setup.py install
 
 USER app
-ENTRYPOINT [ ]
+ENTRYPOINT [ "frost" ]
