@@ -425,21 +425,6 @@ python -m json.tool report.json
 ...
 ```
 
-### Test Regressions
-
-frost custom config format adds support for marking specific tests on specific resources as regressions.
-As with `severity` this does not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
-
-The config looks like:
-```
-...
-regressions:
-  - test_name: test_ec2_security_group_opens_all_ports_to_all
-    test_param_id: '*mycustomgroup'
-    comment: this was remediated by ops team
-...
-```
-
 ### AWS Config
 
 frost has a suite of AWS tests. This section of the custom config includes configuration options specific

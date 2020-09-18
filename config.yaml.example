@@ -17,10 +17,6 @@ severities:
     severity: INFO
   - test_name: '*'
     severity: ERROR
-regressions:
-  - test_name: test_ec2_security_group_opens_all_ports_to_all
-    test_param_id: '*mycustomgroup'
-    comment: this was remediated by ops team
 aws:
   admin_groups:
     - "Administrators"
