@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 
 import exemptions
 import severity
-import regressions
 
 
 class CustomConfig:
@@ -21,12 +20,10 @@ class CustomConfig:
 
         self.exemptions = exemptions.load(parsed_config.get("exemptions"))
         self.severities = severity.load(parsed_config.get("severities"))
-        self.regressions = regressions.load(parsed_config.get("regressions"))
 
     def add_markers(self, item):
         severity.add_severity_marker(item)
         exemptions.add_xfail_marker(item)
-        regressions.add_regression_marker(item)
 
 
 class CustomConfigMixin:
