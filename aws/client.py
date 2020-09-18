@@ -163,7 +163,7 @@ def get_aws_resource(
 
 
 class BotocoreClient:
-    def __init__(self, profiles, cache, debug_calls, debug_cache, offline):
+    def __init__(self, profiles, regions, cache, debug_calls, debug_cache, offline):
         self.profiles = profiles or [None]
         self.cache = cache
 
@@ -173,6 +173,8 @@ class BotocoreClient:
 
         if offline:
             self.regions = ["us-east-1"]
+        elif regions:
+            self.regions = regions
         else:
             self.regions = get_available_regions()
 
