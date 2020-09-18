@@ -86,6 +86,7 @@ frost test aws/rds/test_rds_db_instance_backup_enabled.py --aws-profiles default
 Frost adds the options:
 
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
+* `--aws-regions` for selecting one or more AWS regions to test as a CSV e.g. `us-east-1,us-west-2`. **defaults to all regions**
 * `--gcp-project-id` for selecting the GCP project to test. **Required for GCP tests**
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--config`](#custom-test-config) path to test custom config file

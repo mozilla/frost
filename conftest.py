@@ -30,6 +30,12 @@ def pytest_addoption(parser):
     )
 
     parser.addoption(
+        "--aws-regions",
+        type=str,
+        help="Set AWS regions to use as a comma separate list. Defaults to all available AWS regions",
+    )
+
+    parser.addoption(
         "--gcp-project-id",
         type=str,
         help="Set GCP project to test. Required for GCP tests.",
@@ -80,11 +86,18 @@ def pytest_configure(config):
         patch_cache_set(config)
 
     profiles = config.getoption("--aws-profiles")
+    aws_regions = (
+        config.getoption("--aws-regions").split(",")
+        if config.getoption("--aws-regions")
+        else []
+    )
+
     project_id = config.getoption("--gcp-project-id")
     organization = config.getoption("--organization")
 
     botocore_client = BotocoreClient(
         profiles=profiles,
+        regions=aws_regions,
         cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
