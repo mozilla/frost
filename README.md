@@ -231,6 +231,7 @@ head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_insta
 ```
 
 These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
+The cache can be disabled entirely with [the pytest -p no:cacheprovider](https://stackoverflow.com/questions/47744076/preventing-pytest-from-creating-cache-directories-in-pycharm).
 
 ## Custom Test Config
 

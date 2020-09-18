@@ -73,8 +73,11 @@ def pytest_configure(config):
     global heroku_client
     global custom_config_global
 
-    # monkeypatch cache.set to serialize datetime.datetime's
-    patch_cache_set(config)
+    # run with -p 'no:cacheprovider'
+    cache = config.cache if hasattr(config, "cache") else None
+    if cache:
+        # monkeypatch cache.set to serialize datetime.datetime's
+        patch_cache_set(config)
 
     profiles = config.getoption("--aws-profiles")
     project_id = config.getoption("--gcp-project-id")
@@ -82,7 +85,7 @@ def pytest_configure(config):
 
     botocore_client = BotocoreClient(
         profiles=profiles,
-        cache=config.cache,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -90,7 +93,7 @@ def pytest_configure(config):
 
     gcp_client = GCPClient(
         project_id=project_id,
-        cache=config.cache,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -98,7 +101,6 @@ def pytest_configure(config):
 
     heroku_client = HerokuAdminClient(
         organization=organization,
-        # cache=config.cache,
         cache=None,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
