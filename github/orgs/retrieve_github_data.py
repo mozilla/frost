@@ -47,7 +47,7 @@ class OrgInfo:
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Org Name", "Org Slug", "2FA Required", "id", "db id"]
+        return ["Org Name", "Org Slug", "2FA Required", "v4id", "v3id"]
 
     @classmethod
     def cvs_null(cls) -> List[Optional[str]]:

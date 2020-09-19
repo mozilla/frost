@@ -43,12 +43,10 @@ logger = logging.getLogger(__name__)
 class BranchName:
     name: str
     prefix: str
-    repo_id: str = None  # only available in the top level query
-    owner_id: str = None
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Branch Name", "Ref Prefix", "Repo_id", "Owner_id"]
+        return ["Branch Name", "Ref Prefix"]
 
     @classmethod
     def cvs_null(cls) -> List[str]:
@@ -58,13 +56,13 @@ class BranchName:
         return [
             self.name or None,
             self.prefix or None,
-            self.repo_id or None,
-            self.owner_id or None,
         ]
 
 
 @dataclass
 class BranchProtectionRule:
+    bpr_v4id: str
+    bpr_v3id: str
     is_admin_enforced: bool
     push_actor_count: int
     rule_conflict_count: int
@@ -74,6 +72,8 @@ class BranchProtectionRule:
     @classmethod
     def csv_header(cls) -> List[str]:
         return [
+            "bpr_v4id",
+            "bpr_v3id",
             "Inc Admin",
             "Restricted Pusher Count",
             "Conflicting Rule Count",
@@ -82,10 +82,12 @@ class BranchProtectionRule:
 
     @classmethod
     def cvs_null(cls) -> List[str]:
-        return [None, None, None, None] + BranchName.cvs_null()
+        return [None, None, None, None, None, None] + BranchName.cvs_null()
 
     def csv_row(self) -> List[str]:
         my_info = [
+            self.bpr_v4id,
+            self.bpr_v3id,
             self.is_admin_enforced,
             self.push_actor_count,
             self.rule_conflict_count,
@@ -103,14 +105,27 @@ class BranchProtectionRule:
 class RepoBranchProtections:
     default_branch_ref: str
     name_with_owner: str
+    owner_v4id: str
+    repo_v4id: str
+    repo_v3id: str
     protection_rules: List[BranchProtectionRule] = field(default_factory=list)
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Login", "Repo"] + BranchProtectionRule.csv_header()
+        return [
+            "Login",
+            "Repo",
+            "repo_v4id",
+            "repo_v3id",
+            "default branch",
+            "owner_v4id",
+        ] + BranchProtectionRule.csv_header()
 
     def csv_row(self) -> List[str]:
         my_info = list(self.name_with_owner.split("/"))
+        my_info.extend(
+            (self.repo_v4id, self.repo_v3id, self.default_branch_ref, self.owner_v4id)
+        )
         result = []
         for rule in self.protection_rules:
             for line in rule.csv_row():
@@ -125,7 +140,7 @@ def _add_protection_fields(node) -> None:
 
     In normal gQuery, this would be a fragment
     """
-    node.__fields__(is_admin_enforced=True, id=True, pattern=True)
+    node.__fields__(is_admin_enforced=True, id=True, pattern=True, database_id=True)
     node.branch_protection_rule_conflicts(first=0).__fields__(total_count=True,)
     node.push_allowances(first=0).__fields__(total_count=True,)
 
@@ -148,6 +163,7 @@ def create_operation(owner, name):
     repo.default_branch_ref.__fields__(name=True)
     repo.name_with_owner()
     repo.id()
+    repo.database_id()
     repo.owner().id()
     repo.owner().login()
 
@@ -172,7 +188,7 @@ def create_operation(owner, name):
     ref.total_count()
     ref.page_info.__fields__(end_cursor=True, has_next_page=True)
     ref.nodes().__fields__(
-        name=True, prefix=True, id=True,
+        name=True, prefix=True,
     )
 
     return op
@@ -278,12 +294,17 @@ def extract_branch_data(repodata) -> RepoBranchProtections:
     """
     repo_data = RepoBranchProtections(
         name_with_owner=repodata.name_with_owner,
-        default_branch_ref=repodata.default_branch_ref,
+        default_branch_ref=repodata.default_branch_ref.name,
+        repo_v4id=repodata.id,
+        repo_v3id=repodata.database_id,
+        owner_v4id=repodata.owner.id,
     )
     # Add in each rule for this repo
     rules = []
     for r in repodata.branch_protection_rules.nodes:
         rule = BranchProtectionRule(
+            r.id,
+            r.database_id,
             r.is_admin_enforced,
             r.push_allowances.total_count,
             r.branch_protection_rule_conflicts.total_count,
