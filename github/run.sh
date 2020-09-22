@@ -5,6 +5,7 @@ set -eu
 
 # set up env variable defaults
 export GH_TOKEN=${GH_TOKEN:-$(pass show Mozilla/moz-hwine-PAT)}
+set -x
 export PATH_TO_METADATA=${PATH_TO_METADATA:-~/repos/foxsec/master/services/metadata}
 export TODAY=${TODAY:-$(date --utc --iso=date)}
 export PATH_TO_SCRIPTS=${PATH_TO_SCRIPTS:-$PWD/github}
