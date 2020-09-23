@@ -19,6 +19,29 @@ from . import validate_compliance
 
 import pytest
 
+viewer_login = None
+
+
+def get_viewer(endpoint):
+    from sgqlc.operation import Operation  # noqa: I900
+    from github import github_schema as schema  # noqa: I900
+
+    global viewer_login
+    if not viewer_login:
+        op = Operation(schema.Query)
+
+        org = op.viewer()
+        org.login()
+        d = endpoint(op)
+        errors = d.get("errors")
+        if errors:
+            endpoint.report_download_errors(errors)
+            viewer_login = "unknown"
+        else:
+            viewer_login = (op + d).viewer.login
+
+    return viewer_login
+
 
 @pytest.mark.parametrize("org_info", get_all_org_data(), ids=OrgInfo.idfn)
 @pytest.mark.parametrize(
@@ -33,5 +56,5 @@ def test_require_2fa(
     # info = get_org_info(gql_connection, f"{org_to_check}")
     if org_info:
         met, message = validate_compliance.validate_org_info(org_info, criteria)
-        print(os.environ["GH_TOKEN"][-4:])
+        print(f"authed as {get_viewer(gql_connection)}")
         assert met, message
