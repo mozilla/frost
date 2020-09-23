@@ -5,6 +5,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import os
 from typing import List
 
 from github.orgs.validate_compliance import Criteria
@@ -32,4 +33,5 @@ def test_require_2fa(
     # info = get_org_info(gql_connection, f"{org_to_check}")
     if org_info:
         met, message = validate_compliance.validate_org_info(org_info, criteria)
+        print(os.environ["GH_TOKEN"][-4:])
         assert met, message
