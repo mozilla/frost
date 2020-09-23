@@ -19,7 +19,7 @@ from . import validate_compliance
 
 import pytest
 
-viewer_login = None
+viewer_login: str = "<unqueried>"
 
 
 def get_viewer(endpoint):
@@ -27,7 +27,7 @@ def get_viewer(endpoint):
     from github import github_schema as schema  # noqa: I900
 
     global viewer_login
-    if not viewer_login:
+    if viewer_login == "<unqueried>":
         op = Operation(schema.Query)
 
         org = op.viewer()
@@ -35,8 +35,7 @@ def get_viewer(endpoint):
         d = endpoint(op)
         errors = d.get("errors")
         if errors:
-            endpoint.report_download_errors(errors)
-            viewer_login = "unknown"
+            viewer_login = "<unknown>"
         else:
             viewer_login = (op + d).viewer.login
 
@@ -54,6 +53,7 @@ def test_require_2fa(
     criteria: validate_compliance.Criteria,
 ) -> None:
     # info = get_org_info(gql_connection, f"{org_to_check}")
+    print(f"before call: {org_info}")
     if org_info:
         met, message = validate_compliance.validate_org_info(org_info, criteria)
         print(f"authed as {get_viewer(gql_connection)}")
