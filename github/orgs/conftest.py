@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,7 +15,7 @@ import pathlib
 
 from typing import List, Set
 
-import subprocess
+import subprocess  # nosec
 
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
@@ -49,7 +48,11 @@ def orgs_to_check() -> Set[str]:
 
     # python 3.6 doesn't support capture_output
     # status = subprocess.run(cmd, capture_output=True)
-    status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # fmt: off
+    status = subprocess.run(  # nosec
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
+    )
+    # fmt:on
     assert not status.stderr.decode("utf-8")
     # return as array of non-empty, unquoted, "lines"
     return {

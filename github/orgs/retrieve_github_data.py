@@ -2,11 +2,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
-"""
-Collect Information about branches sufficient to check for all branch
-protection guideline compliance.
-
-"""
+"""Collect Information about branches sufficient to check for all branch
+protection guideline compliance."""
 
 import csv
 from functools import lru_cache
@@ -14,7 +11,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-import subprocess
+import subprocess  # nosec
 import sys
 from typing import Any, List, Optional, Set
 
@@ -39,8 +36,7 @@ class OrgInfo:
 
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
-        """ provide ID for pytest Parametrization
-        """
+        """provide ID for pytest Parametrization."""
         if isinstance(val, (OrgInfo,)):
             return f"{val.id_}-{val.login}"
         return None
@@ -64,7 +60,7 @@ class OrgInfo:
 
 
 def create_operation(owner):
-    """ Create the default Query operation
+    """Create the default Query operation.
 
     We build the structure for:
       organization:
@@ -109,9 +105,7 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
 
 
 def extract_org_data(orgdata) -> OrgInfo:
-    """ extract relevant data from sgqlc structure
-
-    """
+    """extract relevant data from sgqlc structure."""
     org_data = OrgInfo(
         name=orgdata.name,
         login=orgdata.login,
@@ -209,7 +203,11 @@ def _orgs_to_check() -> Set[str]:
 
     # python 3.6 doesn't support capture_output
     # status = subprocess.run(cmd, capture_output=True)
-    status = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # fmt: off
+    status = subprocess.run(  # nosec
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
+    )
+    # fmt:on
     assert not status.stderr.decode("utf-8")
     # return as array of non-empty, unquoted, "lines"
     return {
@@ -220,7 +218,7 @@ def _orgs_to_check() -> Set[str]:
 
 
 def get_all_org_data(endpoint: Any = None, orgs: List[str] = None) -> List[OrgInfo]:
-    """ Generator of org data """
+    """Generator of org data."""
     if not endpoint:
         # if we're creating the endpoint, then arguments must already be
         # in environment variables.
@@ -245,14 +243,14 @@ def _compact_fmt(d):
                     lst.append(_compact_fmt(e))
                 else:
                     lst.append(repr(e))
-            s.append("%s=[%s]" % (k, ", ".join(lst)))
+            s.append("{}=[{}]".format(k, ", ".join(lst)))
             continue
-        s.append("%s=%r" % (k, v))
+        s.append(f"{k}={v!r}")
     return "(" + ", ".join(s) + ")"
 
 
 def _report_download_errors(errors):
-    """ error handling for graphql comms """
+    """error handling for graphql comms."""
     logger.error("Document contain %d errors", len(errors))
     for i, e in enumerate(errors):
         msg = e.pop("message")
