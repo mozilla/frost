@@ -79,7 +79,7 @@ def validate_branch_protections(
 
     # if the production branch is not specified, use the default name
     if not branch:
-        branch = data.default_branch_ref.name
+        branch = data.default_branch_ref
 
     # Multiple steps to validate - first, is the branch even covered
     active_rules = find_applicable_rules(data, branch)

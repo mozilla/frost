@@ -17,7 +17,6 @@ from typing import Any, List
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 
-# from branch_check.github_schema import github_schema as schema  # noqa: I900
 from github import github_schema as schema  # noqa: I900
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
