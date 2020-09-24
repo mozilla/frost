@@ -39,6 +39,7 @@ def test_required_protections(
         url, branch = line, None
     owner, repo = url.split("/")[3:5]
     protections = get_repo_branch_protections(gql_connection, f"{owner}/{repo}")
+    print(f"{owner}/{repo}:", protections)
     rules = protections.protection_rules
 
     if not rules:
