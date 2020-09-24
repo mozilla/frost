@@ -2,11 +2,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
-"""
-Collect Information about branches sufficient to check for all branch
-protection guideline compliance.
-
-"""
+"""Collect Information about branches sufficient to check for all branch
+protection guideline compliance."""
 # TODO add doctests
 
 import csv
@@ -136,7 +133,7 @@ class RepoBranchProtections:
 
 
 def _add_protection_fields(node) -> None:
-    """ Build in fields we want to query
+    """Build in fields we want to query.
 
     In normal gQuery, this would be a fragment
     """
@@ -146,7 +143,7 @@ def _add_protection_fields(node) -> None:
 
 
 def create_operation(owner, name):
-    """ Create the default Query operation
+    """Create the default Query operation.
 
     We build the structure for:
       repository:
@@ -195,7 +192,7 @@ def create_operation(owner, name):
 
 
 def create_rule_query():
-    """ Create a query object for additional branch protection entries
+    """Create a query object for additional branch protection entries.
 
     Used to fetch subsequent pages. End Cursor is passed as a variable
     """
@@ -224,7 +221,7 @@ def get_nested_branch_data(endpoint, reponame):
     repodata = (op + d).repository
 
     def _more_to_do(cur_result, fake_new_page=False):
-        """ Determine if we need another query
+        """Determine if we need another query.
 
         There are two nested repeating elements in the query - if either
         is not yet exhausted, we have to do another query
@@ -289,9 +286,7 @@ def get_nested_branch_data(endpoint, reponame):
 
 
 def extract_branch_data(repodata) -> RepoBranchProtections:
-    """ extract relevant data from sgqlc structure
-
-    """
+    """extract relevant data from sgqlc structure."""
     repo_data = RepoBranchProtections(
         name_with_owner=repodata.name_with_owner,
         default_branch_ref=repodata.default_branch_ref.name,
@@ -392,14 +387,14 @@ def _compact_fmt(d):
                     lst.append(_compact_fmt(e))
                 else:
                     lst.append(repr(e))
-            s.append("%s=[%s]" % (k, ", ".join(lst)))
+            s.append("{}=[{}]".format(k, ", ".join(lst)))
             continue
-        s.append("%s=%r" % (k, v))
+        s.append(f"{k}={v!r}")
     return "(" + ", ".join(s) + ")"
 
 
 def _report_download_errors(errors):
-    """ error handling for graphql comms """
+    """error handling for graphql comms."""
     logger.error("Document contain %d errors", len(errors))
     for i, e in enumerate(errors):
         msg = e.pop("message")

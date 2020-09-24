@@ -89,7 +89,7 @@ class AWSConfig(CustomConfigMixin):
             if test_id == rule["test_param_id"]:
                 return set(rule["ports"])
 
-        return set([])
+        return set()
 
     def get_access_key_expiration_date(self):
         if self.access_key_expires_after is None:

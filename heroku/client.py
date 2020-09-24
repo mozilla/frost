@@ -20,7 +20,7 @@ def cache_key(organization, method, *args, **kwargs):
                 str(organization),
                 str(method),
                 ",".join(args),
-                ",".join("{}={}".format(k, v) for (k, v) in kwargs.items()),
+                ",".join(f"{k}={v}" for (k, v) in kwargs.items()),
             ]
         )
         + ".json"
@@ -37,8 +37,7 @@ def get_heroku_resource(
     debug_calls=False,
     debug_cache=False,
 ):
-    """
-    Fetches and return final data
+    """Fetches and return final data.
 
     TODO: more refactoring of herokuadmintools needed, so can:
         - cache all members
@@ -126,7 +125,7 @@ class HerokuAdminClient:
         return self.extract_key(HerokuDataSets.APP_USER, {})
 
     def values(self):
-        """Returns the wrapped value
+        """Returns the wrapped value.
 
         >>> c = HerokuAdminClient([None], None, None, None, offline=True)
         >>> c.results = []
@@ -136,9 +135,8 @@ class HerokuAdminClient:
         return self.results
 
     def extract_key(self, key, default=None):
-        """
-        From an iterable of dicts returns the value with the given
-        keys discarding other values:
+        """From an iterable of dicts returns the value with the given keys
+        discarding other values:
 
         >>> c = HerokuAdminClient([None], None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {'id': 2}]
@@ -171,8 +169,7 @@ class HerokuAdminClient:
         return self
 
     def flatten(self):
-        """
-        Flattens one level of a nested list:
+        """Flattens one level of a nested list:
 
         >>> c = HerokuAdminClient([None], None, None, None, offline=True)
         >>> c.results = [['A', 1], ['B']]

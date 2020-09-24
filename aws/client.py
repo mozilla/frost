@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from collections import namedtuple
 import functools
@@ -34,7 +32,8 @@ def get_session(profile=None):
 
 @functools.lru_cache()
 def get_client(profile, region, service):
-    """Returns a new or cached botocore service client for the AWS profile, region, and service.
+    """Returns a new or cached botocore service client for the AWS profile,
+    region, and service.
 
     Warns when a service is not available for a region, which means we
     need to update botocore or skip that call for that region.
@@ -42,7 +41,7 @@ def get_client(profile, region, service):
     session = get_session(profile)
 
     if region not in session.get_available_regions(service):
-        warnings.warn("service {} not available in {}".format(service, region))
+        warnings.warn(f"service {service} not available in {region}")
 
     return session.create_client(service, region_name=region)
 
@@ -63,7 +62,10 @@ def get_available_services(profile=None):
 
 
 def full_results(client, method, args, kwargs):
-    """Returns JSON results for an AWS botocore call. Flattens paginated results (if any)."""
+    """Returns JSON results for an AWS botocore call.
+
+    Flattens paginated results (if any).
+    """
     if client.can_paginate(method):
         paginator = client.get_paginator(method)
         return paginator.paginate(*args, **kwargs).build_full_result()
@@ -96,7 +98,7 @@ def cache_key(call):
                 str(call.service),
                 str(call.method),
                 ",".join(call.args),
-                ",".join("{}={}".format(k, v) for (k, v) in call.kwargs.items()),
+                ",".join(f"{k}={v}" for (k, v) in call.kwargs.items()),
             ]
         )
         + ".json"
@@ -115,9 +117,8 @@ def get_aws_resource(
     debug_calls=False,
     debug_cache=False,
 ):
-    """
-    Fetches and yields AWS API JSON responses for all profiles and regions (list params)
-    """
+    """Fetches and yields AWS API JSON responses for all profiles and regions
+    (list params)"""
     for profile, region in itertools.product(profiles, regions):
         call = default_call._replace(
             profile=profile,
@@ -224,7 +225,7 @@ class BotocoreClient:
         return self
 
     def values(self):
-        """Returns the wrapped value
+        """Returns the wrapped value.
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = []
@@ -234,9 +235,8 @@ class BotocoreClient:
         return self.results
 
     def extract_key(self, key, default=None):
-        """
-        From an iterable of dicts returns the value with the given
-        keys discarding other values:
+        """From an iterable of dicts returns the value with the given keys
+        discarding other values:
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {'id': 2}]
@@ -299,8 +299,7 @@ class BotocoreClient:
         return self
 
     def flatten(self):
-        """
-        Flattens one level of a nested list:
+        """Flattens one level of a nested list:
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [['A', 1], ['B']]

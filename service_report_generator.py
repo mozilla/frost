@@ -1,5 +1,5 @@
-"""
-Transform results and metadata from a pytest report JSON output and writes Service JSON reports.
+"""Transform results and metadata from a pytest report JSON output and writes
+Service JSON reports.
 
 Pytest Service JSON format:
 
@@ -45,7 +45,6 @@ Pytest Service JSON format:
     ...
   ]
 }
-
 """
 
 import json
@@ -153,7 +152,7 @@ def pytest_json_to_service_json(pytest_json):
 if __name__ == "__main__":
     args = parse_args()
 
-    pytest_json = json.load(open(args.pytest_json, "r"))
+    pytest_json = json.load(open(args.pytest_json))
 
     service_json = pytest_json_to_service_json(pytest_json)
 

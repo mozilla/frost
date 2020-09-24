@@ -14,11 +14,12 @@ EXCLUDED_ROLES = ["roles/logging.viewer"]
 @pytest.mark.gcp_iam
 @pytest.mark.parametrize("iam_binding", project_iam_bindings(), ids=lambda r: r["role"])
 def test_only_allowed_org_accounts(iam_binding, allowed_org_domains):
-    """
-    Only allow specified org domains as members within this project, with a few exceptions.
-        * Service Accounts are excluded
-        * The following roles are excluded:
-            - roles/logging.viewer
+    """Only allow specified org domains as members within this project, with a
+    few exceptions.
+
+    * Service Accounts are excluded
+    * The following roles are excluded:
+        - roles/logging.viewer
     """
     if len(allowed_org_domains) == 0:
         assert False, "No allowed org domains specified"
@@ -28,4 +29,4 @@ def test_only_allowed_org_accounts(iam_binding, allowed_org_domains):
             if not member.startswith("serviceAccount"):
                 assert (
                     member.split("@")[-1] in allowed_org_domains
-                ), "{} was found and is not in the allowed_org_domains".format(member)
+                ), f"{member} was found and is not in the allowed_org_domains"

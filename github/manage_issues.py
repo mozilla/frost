@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
-"""Perform actions based on frost results"""
+"""Perform actions based on frost results."""
 
 import argparse
 import json
@@ -75,19 +74,16 @@ class Action:
 
 
 def parse_action_string(name: str) -> Optional[Sequence[str]]:
-    """
-    comment
-    """
+    """comment."""
     matches = SPEC_DECODER_RE.match(name)
     return matches.groups() if matches else None
 
 
 def infer_resource_type(path: str) -> str:
-    """infer object type
+    """infer object type.
 
-    This relies on the file system structure of the tests
-    We currently assume it is:
-        "github/" resource_type "/.*"
+    This relies on the file system structure of the tests We currently
+    assume it is:     "github/" resource_type "/.*"
     """
     prefix = "github/"
     start = path.find(prefix) + len(prefix)
@@ -98,7 +94,7 @@ def infer_resource_type(path: str) -> str:
 
 def create_branch_action(action_spec: dict) -> Action:
     """Parse pytest info into information needed to open an issue against a
-    specific branch"""
+    specific branch."""
 
     # most information comes from the (parametrized) name of the test
     test_info = action_spec["name"]
@@ -142,9 +138,7 @@ def get_status(action_spec: dict) -> Tuple[str, str]:
 
 
 def create_org_action(action_spec: dict) -> Action:
-    """
-    Break out the org info from the json
-    """
+    """Break out the org info from the json."""
     # TODO check for outcome of xfailed (means exemption no longer needed)
     # most information comes from the (parametrized) name of the test
     test_info = action_spec["name"]
@@ -180,7 +174,7 @@ def create_action_spec(action_spec: dict) -> Action:
 
 
 def _open_issue(action: Action) -> bool:
-    """ Report status via a GitHub issue
+    """Report status via a GitHub issue.
 
     Used for actions which relate to a specific repository
     TODO support grouping actions for same main issue.
@@ -199,7 +193,7 @@ def _open_issue(action: Action) -> bool:
 
 
 def _alert_owners(action: Action) -> bool:
-    """ Contact org owners
+    """Contact org owners.
 
     Unsure how to do this - may be slack or email to secops. There is no good native way in GitHub.
 
@@ -224,7 +218,7 @@ dispatch_table = {
 
 
 def perform_action(action: Action) -> bool:
-    """ Initiate the appropriate action
+    """Initiate the appropriate action.
 
     Args:
         action (Action): All the data needed to perform the action
@@ -251,7 +245,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     args = parse_args()
 
-    with open(args.json_file, "r") as jf:
+    with open(args.json_file) as jf:
         pytest_report = json.loads(jf.read())
 
     issue_actions = pytest_report["report"]["tests"]

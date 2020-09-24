@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -62,14 +61,14 @@ def _compact_fmt(d):
                     lst.append(_compact_fmt(e))
                 else:
                     lst.append(repr(e))
-            s.append("%s=[%s]" % (k, ", ".join(lst)))
+            s.append("{}=[{}]".format(k, ", ".join(lst)))
             continue
-        s.append("%s=%r" % (k, v))
+        s.append(f"{k}={v!r}")
     return "(" + ", ".join(s) + ")"
 
 
 def _report_download_errors(errors):
-    """ error handling for graphql comms """
+    """error handling for graphql comms."""
     logger.error("Document contain %d errors", len(errors))
     for i, e in enumerate(errors):
         msg = e.pop("message")

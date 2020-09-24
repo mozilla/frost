@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,8 +18,7 @@ class Criteria:
 
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
-        """ provide ID for pytest Parametrization
-        """
+        """provide ID for pytest Parametrization."""
         if isinstance(val, (Criteria,)):
             return f"{val.standard_number}-{val.slug}"
         return None
@@ -75,10 +73,7 @@ def meets_criteria(protections: List[BranchProtectionRule], criteria: Criteria) 
 def validate_branch_protections(
     data: RepoBranchProtections, branch: str, criteria: Criteria,
 ) -> List[str]:
-    """
-        Validate the protections
-
-    """
+    """Validate the protections."""
 
     results = []
 

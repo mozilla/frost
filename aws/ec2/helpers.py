@@ -1,7 +1,6 @@
 def ip_permission_opens_all_ports(ipp):
-    """
-    Returns True if an EC2 security group IP permission opens all
-    ports and False otherwise.
+    """Returns True if an EC2 security group IP permission opens all ports and
+    False otherwise.
 
     >>> ip_permission_opens_all_ports({'FromPort': 1, 'ToPort': 65535})
     True
@@ -31,10 +30,8 @@ def ip_permission_opens_all_ports(ipp):
 
 
 def ip_permission_cidr_allows_all_ips(ipp):
-    """
-    Returns True if any IPv4 or IPv6 range for an EC2 security group
-    IP permission opens allows access to or from all IPs and False
-    otherwise.
+    """Returns True if any IPv4 or IPv6 range for an EC2 security group IP
+    permission opens allows access to or from all IPs and False otherwise.
 
     >>> ip_permission_cidr_allows_all_ips({'IpRanges': [{'CidrIp': '0.0.0.0/0'}]})
     True
@@ -60,9 +57,8 @@ def ip_permission_cidr_allows_all_ips(ipp):
 
 
 def ip_permission_grants_access_to_group_with_id(ipp, security_group_id):
-    """
-    Returns True if an EC2 security group IP permission opens access to
-    a security with the given ID and False otherwise.
+    """Returns True if an EC2 security group IP permission opens access to a
+    security with the given ID and False otherwise.
 
     >>> ip_permission_grants_access_to_group_with_id(
     ... {'UserIdGroupPairs': [{'GroupId': 'test-sgid'}]}, 'test-sgid')
@@ -81,10 +77,8 @@ def ip_permission_grants_access_to_group_with_id(ipp, security_group_id):
 
 
 def ec2_security_group_opens_all_ports(ec2_security_group):
-    """
-    Returns True if an ec2 security group includes a permission
-    allowing inbound access on all ports and False otherwise
-    or if protocol is ICMP.
+    """Returns True if an ec2 security group includes a permission allowing
+    inbound access on all ports and False otherwise or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports(
     ... {'IpPermissions': [{}, {'FromPort': -1,'ToPort': 65536}]})
@@ -109,10 +103,8 @@ def ec2_security_group_opens_all_ports(ec2_security_group):
 
 
 def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
-    """
-    Returns True if an ec2 security group includes a permission
-    allowing all IPs inbound access on all ports and False otherwise
-    or if protocol is ICMP.
+    """Returns True if an ec2 security group includes a permission allowing all
+    IPs inbound access on all ports and False otherwise or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports_to_self({
     ... 'GroupId': 'test-sgid',
@@ -166,10 +158,8 @@ def ec2_security_group_opens_all_ports_to_self(ec2_security_group):
 
 
 def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
-    """
-    Returns True if an ec2 security group includes a permission
-    allowing all IPs inbound access on all ports and False otherwise
-    or if protocol is ICMP.
+    """Returns True if an ec2 security group includes a permission allowing all
+    IPs inbound access on all ports and False otherwise or if protocol is ICMP.
 
     >>> ec2_security_group_opens_all_ports_to_all({'IpPermissions': [
     ... {'FromPort': -1,'ToPort': 65535,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
@@ -208,10 +198,9 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
 def ec2_security_group_opens_specific_ports_to_all(
     ec2_security_group, whitelisted_ports=None
 ):
-    """
-    Returns True if an ec2 security group includes a permission
-    allowing all IPs inbound access on specific unsafe ports and False
-    otherwise or if protocol is ICMP.
+    """Returns True if an ec2 security group includes a permission allowing all
+    IPs inbound access on specific unsafe ports and False otherwise or if
+    protocol is ICMP.
 
     >>> ec2_security_group_opens_specific_ports_to_all({'IpPermissions': [
     ... {'FromPort': 22,'ToPort': 22,'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
@@ -260,18 +249,17 @@ def ec2_security_group_opens_specific_ports_to_all(
 
 
 def ec2_instance_test_id(ec2_instance):
-    """A getter fn for test ids for EC2 instances"""
+    """A getter fn for test ids for EC2 instances."""
     return "{0[InstanceId]}".format(ec2_instance)
 
 
 def ec2_security_group_test_id(ec2_security_group):
-    """A getter fn for test ids for EC2 security groups"""
+    """A getter fn for test ids for EC2 security groups."""
     return "{0[GroupId]} {0[GroupName]}".format(ec2_security_group)
 
 
 def is_ebs_volume_encrypted(ebs):
-    """
-    Checks the EBS volume 'Encrypted' value.
+    """Checks the EBS volume 'Encrypted' value.
 
     >>> is_ebs_volume_encrypted({'Encrypted': True})
     True
@@ -294,8 +282,8 @@ def is_ebs_volume_encrypted(ebs):
 
 
 def is_ebs_snapshot_public(ebs_snapshot):
-    """
-    Checks if the EBS snapshot's 'CreateVolumePermissions' attribute allows for public creation.
+    """Checks if the EBS snapshot's 'CreateVolumePermissions' attribute allows
+    for public creation.
 
     >>> is_ebs_snapshot_public({'CreateVolumePermissions':[{'Group': 'all'}]})
     True
@@ -315,8 +303,7 @@ def is_ebs_snapshot_public(ebs_snapshot):
 
 
 def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
-    """
-    Returns any tag names that are missing from an EC2 Instance.
+    """Returns any tag names that are missing from an EC2 Instance.
 
     >>> ec2_instance_missing_tag_names({'Tags': [{'Key': 'Name'}]}, frozenset(['Name']))
     frozenset()
@@ -325,5 +312,5 @@ def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     frozenset({'Name'})
     """
     tags = ec2_instance.get("Tags", [])
-    instance_tag_names = set(tag["Key"] for tag in tags if "Key" in tag)
+    instance_tag_names = {tag["Key"] for tag in tags if "Key" in tag}
     return required_tag_names - instance_tag_names

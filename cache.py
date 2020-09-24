@@ -1,6 +1,4 @@
-"""
-Patch for pytest cache to serialize datetime.datetime
-"""
+"""Patch for pytest cache to serialize datetime.datetime."""
 
 import datetime
 import functools
@@ -11,8 +9,7 @@ from dateutil.parser import parse
 
 
 def json_iso_datetimes(obj):
-    """JSON serializer for objects not serializable by default json
-    module."""
+    """JSON serializer for objects not serializable by default json module."""
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
 
@@ -20,8 +17,8 @@ def json_iso_datetimes(obj):
 
 
 def json_iso_datetime_string_to_datetime(obj):
-    """JSON object hook that converts object vals from ISO datetime
-    strings to python datetime.datetime`s if possible."""
+    """JSON object hook that converts object vals from ISO datetime strings to
+    python datetime.datetime`s if possible."""
 
     for k, v in obj.items():
         if not isinstance(v, str):
@@ -36,7 +33,7 @@ def json_iso_datetime_string_to_datetime(obj):
 
 
 def datetime_encode_set(self, key, value):
-    """ save value for the given key.
+    """save value for the given key.
 
     :param key: must be a ``/`` separated value. Usually the first
          name is the name of your plugin or your application.
@@ -47,12 +44,12 @@ def datetime_encode_set(self, key, value):
     path = self._getvaluepath(key)
     try:
         path.parent.mkdir(exist_ok=True, parents=True)
-    except (IOError, OSError):
+    except OSError:
         self.warn("could not create cache path {path}", path=path)
         return
     try:
         f = path.open("w")
-    except (IOError, OSError):
+    except OSError:
         self.warn("cache could not write path {path}", path=path)
     else:
         with f:
@@ -61,9 +58,8 @@ def datetime_encode_set(self, key, value):
 
 
 def datetime_encode_get(self, key, default):
-    """ return cached value for the given key.  If no value
-    was yet cached or the value cannot be read, the specified
-    default is returned.
+    """return cached value for the given key.  If no value was yet cached or
+    the value cannot be read, the specified default is returned.
 
     :param key: must be a ``/`` separated value. Usually the first
          name is the name of your plugin or your application.
@@ -74,7 +70,7 @@ def datetime_encode_get(self, key, default):
     try:
         with path.open("r") as f:
             return json.load(f, object_hook=json_iso_datetime_string_to_datetime)
-    except (ValueError, IOError, OSError):
+    except (ValueError, OSError):
         return default
 
 

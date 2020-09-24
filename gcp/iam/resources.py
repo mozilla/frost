@@ -21,11 +21,9 @@ def service_account_keys(service_account):
 
 def all_service_account_keys():
     for sa in service_accounts():
-        for key in service_account_keys(sa):
-            yield key
+        yield from service_account_keys(sa)
 
 
 def project_iam_bindings():
     policy = gcp_client.get_project_iam_policy()
-    for binding in policy.get("bindings", []):
-        yield binding
+    yield from policy.get("bindings", [])
