@@ -14,34 +14,43 @@ def instances():
 
 
 def clusters():
-    parent = "projects/" + gcp_client.get_project_id() + "/locations/-"
-    return gcp_client.list(
-        "container",
-        "projects.locations.clusters",
-        results_key="clusters",
-        call_kwargs={"parent": parent},
-    )
+    results = []
+    for project_id in gcp_client.project_list:
+        results += gcp_client.list(
+            "container",
+            "projects.locations.clusters",
+            results_key="clusters",
+            call_kwargs={"parent": "projects/{}/locations/-".format(project_id)},
+        )
+    return results
 
 
 def networks_with_instances():
+    allInstances = instances()
+    inUseNetworks = []
     for network in networks():
         network["instances"] = []
-        for instance in instances():
+        for instance in allInstances:
             if network["selfLink"] in [
                 interface["network"] for interface in instance["networkInterfaces"]
             ]:
                 network["instances"].append(instance)
         if len(network["instances"]):
-            yield network
+            inUseNetworks.append(network)
+
+    return inUseNetworks
 
 
 def in_use_firewalls():
+    allNetworks = networks_with_instances()
+    inUseFirewalls = []
     for firewall in firewalls():
         if firewall["disabled"] == True:
             continue
-        for network in networks_with_instances():
+        for network in allNetworks:
             if (
                 network["selfLink"] == firewall["network"]
                 and len(network["instances"]) > 0
             ):
-                yield firewall
+                inUseFirewalls.append(firewall)
+    return inUseFirewalls

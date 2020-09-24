@@ -1,68 +1,144 @@
+import warnings
+
 from apiclient.discovery import build as build_service
+from apiclient.errors import HttpError
+
+warnings.filterwarnings(
+    "ignore", "Your application has authenticated using end user credentials"
+)
 
 
-def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
-    return (
-        ":".join(
-            ["pytest_gcp", project_id, version, product, subproduct, call, id_value]
+def get_all_projects_in_folder(folder_id=None):
+    if folder_id is None:
+        return
+
+    if not folder_id.startswith("folders/"):
+        folder_id = "folders/" + folder_id
+
+    crm = build_service("cloudresourcemanager", "v2")
+    allFolders = get_all_folders_in_folder(crm, folder_id)
+    crm.close()
+    allFolders.append(folder_id)
+
+    project_crm = build_service("cloudresourcemanager", "v1")
+    allProjects = []
+    for folder in allFolders:
+        projects = (
+            project_crm.projects().list(filter="parent.id:" + folder[8:]).execute()
         )
-        + ".json"
-    )
+        if projects:
+            allProjects.append(projects)
+    project_crm.close()
+
+    # flatten and return
+    return sum([p["projects"] for p in allProjects], [])
+
+
+def get_all_folders_in_folder(crm, folder_id=None):
+    allFolders = []
+    if folder_id is None:
+        return allFolders
+    folders = crm.folders().list(parent=folder_id).execute()
+    if folders:
+        for folder in folders["folders"]:
+            allFolders.extend(get_all_folders_in_folder(crm, folder["name"]))
+    else:
+        allFolders = [folder_id]
+
+    return allFolders
 
 
 class GCPClient:
-    def __init__(self, project_id, cache, debug_calls, debug_cache, offline):
-        self.project_id = project_id
-        self.cache = cache
+    def __init__(self, project_id, folder_id, debug_calls, offline):
         self.debug_calls = debug_calls
-        self.debug_cache = debug_cache
         self.offline = offline
 
-    def get_project_id(self):
-        if self.offline:
-            return "test"
-        return self.project_id
+        self.project_list = []
+        if project_id is not None:
+            self.project_list = [project_id]
 
-    def get_project_iam_policy(self):
+        if folder_id is not None:
+            self.project_list = [
+                p["projectId"] for p in get_all_projects_in_folder(folder_id)
+            ]
+
+    def get_project_iam_policies(self):
         if self.offline:
-            return {}
+            return []
 
         service = self._service("cloudresourcemanager")
-        request = service.projects().getIamPolicy(
-            resource=self.get_project_id(), body={}
-        )
-        return request.execute()
+        policies = []
+        for project_id in self.project_list:
+            try:
+                resp = (
+                    service.projects()
+                    .getIamPolicy(resource=project_id, body={})
+                    .execute()
+                )
+                policies += resp
+            except HttpError as e:
+                if "has not been used in project" in e._get_reason():
+                    continue
+                raise e
+        return policies
 
     def get_project_container_config(self):
         if self.offline:
             return {}
 
         service = self._service("container")
-        name = "projects/" + self.get_project_id() + "/locations/us-west1"
-        request = service.projects().locations().getServerConfig(name=name)
-        return request.execute()
+        for project_id in self.project_list:
+            try:
+                # TODO : We may want to correlate the zone here with the corresponding clusters zone.
+                request = (
+                    service.projects()
+                    .locations()
+                    .getServerConfig(
+                        name="projects/{}/locations/us-west1".format(project_id)
+                    )
+                )
+                resp = request.execute()
+            except HttpError as e:
+                # This will be thrown if an API is disabled, so we will try the next project id
+                if "has not been used in project" in e._get_reason():
+                    continue
+                raise e
+            return resp
+
+        return {}
 
     def get(
-        self, product, subproduct, id_key, id_value, version="v1", call_kwargs=None
+        self,
+        project_id,
+        product,
+        subproduct,
+        id_key,
+        id_value,
+        version="v1",
+        call_kwargs=None,
     ):
         if self.offline:
             result = {}
         else:
-            result = self._get(product, subproduct, id_key, id_value, version)
+            result = self._get(
+                project_id, product, subproduct, id_key, id_value, version
+            )
         return result
 
     def _get(
-        self, product, subproduct, id_key, id_value, version="v1", call_kwargs=None
+        self,
+        project_id,
+        product,
+        subproduct,
+        id_key,
+        id_value,
+        version="v1",
+        call_kwargs=None,
     ):
         if call_kwargs is None:
-            call_kwargs = {"projectId": self.project_id}
+            call_kwargs = {}
+        call_kwargs["projectId"] = project_id
         call_kwargs[id_key] = id_value
-
-        ckey = cache_key(self.project_id, version, product, subproduct, "get", id_value)
-        cached_result = self.cache.get(ckey, None)
-        if cached_result is not None:
-            print("found cached value for", ckey)
-            return cached_result
 
         service = self._service(product, version)
 
@@ -70,12 +146,15 @@ class GCPClient:
         for entity in subproduct.split(".")[1:]:
             api_entity = getattr(api_entity, entity)()
 
-        result = api_entity.get(**call_kwargs).execute()
+        try:
+            result = api_entity.get(**call_kwargs).execute()
+        except HttpError as e:
+            # This will be thrown if an API is disabled.
+            if "has not been used in project" in e._get_reason():
+                return {}
+            raise e
 
-        if self.debug_cache:
-            print("setting cache value for", ckey)
-
-        self.cache.set(ckey, result)
+        result["projectId"] = project_id
 
         return result
 
@@ -86,9 +165,18 @@ class GCPClient:
         if self.offline:
             results = []
         else:
-            results = list(
-                self._list(product, subproduct, version, results_key, call_kwargs)
-            )
+            if call_kwargs is not None:
+                return list(
+                    self._list(product, subproduct, version, results_key, call_kwargs)
+                )
+
+            results = []
+            for project_id in self.project_list:
+                call_kwargs = {"project": project_id}
+                results += list(
+                    self._list(product, subproduct, version, results_key, call_kwargs)
+                )
+
         return results
 
     def _list(
@@ -98,35 +186,14 @@ class GCPClient:
         Internal function for calling .list() on some service's resource. Supports debug printing
         and caching of the response.
 
-        If you want empty call kwargs, pass in `{}`.
-        """
-        if call_kwargs is None:
-            call_kwargs = {"project": self.project_id}
-
-        ckey = cache_key(self.project_id, version, product, subproduct)
-        cached_result = self.cache.get(ckey, None)
-        if cached_result is not None:
-            print("found cached value for", ckey)
-            return cached_result
-
-        results = self._get_list_results(
-            product, subproduct, version, results_key, call_kwargs
-        )
-
-        if self.debug_cache:
-            print("setting cache value for", ckey)
-
-        self.cache.set(ckey, results)
-
-        return results
-
-    def _get_list_results(self, product, subproduct, version, results_key, call_kwargs):
-        """
-        Internal helper for actually constructing the .list() function call and calling it.
-
         If a service supports "zones", then loop through each zone to collect all resources from
         that service. An example of this is collecting all compute instances (compute.instances().list()).
         """
+
+        project_id = "-"
+        if "project" in call_kwargs:
+            project_id = call_kwargs["project"]
+
         service = self._service(product, version)
 
         api_entity = getattr(service, subproduct.split(".")[0])()
@@ -134,11 +201,13 @@ class GCPClient:
             api_entity = getattr(api_entity, entity)()
 
         if self.debug_calls:
-            print("calling", api_entity)
+            print(
+                "calling {}.{} for project {}".format(product, subproduct, project_id)
+            )
 
         if self._zone_aware(product, subproduct):
             results = []
-            for zone in self._list_zones():
+            for zone in self._list_zones(project_id):
                 results = sum(
                     [results],
                     self._list_all_items(
@@ -148,20 +217,27 @@ class GCPClient:
         else:
             results = self._list_all_items(api_entity, call_kwargs, results_key)
 
-        return results
+        # Append the project id to each resource for use in test metadata
+        return [{"projectId": project_id, **result} for result in results]
 
     def _list_all_items(self, api_entity, call_kwargs, results_key):
         """Internal helper for dealing with pagination"""
         request = api_entity.list(**call_kwargs)
         items = []
         while request is not None:
-            # TODO: exception handling on request.execute()
-            resp = request.execute()
+            try:
+                resp = request.execute()
+            except HttpError as e:
+                # This will be thrown if an API is disabled.
+                if "has not been used in project" in e._get_reason():
+                    return []
+                raise e
             items = sum([items], resp.get(results_key, []))
             try:
                 request = api_entity.list_next(request, resp)
             except AttributeError:
                 request = None
+
         return items
 
     def _service(self, product, version="v1"):
@@ -173,20 +249,24 @@ class GCPClient:
         Internal helper for whether or not a product and subproduct take zones into account.
 
         Differing heavily from AWS, most GCP services do not take zones into account with API
-        calls and such.
+        calls.
         """
         if product == "compute" and subproduct == "instances":
             return True
         return False
 
-    def _list_zones(self):
+    def _list_zones(self, project_id):
         """Internal helper for listing all zones"""
-        # TODO: exception handling
-        response = (
-            self._service("compute")
-            .zones()
-            .list(project=self.project_id)
-            .execute()["items"]
-        )
-        for result in response:
-            yield result["name"]
+        try:
+            response = (
+                self._service("compute")
+                .zones()
+                .list(project=project_id)
+                .execute()["items"]
+            )
+        except HttpError as e:
+            # This will be thrown if an API is disabled.
+            if "has not been used in project" in e._get_reason():
+                return []
+            raise e
+        return [result["name"] for result in response]
