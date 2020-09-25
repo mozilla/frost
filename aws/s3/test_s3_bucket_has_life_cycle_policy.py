@@ -12,4 +12,6 @@ def test_s3_bucket_has_life_cycle_policy(s3_bucket, lifecycle_configuration):
     """
     Check a bucket has a life cycle policy.
     """
-    assert None not in lifecycle_configuration, f"{s3_bucket['Name']} has no life cycle policy."
+    assert (
+        None not in lifecycle_configuration
+    ), f"{s3_bucket['Name']} has no life cycle policy."
