@@ -59,14 +59,8 @@ repos:
     - id: docformatter
       args: [--in-place]
 
-- repo: https://gitlab.com/iamlikeme/nbhooks
-  rev: ""
-  hooks:
-  - id: nb-ensure-clean
-    #args: [--meta, ExecuteTime]  # Optional blacklist of metadata keys (you can use regex)
-
 - repo: https://github.com/Yelp/detect-secrets
-  rev: ""
+  rev: v0.14.2
   hooks:
     - id: detect-secrets
       args: ['--baseline', '.secrets.baseline']
