@@ -7,11 +7,11 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
-PYTHON_MIN_VERSION := 3.6
+PYTHON_MIN_VERSION := 3.8
 PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
+		      you're running $(shell python3 -V))
 PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python -V))
+		      you're running $(shell python3 -V))
 
 all: check_venv
 	pytest
@@ -25,7 +25,7 @@ check_venv:
 ifeq ($(VIRTUAL_ENV),)
 	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
 else
-	python -V | grep $(PYTHON_MIN_VERSION) || true ; $(PYTHON_VER_WARNING)
+	python3 -V | grep $(PYTHON_MIN_VERSION) || true ; $(PYTHON_VER_WARNING)
 endif
 
 check_conftest_imports:
@@ -46,7 +46,7 @@ clean-cache: check_venv
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
-doc-build: 
+doc-build:
 	type sphinx-build || { echo "please install sphinx to build docs"; false; }
 	make -C docs html
 

@@ -47,12 +47,12 @@ def orgs_to_check() -> Set[str]:
     ]
 
     # python 3.6 doesn't support capture_output
-    # status = subprocess.run(cmd, capture_output=True)
-    # fmt: off
-    status = subprocess.run(  # nosec
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
-    )
-    # fmt:on
+    status = subprocess.run(cmd, capture_output=True)  # nosec
+    ## ##    # fmt: off
+    ## ##    status = subprocess.run(  # nosec
+    ## ##        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
+    ## ##    )
+    ## ##    # fmt:on
     assert not status.stderr.decode("utf-8")
     # return as array of non-empty, unquoted, "lines"
     return {

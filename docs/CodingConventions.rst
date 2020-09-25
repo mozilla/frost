@@ -15,5 +15,4 @@ Conventions
   in ``pytest.mark.parametrize`` contain sufficient information for downstream
   processing.
 
-.. _doctest: https://docs.python.org/3.6/library/doctest.html
-
+.. _doctest: https://docs.python.org/3.8/library/doctest.html

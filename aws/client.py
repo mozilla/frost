@@ -12,7 +12,7 @@ import botocore.session
 SERVICES_WITHOUT_REGIONS = ["iam", "s3"]
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_session(profile=None):
     """Returns a new or cached botocore session for the AWS profile."""
 
@@ -30,7 +30,7 @@ def get_session(profile=None):
     return botocore.session.Session(profile=profile)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_client(profile, region, service):
     """Returns a new or cached botocore service client for the AWS profile,
     region, and service.
@@ -56,7 +56,7 @@ def get_available_regions(profile=None):
     return get_session(profile=profile).get_available_regions("ec2")
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_available_services(profile=None):
     return get_session(profile=profile).get_available_services()
 

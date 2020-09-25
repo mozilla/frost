@@ -18,8 +18,7 @@ setuptools.setup(
         "Natural Language :: English",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
