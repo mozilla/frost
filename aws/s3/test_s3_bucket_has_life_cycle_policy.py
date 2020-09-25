@@ -1,0 +1,15 @@
+import pytest
+
+from aws.s3.resources import s3_buckets, s3_bucket_lifecycle_configuration
+
+
+@pytest.mark.s3
+@pytest.mark.parametrize(
+    ["s3_bucket", "lifecycle_configuration"],
+    zip(s3_buckets(), s3_bucket_lifecycle_configuration()),
+)
+def test_s3_bucket_has_life_cycle_policy(s3_bucket, lifecycle_configuration):
+    """
+    Check a bucket has a life cycle policy.
+    """
+    assert None not in lifecycle_configuration, "{0[Name]} has no life cycle policy.".format(s3_bucket)
