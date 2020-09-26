@@ -120,7 +120,7 @@ def csv_output(data, csv_writer) -> None:
     csv_writer.writerow(data.csv_row())
 
 
-def parse_args(*args):
+def parse_args():
     import argparse
 
     ap = argparse.ArgumentParser(description="GitHub Agile Dashboard")
@@ -140,11 +140,16 @@ def parse_args(*args):
     ap.add_argument(
         "--verbose", "-v", help="Increase verbosity", action="count", default=0
     )
+    # Default to no headers for common automation case of generating for
+    # AWS Athena
+    ap.add_argument(
+        "--headers", help="Add column headers to csv output", action="store_true"
+    )
     ap.add_argument(
         "orgs", nargs="*", help='Organization slug name, such as "mozilla".'
     )
 
-    args = ap.parse_args(args)
+    args = ap.parse_args()
 
     endpoint_loglevel = max(10, 40 - ((args.verbose - 3) * 10))
     logfmt = "%(levelname)s: %(message)s"
@@ -268,17 +273,18 @@ def get_connection(base_url: str, token: Optional[str]) -> Any:
     return endpoint
 
 
-def main(*args) -> int:
+def main() -> int:
     # hack to support doctests
     if "pytest" in sys.modules:
         return
-    args = parse_args(*args)
+    args = parse_args()
     if args.output:
         csv_out = csv.writer(open(args.output, "w"))
     else:
         csv_out = csv.writer(sys.stdout)
     endpoint = get_connection(args.graphql_endpoint, args.token)
-    csv_out.writerow(OrgInfo.csv_header())
+    if args.headers:
+        csv_out.writerow(OrgInfo.csv_header())
     for row in get_all_org_data(endpoint, args.orgs):
         csv_output(row, csv_writer=csv_out)
 

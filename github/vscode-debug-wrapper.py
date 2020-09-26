@@ -18,7 +18,7 @@ from github.orgs import retrieve_github_data as org_retrieve_github_data
 from github.branches import retrieve_github_data as branch_retrieve_github_data
 
 # org will get metadata orgs if none supplied
-# org_retrieve_github_data.main()
+org_retrieve_github_data.main()
 
 # branch does not have default, so pass along current command line
 # N.B. since that will also happen in pytest's doctest mode, that

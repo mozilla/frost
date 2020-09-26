@@ -340,6 +340,11 @@ def parse_args():
     ap.add_argument(
         "--verbose", "-v", help="Increase verbosity", action="count", default=0
     )
+    # Default to no headers for common automation case of generating for
+    # AWS Athena
+    ap.add_argument(
+        "--headers", help="Add column headers to csv output", action="store_true"
+    )
     ap.add_argument(
         "repo", nargs="+", help='Repository full name, such as "login/repo".'
     )
@@ -409,7 +414,7 @@ def get_connection(base_url: str, token: str) -> Any:
     return endpoint
 
 
-def main(*args: List[str]) -> int:
+def main() -> int:
     # hack to support doctests
     if "pytest" in sys.modules:
         return
@@ -419,7 +424,8 @@ def main(*args: List[str]) -> int:
     else:
         csv_out = csv.writer(sys.stdout)
     endpoint = get_connection(args.graphql_endpoint, args.token)
-    csv_out.writerow(RepoBranchProtections.csv_header())
+    if args.headers:
+        csv_out.writerow(RepoBranchProtections.csv_header())
     for repo in args.repo:
         row_data = get_repo_branch_protections(endpoint, repo)
         csv_output(row_data, csv_writer=csv_out)
