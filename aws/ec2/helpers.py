@@ -1,8 +1,6 @@
 from helpers import get_param_id
 from datetime import datetime
 
-import dateutil.parser
-
 
 def ip_permission_opens_all_ports(ipp):
     """
