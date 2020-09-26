@@ -7,7 +7,7 @@ pytest-metadata==1.8.0
 pytest==3.10.1
 python-dateutil==2.7.5
 git+https://github.com/hwine/python-herokuadmintools.git#egg=herokuadmintools
-#pre-commit==1.17.0
+pre-commit==2.5.1
 ruamel.yaml==0.15.85
 wheel==0.33.1
 sgqlc==11.0
