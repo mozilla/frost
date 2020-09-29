@@ -27,7 +27,7 @@ def clusters():
 
 def networks_with_instances():
     allInstances = instances()
-    inUseNetworks = []
+    in_use_networks = []
     for network in networks():
         network["instances"] = []
         for instance in allInstances:
@@ -36,21 +36,21 @@ def networks_with_instances():
             ]:
                 network["instances"].append(instance)
         if len(network["instances"]):
-            inUseNetworks.append(network)
+            in_use_networks.append(network)
 
-    return inUseNetworks
+    return in_use_networks
 
 
 def in_use_firewalls():
-    allNetworks = networks_with_instances()
-    inUseFirewalls = []
+    all_networks = networks_with_instances()
+    results = []
     for firewall in firewalls():
         if firewall["disabled"] == True:
             continue
-        for network in allNetworks:
+        for network in all_networks:
             if (
                 network["selfLink"] == firewall["network"]
                 and len(network["instances"]) > 0
             ):
-                inUseFirewalls.append(firewall)
-    return inUseFirewalls
+                results.append(firewall)
+    return results

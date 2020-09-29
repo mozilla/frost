@@ -1,5 +1,4 @@
 import argparse
-from sys import exit
 import datetime
 
 import pytest
@@ -101,9 +100,9 @@ def pytest_configure(config):
     project_id = config.getoption("--gcp-project-id")
     folder_id = config.getoption("--gcp-folder-id")
     if project_id is not None and folder_id is not None:
-        # TODO: Probably a better way to cleanly exit than `exit(1)`?
-        print("--gcp-project-id and --gcp-folder-id are mutually exclusive arguments")
-        exit(1)
+        raise Exception(
+            "--gcp-project-id and --gcp-folder-id are mutually exclusive arguments"
+        )
 
     organization = config.getoption("--organization")
 
