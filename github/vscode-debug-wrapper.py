@@ -27,5 +27,8 @@ elif sub_command == "branches":
     # N.B. since that will also happen in pytest's doctest mode, that
     #      special case is dealt with in the parse_args function
     branch_retrieve_github_data.main()
+elif sub_command == "--doctest-modules":
+    # Another special case
+    pass
 else:
     raise SystemError(f"Unknown sub command '{sub_command}'")
