@@ -10,7 +10,6 @@ from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
-from heroku.client import HerokuAdminClient
 from github.client import GitHubClient
 
 import custom_config
@@ -19,7 +18,6 @@ import custom_config
 botocore_client = None
 gcp_client = None
 gsuite_client = None
-heroku_client = None
 github_client = None
 
 # globals in conftest.py are hard to import from several levels down, so provide access function
@@ -79,7 +77,6 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
-    global heroku_client
     global github_client
 
     # monkeypatch cache.set to serialize datetime.datetime's
@@ -100,15 +97,6 @@ def pytest_configure(config):
     gcp_client = GCPClient(
         project_id=project_id,
         cache=config.cache,
-        debug_calls=config.getoption("--debug-calls"),
-        debug_cache=config.getoption("--debug-cache"),
-        offline=config.getoption("--offline"),
-    )
-
-    heroku_client = HerokuAdminClient(
-        organization=organization,
-        # cache=config.cache,
-        cache=None,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -139,8 +127,7 @@ def aws_config(pytestconfig):
 
 
 def pytest_runtest_setup(item):
-    """
-    """
+    """"""
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 
@@ -252,8 +239,7 @@ def get_outcome_and_reason(report, markers, call):
 
 
 def clean_docstring(docstr):
-    """
-    Transforms a docstring into a properly formatted single line string.
+    """Transforms a docstring into a properly formatted single line string.
 
     >>> clean_docstring("\\nfoo\\n    bar\\n")
     'foo bar'
