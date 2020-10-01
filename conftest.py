@@ -9,7 +9,6 @@ from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
-from heroku.client import HerokuAdminClient
 
 import custom_config
 
@@ -18,7 +17,6 @@ collect_ignore_glob = ["*.py"]
 botocore_client = None
 gcp_client = None
 gsuite_client = None
-heroku_client = None
 custom_config_global = None
 
 
@@ -81,7 +79,6 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
-    global heroku_client
     global custom_config_global
 
     # run with -p 'no:cacheprovider'
@@ -119,14 +116,6 @@ def pytest_configure(config):
         project_id=project_id,
         folder_id=folder_id,
         debug_calls=config.getoption("--debug-calls"),
-        offline=config.getoption("--offline"),
-    )
-
-    heroku_client = HerokuAdminClient(
-        organization=organization,
-        cache=None,
-        debug_calls=config.getoption("--debug-calls"),
-        debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
     )
 
