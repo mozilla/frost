@@ -6,13 +6,15 @@
 protection guideline compliance."""
 # TODO add doctests
 
-import csv
 from functools import lru_cache
+import csv
+from github import branches
 import logging
 import os
 from dataclasses import dataclass, field
+import json
 import sys
-from typing import Any, List
+from typing import Any, Generator, List
 
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
@@ -39,6 +41,8 @@ logger = logging.getLogger(__name__)
 class BranchName:
     name: str
     prefix: str
+    _type: str = "BranchName"
+    _revision: int = 1
 
     @classmethod
     def csv_header(cls) -> List[str]:
@@ -54,6 +58,12 @@ class BranchName:
             self.prefix or None,
         ]
 
+    def flat_json(self) -> Generator:
+        yield self.as_dict()
+
+    def as_dict(self):
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+
 
 @dataclass
 class BranchProtectionRule:
@@ -64,6 +74,8 @@ class BranchProtectionRule:
     rule_conflict_count: int
     pattern: str
     matching_branches: List[BranchName] = field(default_factory=list)
+    _type: str = "BranchProtectionRule"
+    _revision: int = 1
 
     @classmethod
     def csv_header(cls) -> List[str]:
@@ -96,6 +108,19 @@ class BranchProtectionRule:
             result.append(my_info + BranchName.cvs_null())
         return result
 
+    def flat_json(self) -> Generator:
+        exportable_dict = self.as_dict()
+        del exportable_dict["matching_branches"]
+        for branch in self.matching_branches:
+            for match in branch.flat_json():
+                copy = exportable_dict.copy()
+                copy.update(match)
+                assert len(copy) == len(exportable_dict) + len(match)
+                yield copy
+
+    def as_dict(self):
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+
 
 @dataclass
 class RepoBranchProtections:
@@ -105,6 +130,8 @@ class RepoBranchProtections:
     repo_v4id: str
     repo_v3id: str
     protection_rules: List[BranchProtectionRule] = field(default_factory=list)
+    _type: str = "RepoBranchProtections"
+    _revision: int = 1
 
     @classmethod
     def csv_header(cls) -> List[str]:
@@ -129,6 +156,19 @@ class RepoBranchProtections:
         if len(result) == 0:
             result.append(my_info + BranchProtectionRule.cvs_null())
         return result
+
+    def flat_json(self) -> Generator:
+        exportable_dict = self.as_dict()
+        del exportable_dict["protection_rules"]
+        for rule in self.protection_rules:
+            for d in rule.flat_json():
+                copy = exportable_dict.copy()
+                copy.update(d)
+                assert len(copy) == len(exportable_dict) + len(d)
+                yield copy
+
+    def as_dict(self):
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
 
 def _add_protection_fields(node) -> None:
@@ -346,6 +386,18 @@ def parse_args():
         "--headers", help="Add column headers to csv output", action="store_true"
     )
     ap.add_argument(
+        "--no-csv",
+        help="Do not output to CSV (default True if called via cli).",
+        action="store_true",
+    )
+    ap.add_argument("--no-json", help="Do not output JSON.", action="store_true")
+    ap.add_argument(
+        "--json",
+        help="JSON output file name (default 'org.json')",
+        type=argparse.FileType("w"),
+        default=sys.stdout,
+    )
+    ap.add_argument(
         "repo", nargs="+", help='Repository full name, such as "login/repo".'
     )
 
@@ -419,16 +471,23 @@ def main() -> int:
     if "pytest" in sys.modules:
         return
     args = parse_args()
-    if args.output:
-        csv_out = csv.writer(open(args.output, "w"))
-    else:
-        csv_out = csv.writer(sys.stdout)
     endpoint = get_connection(args.graphql_endpoint, args.token)
-    if args.headers:
+    if not args.no_csv:
+        if args.output:
+            csv_out = csv.writer(open(args.output, "w"))
+        else:
+            csv_out = csv.writer(sys.stdout)
         csv_out.writerow(RepoBranchProtections.csv_header())
-    for repo in args.repo:
-        row_data = get_repo_branch_protections(endpoint, repo)
-        csv_output(row_data, csv_writer=csv_out)
+        for repo in args.repo:
+            row_data = get_repo_branch_protections(endpoint, repo)
+            csv_output(row_data, csv_writer=csv_out)
+
+    with args.json as jf:
+        if not args.no_json:
+            for repo in args.repo:
+                repo_data = get_repo_branch_protections(endpoint, repo)
+                for bprs in repo_data.flat_json():
+                    jf.write(f"{json.dumps(bprs)}\n")
 
 
 if __name__ == "__main__":

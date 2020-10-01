@@ -53,14 +53,7 @@ def repos_to_check() -> List[str]:
         *in_files,
     ]
 
-    # python 3.6 doesn't support capture_output
     status = subprocess.run(cmd, capture_output=True)  # nosec
-    ## ##    # fmt: off
-    ## ##    status = subprocess.run(  # nosec
-    ## ##        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
-    ## ##    )
-    ## ##    # fmt:on
-    ## ##    # return as array of non-empty, unquoted, "lines"
     return [
         x.translate({ord('"'): None, ord("'"): None})
         for x in status.stdout.decode("utf-8").split("\n")

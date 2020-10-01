@@ -6,19 +6,19 @@
 protection guideline compliance."""
 
 import csv
-from functools import lru_cache
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+import json
 from pathlib import Path
 import subprocess  # nosec
 import sys
 from typing import Any, List, Optional, Set
 
-from sgqlc.operation import Operation  # noqa: I900
-from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
+from sgqlc.operation import Operation
+from sgqlc.endpoint.http import HTTPEndpoint
 
-from github import github_schema as schema  # noqa: I900
+from github import github_schema as schema
 
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 
@@ -31,19 +31,21 @@ class OrgInfo:
     name: str
     login: str
     requires_two_factor_authentication: bool
-    id_: str
-    database_id: str
+    org_v4id: str
+    org_v3id: str
+    _type: str = "OrgInfo"
+    _revision: int = 1
 
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
         """provide ID for pytest Parametrization."""
         if isinstance(val, (OrgInfo,)):
-            return f"{val.id_}-{val.login}"
+            return f"{val.org_v4id}-{val.login}"
         return None
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Org Name", "Org Slug", "2FA Required", "v4id", "v3id"]
+        return ["Org Name", "Org Slug", "2FA Required", "org_v4id", "org_v3id"]
 
     @classmethod
     def cvs_null(cls) -> List[Optional[str]]:
@@ -54,9 +56,12 @@ class OrgInfo:
             self.name or None,
             self.login or None,
             str(self.requires_two_factor_authentication) or None,
-            self.id_ or None,
-            self.database_id or None,
+            self.org_v4id or None,
+            self.org_v3id or None,
         ]
+
+    def as_dict(self):
+        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
 
 def create_operation(owner):
@@ -93,8 +98,8 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
             name="",
             login=org,
             requires_two_factor_authentication=False,
-            id_=None,
-            database_id=None,
+            org_v4id=None,
+            org_v3id=None,
         )
 
     orgdata = (op + d).organization
@@ -110,8 +115,8 @@ def extract_org_data(orgdata) -> OrgInfo:
         name=orgdata.name,
         login=orgdata.login,
         requires_two_factor_authentication=orgdata.requires_two_factor_authentication,
-        id_=orgdata.id,
-        database_id=orgdata.database_id,
+        org_v4id=orgdata.id,
+        org_v3id=orgdata.database_id,
     )
     return org_data
 
@@ -140,11 +145,19 @@ def parse_args():
     ap.add_argument(
         "--verbose", "-v", help="Increase verbosity", action="count", default=0
     )
-    # Default to no headers for common automation case of generating for
-    # AWS Athena
     ap.add_argument(
-        "--headers", help="Add column headers to csv output", action="store_true"
+        "--no-csv",
+        help="Do not output to CSV (default True if called via cli).",
+        action="store_true",
     )
+    ap.add_argument("--no-json", help="Do not output JSON.", action="store_true")
+    ap.add_argument(
+        "--json",
+        help="JSON output file name (default 'org.json')",
+        type=argparse.FileType("w"),
+        default=sys.stdout,
+    )
+
     ap.add_argument(
         "orgs", nargs="*", help='Organization slug name, such as "mozilla".'
     )
@@ -205,14 +218,8 @@ def _orgs_to_check() -> Set[str]:
                 """,
         *in_files,
     ]
-
     # python 3.6 doesn't support capture_output
     status = subprocess.run(cmd, capture_output=True)  # nosec
-    ## ##    # fmt: off
-    ## ##    status = subprocess.run(  # nosec
-    ## ##        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
-    ## ##    )
-    ## ##    # fmt:on
     assert not status.stderr.decode("utf-8")
     # return as array of non-empty, unquoted, "lines"
     return {
@@ -273,7 +280,7 @@ def get_connection(base_url: str, token: Optional[str]) -> Any:
     return endpoint
 
 
-def main() -> int:
+def main() -> None:
     # hack to support doctests
     if "pytest" in sys.modules:
         return
@@ -283,10 +290,14 @@ def main() -> int:
     else:
         csv_out = csv.writer(sys.stdout)
     endpoint = get_connection(args.graphql_endpoint, args.token)
-    if args.headers:
+    if not args.no_csv:
         csv_out.writerow(OrgInfo.csv_header())
-    for row in get_all_org_data(endpoint, args.orgs):
-        csv_output(row, csv_writer=csv_out)
+        for row in get_all_org_data(endpoint, args.orgs):
+            csv_output(row, csv_writer=csv_out)
+    if not args.no_json:
+        with args.json as jf:
+            for row in get_all_org_data(endpoint, args.orgs):
+                jf.write(f"{json.dumps(row.as_dict())}\n")
 
     ## csv_out.writerow(OrgInfo.csv_header())
     ## for org in args.orgs:
