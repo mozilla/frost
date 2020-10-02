@@ -6,6 +6,8 @@
 protection guideline compliance."""
 # TODO add doctests
 
+import pathlib
+import subprocess  # nosec
 from functools import lru_cache
 import csv
 from github import branches
@@ -391,6 +393,7 @@ def parse_args():
         action="store_true",
     )
     ap.add_argument("--no-json", help="Do not output JSON.", action="store_true")
+    ap.add_argument("--prod", help="run against prod repo set", action="store_true")
     ap.add_argument(
         "--json",
         help="JSON output file name (default 'org.json')",
@@ -398,7 +401,7 @@ def parse_args():
         default=sys.stdout,
     )
     ap.add_argument(
-        "repo", nargs="+", help='Repository full name, such as "login/repo".'
+        "repo", nargs="*", help='Repository full name, such as "login/repo".'
     )
 
     args = ap.parse_args()
@@ -412,11 +415,13 @@ def parse_args():
     HTTPEndpoint.logger.setLevel(endpoint_loglevel)
 
     if not args.token:
-        raise SystemExit(
+        ap.error(
             "token must be provided. You may create an "
             "app or personal token at "
             "https://github.com/settings/tokens"
         )
+    if not args.prod and (len(args.repo) == 0):
+        ap.error("Must supply 'repo' or set '--prod'")
     return args
 
 
@@ -466,12 +471,72 @@ def get_connection(base_url: str, token: str) -> Any:
     return endpoint
 
 
+def _in_offline_mode() -> bool:
+    is_offline = False
+    try:
+        # if we're running under pytest, we need to fetch the value from
+        # the current configuration
+        import conftest
+
+        is_offline = conftest.get_client("github_client").is_offline()
+    except ImportError:
+        pass
+
+    return is_offline
+
+
+def _repos_to_check() -> List[str]:
+    # just shell out for now
+    # TODO: fix ickiness
+    #   While there is no network operation done here, we don't want to go
+    #   poking around the file system if we're in "--offline" mode
+    #   (e.g. doctest mode)
+    if _in_offline_mode():
+        return []
+
+    # real work
+    path_to_metadata = os.environ["PATH_TO_METADATA"]
+    meta_dir = pathlib.Path(os.path.expanduser(path_to_metadata)).resolve()
+    in_files = list(meta_dir.glob("*.json"))
+
+    cmd = [
+        "jq",
+        "-rc",
+        """.codeRepositories[]
+                | select(.status == "active")
+                | .url as $url
+                | .branchesToProtect[] // ""
+                | [$url, . ]
+                | @csv
+                """,
+        *in_files,
+    ]
+
+    status = subprocess.run(cmd, capture_output=True)  # nosec
+    owner_repo = []
+    for line in [
+        x.translate({ord('"'): None, ord("'"): None})
+        for x in status.stdout.decode("utf-8").split("\n")
+        if x
+    ]:
+        if "," in line:
+            url, branch = line.split(",")
+        else:
+            url, branch = line, None
+        owner, repo = url.split("/")[3:5]
+        owner_repo.append(f"{owner}/{repo}")
+
+    return owner_repo
+
+
 def main() -> int:
     # hack to support doctests
     if "pytest" in sys.modules:
         return
     args = parse_args()
     endpoint = get_connection(args.graphql_endpoint, args.token)
+    if args.prod:
+        args.repo = _repos_to_check()
     if not args.no_csv:
         if args.output:
             csv_out = csv.writer(open(args.output, "w"))

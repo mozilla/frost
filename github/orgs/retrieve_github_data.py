@@ -157,6 +157,7 @@ def parse_args():
         type=argparse.FileType("w"),
         default=sys.stdout,
     )
+    ap.add_argument("--prod", help="run against prod org set", action="store_true")
 
     ap.add_argument(
         "orgs", nargs="*", help='Organization slug name, such as "mozilla".'
@@ -173,11 +174,13 @@ def parse_args():
     HTTPEndpoint.logger.setLevel(endpoint_loglevel)
 
     if not args.token:
-        raise SystemExit(
+        ap.error(
             "token must be provided. You may create an "
             "app or personal token at "
             "https://github.com/settings/tokens"
         )
+    if not args.prod and (len(args.orgs) == 0):
+        ap.error("Must supply 'repo' or set '--prod'")
     return args
 
 
