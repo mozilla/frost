@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requires = [
-    line.split("==")[0] for line in open("requirements.txt", "r") if ".git" not in line
+    line for line in open("requirements.txt", "r") if ".git" not in line
 ]
 
 setuptools.setup(
