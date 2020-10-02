@@ -398,7 +398,7 @@ def parse_args():
         "--json",
         help="JSON output file name (default 'org.json')",
         type=argparse.FileType("w"),
-        default=sys.stdout,
+        ## ##        default=sys.stdout,
     )
     ap.add_argument(
         "repo", nargs="*", help='Repository full name, such as "login/repo".'
