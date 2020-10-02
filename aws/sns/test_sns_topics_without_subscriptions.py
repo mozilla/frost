@@ -5,10 +5,9 @@ from aws.sns.resources import sns_subscriptions_by_topic
 
 @pytest.mark.sns
 @pytest.mark.parametrize(
-    #"subscriptions",
     "topic",
     sns_subscriptions_by_topic(),
     ids=lambda topic: get_param_id(topic, "TopicArn"),
 )
-def test_sns_topics_without_subscriptions(subscriptions):
-    assert len(subscriptions) > 0
+def test_sns_topics_without_subscriptions(topic):
+    assert len(topic["Subscriptions"]) > 0

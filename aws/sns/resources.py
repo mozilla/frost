@@ -38,7 +38,7 @@ def sns_subscription_attributes():
 def sns_subscriptions_by_topic():
     "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
     return [
-        botocore_client.get(
+        {**{"Subscriptions": botocore_client.get(
             service_name="sns",
             method_name="list_subscriptions_by_topic",
             call_args=[],
@@ -47,6 +47,6 @@ def sns_subscriptions_by_topic():
             regions=[topic["__pytest_meta"]["region"]],
         )
         .extract_key("Subscriptions")
-        .values()[0]
+        .values()[0]}, **topic}
         for topic in sns_topics()
     ]
