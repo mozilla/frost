@@ -396,9 +396,9 @@ def parse_args():
     ap.add_argument("--prod", help="run against prod repo set", action="store_true")
     ap.add_argument(
         "--json",
-        help="JSON output file name (default 'org.json')",
+        help="JSON output file name",
         type=argparse.FileType("w"),
-        ## ##        default=sys.stdout,
+        default=sys.stdout,
     )
     ap.add_argument(
         "repo", nargs="*", help='Repository full name, such as "login/repo".'

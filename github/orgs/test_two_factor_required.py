@@ -47,5 +47,4 @@ def test_require_2fa(
     # info = get_org_info(gql_connection, f"{org_to_check}")
     if org_info:
         met, message = validate_compliance.validate_org_info(org_info, criteria)
-        print(f"authed as {get_viewer(gql_connection)}")
         assert met, message

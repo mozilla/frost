@@ -76,8 +76,3 @@ def _report_download_errors(errors):
         if e:
             extra = " %s" % _compact_fmt(e)
         logger.error("Error #%d: %s%s", i + 1, msg, extra)
-
-
-if __name__ == "__main__":
-    if os.environ.get("DEBUG"):
-        print(repos_to_check())

@@ -68,8 +68,3 @@ def get_branch_info(gql_connection, repo_full_name: str) -> str:
         gql_connection, repo_full_name
     )
     return repo_info
-
-
-if __name__ == "__main__":
-    if os.environ.get("DEBUG"):
-        print(repos_to_check())
