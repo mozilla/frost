@@ -3,6 +3,7 @@ from helpers import get_param_id
 
 from aws.sns.resources import sns_subscriptions_by_topic
 
+
 @pytest.mark.sns
 @pytest.mark.rationale(
     """
