@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "frost"
+version = "0.4.0"
+description = "tests for checking that third party services the Firefox Operations Security or foxsec team uses are configured correctly"
+authors = ["Firefox Operations Security Team (foxsec)"]
+license = "MPL-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+botocore = "1.12.75"
+click = "7.1.2"
+google-api-python-client = "1.12.3"
+oauth2client = "4.1.3"
+pytest-json = "0.4.0"
+pytest-metadata = "1.10.0"
+pytest = "6.0.2"
+python-dateutil = "2.7.5"
+"ruamel.yaml" = "0.15.85"
+
+[tool.poetry.dev-dependencies]
+coverage = "4.5.3"
+pre-commit = "1.17.0"
+pytest-cov = "2.10.0"
+wheel = "0.33.1"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
