@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/frost.svg)](https://badge.fury.io/py/frost)
 
-![frost snowman logo](docs/_static/frost-snowman-logo.png)
+![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
 
 HTTP clients and a wrapper around
 [pytest](https://docs.pytest.org/en/latest/index.html) tests to verify
