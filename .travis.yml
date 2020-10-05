@@ -9,6 +9,8 @@ install:
 script:
   - make black check_conftest_imports doctest coverage doc-build
 
+# Deploy the documentation to the `gh-pages` branch using the Github Pages
+# provider: https://docs.travis-ci.com/user/deployment/pages/
 deploy:
   provider: pages
   skip_cleanup: true

@@ -66,7 +66,7 @@ install: venv
 	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt && python setup.py develop && pre-commit install )
 
 install-docs: venv
-	( . venv/bin/activate && pip install -r docs-requirements.txt )
+	( . venv/bin/activate && pip install -r docs/requirements.txt )
 
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
