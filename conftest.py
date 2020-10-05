@@ -115,7 +115,9 @@ def pytest_configure(config):
     gcp_client = GCPClient(
         project_id=project_id,
         folder_id=folder_id,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
+        debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
     )
 
