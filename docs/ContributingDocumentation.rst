@@ -38,4 +38,4 @@ Commit::
    git add .
    git push -m 'Adding new documentation section on video toasters'
 
-File a `PR <https://github.com/mozilla/frost/compare>`_ and request a review from a `code owner <https://github.com/mozilla/frost/graphs/contributors>`_.
+File a `PR <https://github.com/mozilla/frost/pulls>`_ and request a review from a `code owner <https://github.com/mozilla/frost/graphs/contributors>`_.
