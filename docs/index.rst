@@ -16,6 +16,7 @@ Welcome to Frost's documentation!
    CodingConventions.rst
    MozillaDeployment.rst
    NewServices.rst
+   ContributingDocumentation.rst
 
 
 Indices and tables
