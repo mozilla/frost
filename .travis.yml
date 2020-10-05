@@ -8,3 +8,10 @@ install:
 
 script:
   - make black check_conftest_imports doctest coverage
+
+deploy:
+  provider: pypi
+  on:
+    tags: true
+  distributions: sdist bdist_wheel
+  edge: true # opt in to dpl v2 https://docs.travis-ci.com/user/deployment-v2/providers/pypi/
