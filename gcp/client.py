@@ -8,6 +8,15 @@ warnings.filterwarnings(
 )
 
 
+def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
+    return (
+        ":".join(
+            ["pytest_gcp", project_id, version, product, subproduct, call, id_value]
+        )
+        + ".json"
+    )
+
+
 def get_all_projects_in_folder(folder_id=None):
     if folder_id is None:
         return
@@ -49,8 +58,10 @@ def get_all_folders_in_folder(crm, folder_id=None):
 
 
 class GCPClient:
-    def __init__(self, project_id, folder_id, debug_calls, offline):
+    def __init__(self, project_id, folder_id, cache, debug_calls, debug_cache, offline):
+        self.cache = cache
         self.debug_calls = debug_calls
+        self.debug_cache = debug_cache
         self.offline = offline
 
         self.project_list = []
@@ -135,6 +146,12 @@ class GCPClient:
         version="v1",
         call_kwargs=None,
     ):
+        ckey = cache_key(project_id, version, product, subproduct, "get", id_value)
+        cached_result = self.cache.get(ckey, None)
+        if cached_result is not None:
+            print("found cached value for", ckey)
+            return cached_result
+
         if call_kwargs is None:
             call_kwargs = {}
         call_kwargs["projectId"] = project_id
@@ -155,6 +172,11 @@ class GCPClient:
             raise e
 
         result["projectId"] = project_id
+
+        if self.debug_cache:
+            print("setting cache value for", ckey)
+
+        self.cache.set(ckey, result)
 
         return result
 
@@ -193,6 +215,18 @@ class GCPClient:
         project_id = "-"
         if "project" in call_kwargs:
             project_id = call_kwargs["project"]
+        if "projectId" in call_kwargs:
+            project_id = call_kwargs["projectId"]
+
+        call_id = project_id
+        if call_kwargs is not None:
+            call_id = "-".join(sum([x for x in call_kwargs.items()], ()))
+
+        ckey = cache_key(call_id, version, product, subproduct)
+        cached_result = self.cache.get(ckey, None)
+        if cached_result is not None:
+            print("found cached value for", ckey)
+            return cached_result
 
         service = self._service(product, version)
 
@@ -218,7 +252,14 @@ class GCPClient:
             results = self._list_all_items(api_entity, call_kwargs, results_key)
 
         # Append the project id to each resource for use in test metadata
-        return [{"projectId": project_id, **result} for result in results]
+        results = [{"projectId": project_id, **result} for result in results]
+
+        if self.debug_cache:
+            print("setting cache value for", ckey)
+
+        self.cache.set(ckey, results)
+
+        return results
 
     def _list_all_items(self, api_entity, call_kwargs, results_key):
         """Internal helper for dealing with pagination"""
