@@ -9,6 +9,7 @@ import csv
 import logging
 import os
 from dataclasses import dataclass
+from datetime import date
 import json
 from pathlib import Path
 import subprocess  # nosec
@@ -24,6 +25,8 @@ DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 
 logger = logging.getLogger(__name__)
 
+# Todo figure out how to avoid global
+_collection_date: str = "1970-01-01"
 
 # Collect and return information about organization protections
 @dataclass
@@ -45,14 +48,16 @@ class OrgInfo:
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Org Name", "Org Slug", "2FA Required", "org_v4id", "org_v3id"]
+        return ["Date", "Org Name", "Org Slug", "2FA Required", "org_v4id", "org_v3id"]
 
     @classmethod
     def cvs_null(cls) -> List[Optional[str]]:
         return [None, None, None, None, None]
 
     def csv_row(self) -> List[Optional[str]]:
+        global _collection_date
         return [
+            _collection_date,
             self.name or None,
             self.login or None,
             str(self.requires_two_factor_authentication) or None,
@@ -61,7 +66,10 @@ class OrgInfo:
         ]
 
     def as_dict(self):
-        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+        global _collection_date
+        d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+        d["date"] = _collection_date
+        return d
 
 
 def create_operation(owner):
@@ -280,6 +288,11 @@ def get_connection(base_url: str, token: Optional[str]) -> Any:
     # token and doctests are running, so token is None
     endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + (token or ""),})
     endpoint.report_download_errors = _report_download_errors
+
+    # determine which date we're collecting for
+    global _collection_date
+    assert _collection_date == "1970-01-01"
+    _collection_date = date.today().isoformat()
     return endpoint
 
 

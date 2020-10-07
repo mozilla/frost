@@ -8,6 +8,7 @@ protection guideline compliance."""
 
 import pathlib
 import subprocess  # nosec
+from datetime import date
 from functools import lru_cache
 import csv
 from github import branches
@@ -61,7 +62,7 @@ class BranchName:
         ]
 
     def flat_json(self) -> Generator:
-        yield self.as_dict()
+        yield {**self.as_dict()}
 
     def as_dict(self):
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
@@ -124,6 +125,10 @@ class BranchProtectionRule:
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
 
+# Todo figure out how to avoid global
+_collection_date: str = "1970-01-01"
+
+
 @dataclass
 class RepoBranchProtections:
     default_branch_ref: str
@@ -138,6 +143,7 @@ class RepoBranchProtections:
     @classmethod
     def csv_header(cls) -> List[str]:
         return [
+            "Date",
             "Login",
             "Repo",
             "repo_v4id",
@@ -147,7 +153,9 @@ class RepoBranchProtections:
         ] + BranchProtectionRule.csv_header()
 
     def csv_row(self) -> List[str]:
-        my_info = list(self.name_with_owner.split("/"))
+        global _collection_date
+        my_info = [_collection_date]
+        my_info.extend(self.name_with_owner.split("/"))
         my_info.extend(
             (self.repo_v4id, self.repo_v3id, self.default_branch_ref, self.owner_v4id)
         )
@@ -162,15 +170,18 @@ class RepoBranchProtections:
     def flat_json(self) -> Generator:
         exportable_dict = self.as_dict()
         del exportable_dict["protection_rules"]
+        assert self.__dict__["protection_rules"]
         for rule in self.protection_rules:
             for d in rule.flat_json():
-                copy = exportable_dict.copy()
-                copy.update(d)
+                copy = {**exportable_dict, **d}
                 assert len(copy) == len(exportable_dict) + len(d)
                 yield copy
 
     def as_dict(self):
-        return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+        global _collection_date
+        d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
+        d["date"] = _collection_date
+        return d
 
 
 def _add_protection_fields(node) -> None:
@@ -468,6 +479,11 @@ def _report_download_errors(errors):
 def get_connection(base_url: str, token: str) -> Any:
     endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + token,})
     endpoint.report_download_errors = _report_download_errors
+
+    # determine which date we're collecting for
+    global _collection_date
+    assert _collection_date == "1970-01-01"
+    _collection_date = date.today().isoformat()
     return endpoint
 
 
