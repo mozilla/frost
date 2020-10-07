@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adding a New Service &#8212; Frost  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -73,7 +73,8 @@ placing it into the PyTest cache. The client module typically exposes the data v
 “{service}_client” object. The PyTest framework will instantiate the client
 before any tests are run with all the configuration &amp; credential
 information provided by the configuration files and command line
-options. (See <a class="reference internal" href="Architecture.html#architecture"><span class="std std-ref">Architecture</span></a> for status of cache functionality.)</p>
+options. (See <a class="reference internal" href="Architecture.html#architecture"><span class="std std-ref">Architecture</span></a> for status of cache functionality.) (See
+<a class="reference internal" href="CodingConventions.html#offline"><span class="std std-ref">doctest offline support</span></a> for other requirements.)</p>
 <p><code class="docutils literal notranslate"><span class="pre">resources.py</span></code>: holds mapping functions which convert the data from
 the cache into the format expected by the tests. This should be the only
 file which imports the instantiation of the client. (Future best
@@ -158,7 +159,7 @@ need to test.</p>
       &copy;2020.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

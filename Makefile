@@ -38,8 +38,8 @@ clean-cache: check_venv
 clean-python:
 	find . -type d -name venv -prune -o -type d -name __pycache__ -print0 | xargs -0 rm -rf
 
-doc-build:
-	type sphinx-build || { echo "please install sphinx to build docs"; false; }
+doc-build: check_venv
+	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
 	make -C docs html
 
 doctest: check_venv
@@ -65,11 +65,11 @@ black: check_venv
 install: venv
 	( . venv/bin/activate && pip install -U pip && pip install -r requirements.txt && python setup.py develop && pre-commit install )
 
+install-docs: venv
+	( . venv/bin/activate && pip install -r docs/requirements.txt )
+
 setup_gsuite: check_venv
 	python -m bin.auth.setup_gsuite
-
-stage-docs: docs
-	git add --all --force docs/_build/html
 
 metatest:
 	frost test --aws-profiles example-account \
@@ -82,16 +82,22 @@ venv:
 build-image:
 	docker build -t localhost/frost:latest .
 
-.PHONY:
+.PHONY: \
 	all \
+	awsci \
+	black \
 	build-image \
-	check_venv \
 	check_conftest_imports \
+	check_venv \
 	clean \
 	clean-cache \
 	clean-python \
+	coverage \
 	doc-build \
+	doctest \
 	flake8 \
 	install \
-	stage-docs \
+	install-docs \
+	metatest \
+	setup_gsuite \
 	venv
