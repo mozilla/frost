@@ -1,6 +1,6 @@
 import pytest
 
-from aws.s3.helpers import get_s3_bucket_name
+from aws.s3.helpers import get_s3_bucket_name_only
 from aws.s3.resources import s3_buckets, s3_bucket_lifecycle_configuration
 
 
