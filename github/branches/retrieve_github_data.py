@@ -170,7 +170,6 @@ class RepoBranchProtections:
     def flat_json(self) -> Generator:
         exportable_dict = self.as_dict()
         del exportable_dict["protection_rules"]
-        assert self.__dict__["protection_rules"]
         for rule in self.protection_rules:
             for d in rule.flat_json():
                 copy = {**exportable_dict, **d}
