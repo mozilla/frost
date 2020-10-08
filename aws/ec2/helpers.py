@@ -1,4 +1,5 @@
 from helpers import get_param_id
+from datetime import datetime
 
 
 def ip_permission_opens_all_ports(ipp):
@@ -367,3 +368,30 @@ def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     tags = ec2_instance.get("Tags", [])
     instance_tag_names = set(tag["Key"] for tag in tags if "Key" in tag)
     return required_tag_names - instance_tag_names
+
+
+def ebs_volume_attached_to_instance(ebs, volume_created_days_ago=90):
+    """
+    Check an ebs volume is attached to an instance. The "volume_created_days_ago"
+    parameter allows checking for volumes that were created that many days ago.
+    
+    >>> from datetime import datetime
+    >>> from datetime import timezone
+
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2020-09-11T19:45:22.116+00:00"), "State": "in-use"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2000-09-11T19:45:22.116+00:00"), "State": "in-use"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.now(timezone.utc), "State": "available"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2000-09-11T19:45:22.116+00:00"), "State": "available"})
+    False
+    """
+    creation_time = ebs["CreateTime"]
+    now = datetime.now(tz=creation_time.tzinfo)
+
+    if (now - creation_time).days > volume_created_days_ago:
+        if ebs["State"] == "available":
+            return False
+
+    return True
