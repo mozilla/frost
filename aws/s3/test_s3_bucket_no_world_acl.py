@@ -1,6 +1,6 @@
 import pytest
 
-from aws.s3.helpers import get_s3_bucket_name
+from aws.s3.helpers import get_s3_bucket_name_only
 from aws.s3.resources import s3_buckets, s3_buckets_acls
 
 
@@ -16,7 +16,7 @@ AWS_PREDEFINED_GROUPS = [
 @pytest.mark.parametrize(
     ["s3_bucket", "s3_bucket_acl"],
     zip(s3_buckets(), s3_buckets_acls()),
-    ids=get_s3_bucket_name,
+    ids=get_s3_bucket_name_only,
 )
 def test_s3_bucket_no_world_acl(s3_bucket, s3_bucket_acl):
     """

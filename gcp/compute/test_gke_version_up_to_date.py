@@ -18,7 +18,7 @@ def server_config():
 def test_gke_version_up_to_date(cluster, server_config):
     """
     Tests if GKE version is up to date by comparing the
-    list of valid master and node versions to what is
+    list of valid master versions to what is
     currently running on the cluster.
     """
     assert (
