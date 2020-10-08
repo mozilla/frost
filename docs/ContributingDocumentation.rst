@@ -25,8 +25,8 @@ Build docs and read over changes
 
 build::
 
-   pip install sphinx
    pwd # Should be the docs directory.
+   pip install -r requirements.txt
    make html
 
 Read over your changes using your `favorite web browser <https://getfirefox.com>`_ by going to a `file:// URL <https://en.wikipedia.org/wiki/File_URI_scheme>`_ for the **index.html** file.
