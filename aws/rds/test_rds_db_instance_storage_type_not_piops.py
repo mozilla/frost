@@ -12,6 +12,6 @@ def test_rds_db_instance_storage_type_not_piops(rds_db_instance):
     """PIOPs storage type is expensive. Cloudops recommends using gp2 type with
     a volume size that offers the same IOPs as the desired PIOPs type.
     """
-    assert (
-        not rds_db_instance["StorageType"].startswith("io")
+    assert not rds_db_instance["StorageType"].startswith(
+        "io"
     ), f"{rds_db_instance['DBInstanceIdentifier']} uses PIOPs storage type with IOPs of {rds_db_instance['Iops']}"
