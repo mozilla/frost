@@ -24,7 +24,7 @@ and after the main frost run. PyTest is always invoked with the ``--json``
 options supported by the frost extensions, and post processing steps are
 expected to use the JSON as input.
 
-*[The deployment is under revision. A rough "as is" doc may be found here__.]*
+[The deployment is under revision. A rough "as is" doc may be found `here`__.]
 
 __ https://docs.google.com/document/d/1ePUkJPcHEj9XxaVYr2TSABOxRjhDBKr2KSQ2EzgHJm4
 
@@ -36,4 +36,4 @@ that is easily consumable by our injestion engine: AWS Athena reading from S3.  
 such as CSV and un-nested JSON are easier to work with. To support that, our jobs typically post process the Frost JSON 
 into reasonable morsels for our metrics. Our conventions__ may be of interest.
 
-__ https://github.com/mozilla-services/foxsec-tools/raw/master/metrics/utils/Conventions.md
+__ https://github.com/mozilla-services/foxsec-tools/tree/master/metrics/utils/Conventions.md

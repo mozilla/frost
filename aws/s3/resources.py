@@ -114,3 +114,21 @@ def s3_buckets_policy():
         .values()[0]
         for bucket in s3_buckets()
     ]
+
+
+def s3_bucket_lifecycle_configuration():
+    "https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_bucket_lifecycle_configuration"
+    return [
+        botocore_client.get(
+            "s3",
+            "get_bucket_lifecycle_configuration",
+            [],
+            {"Bucket": bucket["Name"]},
+            profiles=[bucket["__pytest_meta"]["profile"]],
+            regions=[bucket["__pytest_meta"]["region"]],
+            result_from_error=lambda e, call: [],
+        )
+        .extract_key("Rules")
+        .values()
+        for bucket in s3_buckets()
+    ]
