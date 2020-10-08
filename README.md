@@ -1,8 +1,9 @@
 # Frost
 
 [![PyPI version](https://badge.fury.io/py/frost.svg)](https://badge.fury.io/py/frost)
+[![Documentation](https://img.shields.io/badge/Docs-gh--pages-yellowgreen.svg)](https://mozilla.github.com/frost/)
 
-![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
+![frost snowman logo](docs/frost-snowman-logo.png)
 
 HTTP clients and a wrapper around
 [pytest](https://docs.pytest.org/en/latest/index.html) tests to verify

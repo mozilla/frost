@@ -11,6 +11,7 @@ Welcome to Frost's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Overview <readme-include.md>
    FAQ.rst
    Architecture.rst
    CodingConventions.rst

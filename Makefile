@@ -42,6 +42,9 @@ doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
 	make -C docs html
 
+doc-preview: check_venv doc-build
+	python3 -m http.server --directory docs/_build/html/
+
 doctest: check_venv
 	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
 	 --doctest-modules -s --offline --debug-calls
