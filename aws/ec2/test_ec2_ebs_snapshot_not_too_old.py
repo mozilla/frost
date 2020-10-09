@@ -13,5 +13,6 @@ from aws.ec2.helpers import ebs_snapshot_not_too_old
     ids=lambda ebs: get_param_id(ebs, "SnapshotId"),
 )
 def test_ec2_ebs_snapshot_not_too_old(ec2_ebs_snapshot):
-    assert ebs_snapshot_not_too_old(ec2_ebs_snapshot
+    assert ebs_snapshot_not_too_old(
+        ec2_ebs_snapshot
     ), f"{ec2_ebs_snapshot['SnapshotId']} is started at {ec2_ebs_snapshot['StartTime']}, and is considered too old."
