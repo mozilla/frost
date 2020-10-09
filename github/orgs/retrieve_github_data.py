@@ -136,7 +136,7 @@ def csv_output(data, csv_writer) -> None:
 def parse_args():
     import argparse
 
-    ap = argparse.ArgumentParser(description="GitHub Agile Dashboard")
+    ap = argparse.ArgumentParser(description="GitHub Organization Dashboard")
 
     # Generic options to access the GraphQL API
     ap.add_argument(
@@ -155,7 +155,7 @@ def parse_args():
     )
     ap.add_argument(
         "--no-csv",
-        help="Do not output to CSV (default True if called via cli).",
+        help="Do not output to CSV (default False if called via cli).",
         action="store_true",
     )
     ap.add_argument("--no-json", help="Do not output JSON.", action="store_true")
@@ -165,7 +165,9 @@ def parse_args():
         type=argparse.FileType("w"),
         default=sys.stdout,
     )
-    ap.add_argument("--prod", help="run against prod org set", action="store_true")
+    meg = ap.add_mutually_exclusive_group()
+    meg.add_argument("--prod", help="run against prod org set", action="store_true")
+    meg.add_argument("--all", help="run against all orgs you own", action="store_true")
 
     ap.add_argument(
         "orgs", nargs="*", help='Organization slug name, such as "mozilla".'
@@ -187,8 +189,8 @@ def parse_args():
             "app or personal token at "
             "https://github.com/settings/tokens"
         )
-    if not args.prod and (len(args.orgs) == 0):
-        ap.error("Must supply 'repo' or set '--prod'")
+    if not (args.prod or args.all) and (len(args.orgs) == 0):
+        ap.error("Must supply 'repo' or set either '--prod' or '--all'")
     return args
 
 
@@ -240,14 +242,41 @@ def _orgs_to_check() -> Set[str]:
     }
 
 
-def get_all_org_data(endpoint: Any = None, orgs: List[str] = None) -> List[OrgInfo]:
+def _all_owned_orgs(endpoint: Any) -> List[str]:
+    """Return a list of all orgs for which this user has owner permissions."""
+
+    op = Operation(schema.Query)
+
+    me = op.viewer()
+    me.login()
+    org = me.organizations(first=100).nodes()
+    org.login()
+    org.viewer_can_administer()
+    d = endpoint(op)
+    errors = d.get("errors")
+    if errors:
+        endpoint.report_download_errors(errors)
+        raise StopIteration
+    else:
+        for x in (op + d).viewer.organizations.nodes:
+            if x.viewer_can_administer:
+                yield x.login
+
+
+def get_all_org_data(
+    endpoint: Any = None, orgs: List[str] = None, all_permitted: bool = False
+) -> List[OrgInfo]:
     """Generator of org data."""
     if not endpoint:
         # if we're creating the endpoint, then arguments must already be
         # in environment variables.
         endpoint = get_connection(DEFAULT_GRAPHQL_ENDPOINT, os.environ.get("GH_TOKEN"))
     if not orgs:
-        orgs = _orgs_to_check()
+        if all_permitted:
+            orgs = _all_owned_orgs(endpoint)
+        else:
+            # Just get the ones we are configured to monitor
+            orgs = _orgs_to_check()
     for org in orgs:
         data = get_org_info(endpoint, org)
         yield data
@@ -308,11 +337,11 @@ def main() -> None:
     endpoint = get_connection(args.graphql_endpoint, args.token)
     if not args.no_csv:
         csv_out.writerow(OrgInfo.csv_header())
-        for row in get_all_org_data(endpoint, args.orgs):
+        for row in get_all_org_data(endpoint, args.orgs, args.all):
             csv_output(row, csv_writer=csv_out)
     if not args.no_json:
         with args.json as jf:
-            for row in get_all_org_data(endpoint, args.orgs):
+            for row in get_all_org_data(endpoint, args.orgs, args.all):
                 jf.write(f"{json.dumps(row.as_dict())}\n")
 
     ## csv_out.writerow(OrgInfo.csv_header())
