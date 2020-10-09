@@ -143,10 +143,21 @@ def get_db_security_group_arn(sg):
 
 
 def rds_db_snapshot_not_too_old(snapshot, snapshot_created_days_ago=365):
-     create_time = snapshot["SnapshotCreateTime"]
-     now = datetime.now(tz=create_time.tzinfo)
+    """
+    Check a rds snapshot is created "snapshot_created_days_ago".
 
-     if (now - create_time).days < snapshot_created_days_ago:
-         return True
-     else:
-         return False
+    >>> from datetime import datetime
+    >>> from datetime import timezone
+
+    >>> rds_db_snapshot_not_too_old({"SnapshotCreateTime": datetime.now(timezone.utc)})
+    True
+    >>> rds_db_snapshot_not_too_old({"SnapshotCreateTime": datetime.fromisoformat("2019-09-11T19:45:22.116+00:00")})
+    False
+    """
+    create_time = snapshot["SnapshotCreateTime"]
+    now = datetime.now(tz=create_time.tzinfo)
+
+    if (now - create_time).days < snapshot_created_days_ago:
+        return True
+    else:
+        return False
