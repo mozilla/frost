@@ -7,6 +7,8 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
+AUTOBUILD_OPTS ?= --open-browser --port=0 --delay 5
+
 all: check_venv
 	frost test
 
@@ -40,7 +42,11 @@ clean-python:
 
 doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
-	make -C docs html
+	make -C docs clean html
+
+doc-preview: check_venv
+	@#sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	sphinx-autobuild $(AUTOBUILD_OPTS) "docs/" "docs/_build/html/" $(SPHINXOPTS) $(O)
 
 doctest: check_venv
 	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
@@ -94,6 +100,7 @@ build-image:
 	clean-python \
 	coverage \
 	doc-build \
+	doc-preview \
 	doctest \
 	flake8 \
 	install \

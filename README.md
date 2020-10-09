@@ -1,8 +1,9 @@
 # Frost
 
 [![PyPI version](https://badge.fury.io/py/frost.svg)](https://badge.fury.io/py/frost)
+[![Documentation](https://img.shields.io/badge/Docs-gh--pages-yellowgreen.svg)](https://mozilla.github.com/frost/)
 
-![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
+![frost snowman logo](docs/frost-snowman-logo.png)
 
 HTTP clients and a wrapper around
 [pytest](https://docs.pytest.org/en/latest/index.html) tests to verify
@@ -523,14 +524,14 @@ attached. This obviously has a high chance of false negatives.
 ### Design
 
 Currently this is a monolithic pytest package, but should eventually
-[be extracted into a pytest plugin](#3) and with [separate dependent
-pytest plugins for each service](#4).
+[be extracted into a pytest plugin](https://github.com/mozilla/frost/issues/3) and with [separate dependent
+pytest plugins for each service](https://github.com/mozilla/frost/issues/4).
 
 API responses should fit on disk and in memory (i.e. don't use this
 for log processing or checking binaries for malware), and be safe to
 cache for minutes, hours, or days (i.e. probably don't use this for
 monitoring a streaming API) (NB: [bug for specifying data
-freshness](#5)).
+freshness](https://github.com/mozilla/frost/issues/5)).
 
 Additionally we want:
 
