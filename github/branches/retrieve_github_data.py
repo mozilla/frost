@@ -143,7 +143,7 @@ class RepoBranchProtections:
     @classmethod
     def csv_header(cls) -> List[str]:
         return [
-            "Date",
+            "day",
             "Login",
             "Repo",
             "repo_v4id",
@@ -179,7 +179,7 @@ class RepoBranchProtections:
     def as_dict(self):
         global _collection_date
         d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
-        d["date"] = _collection_date
+        d["day"] = _collection_date
         return d
 
 

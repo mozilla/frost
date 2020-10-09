@@ -48,7 +48,7 @@ class OrgInfo:
 
     @classmethod
     def csv_header(cls) -> List[str]:
-        return ["Date", "Org Name", "Org Slug", "2FA Required", "org_v4id", "org_v3id"]
+        return ["day", "Org Name", "Org Slug", "2FA Required", "org_v4id", "org_v3id"]
 
     @classmethod
     def cvs_null(cls) -> List[Optional[str]]:
@@ -68,7 +68,7 @@ class OrgInfo:
     def as_dict(self):
         global _collection_date
         d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
-        d["date"] = _collection_date
+        d["day"] = _collection_date
         return d
 
 
