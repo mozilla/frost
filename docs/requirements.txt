@@ -1,2 +1,3 @@
-sphinx==3.2.1
 myst_parser==0.12.10
+sphinx-autobuild==2020.9.1
+sphinx==3.2.1

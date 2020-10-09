@@ -10,5 +10,4 @@ pytest-metadata==1.10.0
 pytest==6.0.2
 python-dateutil==2.7.5
 ruamel.yaml==0.15.85
-sphinx-autobuild==2020.9.1
 wheel==0.33.1

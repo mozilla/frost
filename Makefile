@@ -7,7 +7,7 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
-AUTOBUILD_OPTS ?= --open-browser --port=0
+AUTOBUILD_OPTS ?= --open-browser --port=0 --delay 5
 
 all: check_venv
 	frost test
@@ -42,7 +42,7 @@ clean-python:
 
 doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
-	make -C docs html
+	make -C docs clean html
 
 doc-preview: check_venv
 	@#sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
