@@ -1,3 +1,4 @@
+from datetime import datetime
 from helpers import get_param_id
 
 
@@ -139,3 +140,13 @@ def get_db_snapshot_arn(snapshot):
 
 def get_db_security_group_arn(sg):
     return get_param_id(sg, "DBSecurityGroupArn")
+
+
+def rds_db_snapshot_not_too_old(snapshot, snapshot_created_days_ago=365):
+     create_time = snapshot["SnapshotCreateTime"]
+     now = datetime.now(tz=create_time.tzinfo)
+
+     if (now - create_time).days < snapshot_created_days_ago:
+         return True
+     else:
+         return False
