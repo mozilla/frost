@@ -404,7 +404,7 @@ def ebs_snapshot_not_too_old(snapshot, snapshot_started_days_ago=365):
     >>> from datetime import datetime
     >>> from datetime import timezone
     >>> from aws.ec2.helpers import ebs_snapshot_not_too_old
-    >>> ebs_snapshot_not_too_old({"StartTime": datetime.fromisoformat("2020-09-11T19:45:22.116+00:00")})
+    >>> ebs_snapshot_not_too_old({"StartTime": datetime.now(timezone.utc)})
     True
     >>> ebs_snapshot_not_too_old({"StartTime": datetime.fromisoformat("2019-09-11T19:45:22.116+00:00")})
     False
