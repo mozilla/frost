@@ -10,9 +10,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(".."))
 
 
 # -- Project information -----------------------------------------------------
@@ -29,8 +30,22 @@ author = "Firefox Operations Security team"
 # ones.
 extensions = [
     "sphinx.ext.githubpages",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
     "myst_parser",
 ]
+
+# autodoc extension config
+# from https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+# autodoc_mock_imports = ["pytest", "_pytest", "py"]
+##autodoc_default_options = {
+##    ##'members': 'var1, var2',
+##    ##'member-order': 'bysource',
+##    ##'special-members': '__init__',
+##    ##'undoc-members': True,
+##    ##'exclude-members': '__weakref__'
+##}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

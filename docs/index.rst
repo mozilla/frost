@@ -11,6 +11,10 @@ Welcome to Frost's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Source frost <source/frost/modules.rst>
+   Source aws (no tests) <source/aws/modules.rst>
+   Source gcp (tests) <source/gcp/modules.rst>
+
    Overview <readme-include.md>
    FAQ.rst
    Architecture.rst
