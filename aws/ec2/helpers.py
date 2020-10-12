@@ -395,3 +395,24 @@ def ebs_volume_attached_to_instance(ebs, volume_created_days_ago=90):
             return False
 
     return True
+
+
+def ebs_snapshot_not_too_old(snapshot, snapshot_started_days_ago=365):
+    """
+    Check an ebs snapshot is created less than "snapshot_started_days_ago".
+
+    >>> from datetime import datetime
+    >>> from datetime import timezone
+    >>> from aws.ec2.helpers import ebs_snapshot_not_too_old
+    >>> ebs_snapshot_not_too_old({"StartTime": datetime.now(timezone.utc)})
+    True
+    >>> ebs_snapshot_not_too_old({"StartTime": datetime.fromisoformat("2019-09-11T19:45:22.116+00:00")})
+    False
+    """
+    start_time = snapshot["StartTime"]
+    now = datetime.now(tz=start_time.tzinfo)
+
+    if (now - start_time).days < snapshot_started_days_ago:
+        return True
+    else:
+        return False
