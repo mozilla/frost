@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from aws.s3.helpers import get_s3_bucket_name_only
 from aws.s3.resources import s3_buckets, s3_buckets_policy
 
 
@@ -12,7 +13,7 @@ STAR_ACTIONS = ["*", "s3:*", "s3:delete*", "s3:put*", "s3:get*", "s3:list*"]
 @pytest.mark.parametrize(
     ["s3_bucket", "s3_bucket_policy"],
     zip(s3_buckets(), s3_buckets_policy()),
-    ids=lambda bucket: bucket["Name"],
+    ids=get_s3_bucket_name_only,
 )
 def test_s3_bucket_does_not_grant_all_principals_all_actions(
     s3_bucket, s3_bucket_policy

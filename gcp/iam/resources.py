@@ -2,12 +2,15 @@ from conftest import gcp_client
 
 
 def service_accounts():
-    return gcp_client.list(
-        "iam",
-        "projects.serviceAccounts",
-        results_key="accounts",
-        call_kwargs={"name": "projects/" + gcp_client.get_project_id()},
-    )
+    results = []
+    for project_id in gcp_client.project_list:
+        results += gcp_client.list(
+            "iam",
+            "projects.serviceAccounts",
+            results_key="accounts",
+            call_kwargs={"name": "projects/" + project_id},
+        )
+    return results
 
 
 def service_account_keys(service_account):
@@ -20,10 +23,17 @@ def service_account_keys(service_account):
 
 
 def all_service_account_keys():
+    keys = []
     for sa in service_accounts():
-        yield from service_account_keys(sa)
+        for key in service_account_keys(sa):
+            keys.append(key)
+    return key
 
 
 def project_iam_bindings():
-    policy = gcp_client.get_project_iam_policy()
-    yield from policy.get("bindings", [])
+    bindings = []
+    policies = gcp_client.get_project_iam_policy()
+    for policy in policies:
+        for binding in policy.get("bindings", []):
+            bindings.append(binding)
+    return bindings

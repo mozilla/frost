@@ -32,8 +32,7 @@ def get_session(profile=None):
 
 @functools.lru_cache
 def get_client(profile, region, service):
-    """Returns a new or cached botocore service client for the AWS profile,
-    region, and service.
+    """Returns a new or cached botocore service client for the AWS profile, region, and service.
 
     Warns when a service is not available for a region, which means we
     need to update botocore or skip that call for that region.
@@ -62,10 +61,7 @@ def get_available_services(profile=None):
 
 
 def full_results(client, method, args, kwargs):
-    """Returns JSON results for an AWS botocore call.
-
-    Flattens paginated results (if any).
-    """
+    """Returns JSON results for an AWS botocore call. Flattens paginated results (if any)."""
     if client.can_paginate(method):
         paginator = client.get_paginator(method)
         return paginator.paginate(*args, **kwargs).build_full_result()
@@ -117,8 +113,9 @@ def get_aws_resource(
     debug_calls=False,
     debug_cache=False,
 ):
-    """Fetches and yields AWS API JSON responses for all profiles and regions
-    (list params)"""
+    """
+    Fetches and yields AWS API JSON responses for all profiles and regions (list params)
+    """
     for profile, region in itertools.product(profiles, regions):
         call = default_call._replace(
             profile=profile,
@@ -164,7 +161,7 @@ def get_aws_resource(
 
 
 class BotocoreClient:
-    def __init__(self, profiles, cache, debug_calls, debug_cache, offline):
+    def __init__(self, profiles, regions, cache, debug_calls, debug_cache, offline):
         self.profiles = profiles or [None]
         self.cache = cache
 
@@ -174,6 +171,8 @@ class BotocoreClient:
 
         if offline:
             self.regions = ["us-east-1"]
+        elif regions:
+            self.regions = regions
         else:
             self.regions = get_available_regions()
 
@@ -225,7 +224,7 @@ class BotocoreClient:
         return self
 
     def values(self):
-        """Returns the wrapped value.
+        """Returns the wrapped value
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = []
@@ -235,8 +234,9 @@ class BotocoreClient:
         return self.results
 
     def extract_key(self, key, default=None):
-        """From an iterable of dicts returns the value with the given keys
-        discarding other values:
+        """
+        From an iterable of dicts returns the value with the given
+        keys discarding other values:
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [{'id': 1}, {'id': 2}]
@@ -299,7 +299,8 @@ class BotocoreClient:
         return self
 
     def flatten(self):
-        """Flattens one level of a nested list:
+        """
+        Flattens one level of a nested list:
 
         >>> c = BotocoreClient([None], None, None, None, offline=True)
         >>> c.results = [['A', 1], ['B']]

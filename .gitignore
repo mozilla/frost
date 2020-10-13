@@ -1,5 +1,11 @@
+# Frost specific files
+.all_python_files.tmp
+
 # IDE files
 .vscode/
+
+# lots of caches fit this pattern (pytest, mypy, ...)
+*cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

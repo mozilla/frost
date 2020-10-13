@@ -14,11 +14,13 @@ from github.client import GitHubClient
 
 import custom_config
 
+collect_ignore_glob = ["*.py"]
 
 botocore_client = None
 gcp_client = None
 gsuite_client = None
 github_client = None
+custom_config_global = None
 
 # globals in conftest.py are hard to import from several levels down, so provide access function
 def get_client(client_name: str) -> Any:
@@ -30,45 +32,56 @@ def get_client(client_name: str) -> Any:
 
 
 def pytest_addoption(parser):
-    parser.addoption(
+    frost_parser = parser.getgroup("Frost", "Frost's custom arguments")
+    frost_parser.addoption(
         "--aws-profiles",
         nargs="*",
         help="Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].",
     )
 
-    parser.addoption(
-        "--gcp-project-id",
+    frost_parser.addoption(
+        "--aws-regions",
         type=str,
-        help="Set GCP project to test. Required for GCP tests.",
+        help="Set AWS regions to use as a comma separate list. Defaults to all available AWS regions",
+    )
+
+    frost_parser.addoption(
+        "--gcp-project-id", type=str, help="Set GCP project to test.",
+    )
+
+    frost_parser.addoption(
+        "--gcp-folder-id",
+        type=str,
+        help="Set GCP folder to test. Will test all projects under this folder.",
     )
 
     # While only used for Heroku at the moment, GitHub tests are soon to be
     # added, which will also need an "organization" option. Current plan is to
     # reuse this one.
-    parser.addoption(
+    frost_parser.addoption(
         "--organization",
         type=str,
         help="Set organization to test. Used for Heroku tests.",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--debug-calls", action="store_true", help="Log API calls. Requires -s"
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--debug-cache",
         action="store_true",
         help="Log whether API calls hit the cache. Requires -s",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--offline",
         action="store_true",
         default=False,
         help="Instruct service clients to return empty lists and not make HTTP requests.",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--config", type=argparse.FileType("r"), help="Path to the config file."
     )
 
@@ -77,18 +90,34 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
-    global github_client
+    global custom_config_global
 
-    # monkeypatch cache.set to serialize datetime.datetime's
-    patch_cache_set(config)
+    # run with -p 'no:cacheprovider'
+    cache = config.cache if hasattr(config, "cache") else None
+    if cache:
+        # monkeypatch cache.set to serialize datetime.datetime's
+        patch_cache_set(config)
 
     profiles = config.getoption("--aws-profiles")
+    aws_regions = (
+        config.getoption("--aws-regions").split(",")
+        if config.getoption("--aws-regions")
+        else []
+    )
+
     project_id = config.getoption("--gcp-project-id")
+    folder_id = config.getoption("--gcp-folder-id")
+    if project_id is not None and folder_id is not None:
+        raise Exception(
+            "--gcp-project-id and --gcp-folder-id are mutually exclusive arguments"
+        )
+
     organization = config.getoption("--organization")
 
     botocore_client = BotocoreClient(
         profiles=profiles,
-        cache=config.cache,
+        regions=aws_regions,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -96,7 +125,8 @@ def pytest_configure(config):
 
     gcp_client = GCPClient(
         project_id=project_id,
-        cache=config.cache,
+        folder_id=folder_id,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -107,7 +137,8 @@ def pytest_configure(config):
         offline=config.getoption("--offline"),
     )
 
-    config.custom_config = custom_config.CustomConfig(config.getoption("--config"))
+    custom_config_global = custom_config.CustomConfig(config.getoption("--config"))
+    config.custom_config = custom_config_global
 
     try:
         if any(x for x in config.args if "gsuite" in x):
@@ -119,6 +150,12 @@ def pytest_configure(config):
             gsuite_client = GsuiteClient(domain="", offline=True)
     except AttributeError as e:
         gsuite_client = GsuiteClient(domain="", offline=True)
+
+    # register custom marker for rationale (used in report)
+    config.addinivalue_line(
+        "markers",
+        "rationale(reason): (optional) rationale behind the test. (null if not set)",
+    )
 
 
 @pytest.fixture
@@ -153,13 +190,15 @@ METADATA_KEYS = [
     "VolumeId",
     "VpcId",
     "__pytest_meta",
-    "name",
     "displayName",
-    "projectId",
-    "uniqueId",
     "id",
+    "kind",
     "members",
+    "name",
+    "project",
+    "projectId",
     "role",
+    "uniqueId",
 ]
 
 
@@ -204,13 +243,6 @@ def get_metadata_from_funcargs(funcargs):
     return metadata
 
 
-def get_metadata(function_args):
-    metadata = get_metadata_from_funcargs(function_args)
-    if gcp_client.get_project_id() != "":
-        metadata["gcp_project_id"] = gcp_client.get_project_id()
-    return metadata
-
-
 def serialize_marker(marker):
     if isinstance(marker, (MarkDecorator, Mark)):
         args = ["...skipped..."] if marker.name == "parametrize" else marker.args
@@ -239,7 +271,8 @@ def get_outcome_and_reason(report, markers, call):
 
 
 def clean_docstring(docstr):
-    """Transforms a docstring into a properly formatted single line string.
+    """
+    Transforms a docstring into a properly formatted single line string.
 
     >>> clean_docstring("\\nfoo\\n    bar\\n")
     'foo bar'
@@ -258,7 +291,7 @@ def pytest_runtest_makereport(item, call):
 
     # only add this during call instead of during any stage
     if report.when == "call" and not isinstance(item, DoctestItem):
-        metadata = get_metadata(item.funcargs)
+        metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {n.name: serialize_marker(n) for n in get_node_markers(item)}
         severity = markers.get("severity", None) and markers.get("severity")["args"][0]
         regression = (

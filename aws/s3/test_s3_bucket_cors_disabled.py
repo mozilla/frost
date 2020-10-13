@@ -1,5 +1,6 @@
 import pytest
 
+from aws.s3.helpers import get_s3_bucket_name_only
 from aws.s3.resources import s3_buckets, s3_buckets_cors_rules
 
 
@@ -7,7 +8,7 @@ from aws.s3.resources import s3_buckets, s3_buckets_cors_rules
 @pytest.mark.parametrize(
     ["s3_bucket", "s3_bucket_cors_rules"],
     zip(s3_buckets(), s3_buckets_cors_rules()),
-    ids=lambda bucket: bucket["Name"],
+    ids=get_s3_bucket_name_only,
 )
 def test_s3_bucket_cors_disabled(s3_bucket, s3_bucket_cors_rules):
     """

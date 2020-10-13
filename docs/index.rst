@@ -11,11 +11,13 @@ Welcome to Frost's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Overview <readme-include.md>
    FAQ.rst
    Architecture.rst
    CodingConventions.rst
    MozillaDeployment.rst
    NewServices.rst
+   ContributingDocumentation.rst
 
 
 Indices and tables

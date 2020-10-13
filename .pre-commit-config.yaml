@@ -53,12 +53,6 @@ repos:
       - "B101"          # use of assert
       - --quiet
 
-- repo: https://github.com/myint/docformatter
-  rev: v1.3.1
-  hooks:
-    - id: docformatter
-      args: [--in-place]
-
 - repo: https://github.com/Yelp/detect-secrets
   rev: v0.14.2
   hooks:

@@ -1,5 +1,5 @@
-"""Transform results and metadata from a pytest report JSON output and writes
-Service JSON reports.
+"""
+Transform results and metadata from a pytest report JSON output and writes Service JSON reports.
 
 Pytest Service JSON format:
 
@@ -45,6 +45,7 @@ Pytest Service JSON format:
     ...
   ]
 }
+
 """
 
 import json

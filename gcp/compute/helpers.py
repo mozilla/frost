@@ -106,4 +106,8 @@ def does_firewall_open_any_ports_to_all(firewall):
 
 def firewall_id(firewall):
     """A getter fn for test ids for Firewalls"""
-    return "{}-{}".format(firewall["id"], firewall["name"])
+    return (
+        "{}-{}".format(firewall["id"], firewall["name"])
+        if hasattr(firewall, "__getitem__")
+        else None
+    )
