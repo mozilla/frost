@@ -8,12 +8,16 @@ Welcome to Frost's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Source Code Examples:
 
    Source frost <source/frost/modules.rst>
-   Source aws (no tests) <source/aws/modules.rst>
+   Source aws (attempted no tests, but that isn't working) <source/aws/modules.rst>
    Source gcp (tests) <source/gcp/modules.rst>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
    Overview <readme-include.md>
    FAQ.rst
