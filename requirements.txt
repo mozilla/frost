@@ -12,5 +12,3 @@ python-dateutil==2.7.5
 ruamel.yaml==0.15.85
 wheel==0.33.1
 sgqlc==11.0
-# install frost locally
--e .
