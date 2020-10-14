@@ -58,4 +58,4 @@ repos:
   hooks:
     - id: detect-secrets
       args: ['--baseline', '.secrets.baseline']
-      exclude: .*/tests/.*
+      exclude: ".*/tests/.*|docs/_build/html/.buildinfo"

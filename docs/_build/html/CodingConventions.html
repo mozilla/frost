@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Conventions &#8212; Frost  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,22 +17,22 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Mozilla Deployment" href="MozillaDeployment.html" />
     <link rel="prev" title="Architecture" href="Architecture.html" />
-   
+
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
+
+
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-  
+
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
+
 
           <div class="body" role="main">
-            
+
   <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at https://mozilla.org/MPL/2.0/. --><div class="section" id="conventions">
@@ -44,11 +44,20 @@ have <a class="reference external" href="https://docs.python.org/3.6/library/doc
 in <code class="docutils literal notranslate"><span class="pre">pytest.mark.parametrize</span></code> contain sufficient information for downstream
 processing.</p></li>
 </ul>
+<ul id="offline">
+<li><p>All data access routines should respect the <code class="docutils literal notranslate"><span class="pre">--offline</span></code> command line option
+that is a <code class="docutils literal notranslate"><span class="pre">frost</span></code> extension. The value of <code class="docutils literal notranslate"><span class="pre">--offline</span></code> is passed as a value to
+the “client” constructor.</p>
+<p>If you do not properly implement this option, you will break “<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">doctest</span></code>” for
+everything. (I.e. you’re advised to run “<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">doctest</span></code>” early &amp; often while
+implementing a new service.)</p>
+</li>
+</ul>
 </div>
 
 
           </div>
-          
+
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -70,6 +79,7 @@ processing.</p></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MozillaDeployment.html">Mozilla Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="NewServices.html">Adding a New Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ContributingDocumentation.html">Contributing Documentation</a></li>
 </ul>
 
 <div class="relations">
@@ -105,18 +115,18 @@ processing.</p></li>
     </div>
     <div class="footer">
       &copy;2020.
-      
+
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
+
       |
       <a href="_sources/CodingConventions.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
-    
 
-    
+
+
   </body>
 </html>
