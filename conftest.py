@@ -147,6 +147,11 @@ def aws_config(pytestconfig):
     return pytestconfig.custom_config.aws
 
 
+@pytest.fixture
+def gcp_config(pytestconfig):
+    return pytestconfig.custom_config.gcp
+
+
 def pytest_runtest_setup(item):
     """"""
     if not isinstance(item, DoctestItem):

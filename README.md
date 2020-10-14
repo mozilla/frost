@@ -281,9 +281,24 @@ aws:
   required_amis:
     - ami-00000000000000000
     - ami-55555555555555555
-  whitelisted_ports_global:
+  allowed_ports_global:
     - 25
-  whitelisted_ports:
+  allowed_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222
+gcp:
+  allowed_org_domains:
+    - mygsuiteorg.com
+  allowed_gke_versions:
+    - 1.15.12-gke.20
+    - 1.16.13-gke.401
+    - 1.17.9-gke.1504
+    - 1.18.6-gke.3504
+  allowed_ports_global:
+    - 25
+  allowed_ports:
     - test_param_id: '*bastion'
       ports:
         - 22
@@ -455,12 +470,12 @@ aws:
     - Env
   # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
   # test for all instances
-  whitelisted_ports_global:
+  allowed_ports_global:
     - 25
   # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
   # test for specific instances. In this example, we are whitelisting ports 22
   # and 2222 for all security groups that include the word 'bastion' in them.
-  whitelisted_ports:
+  allowed_ports:
     - test_param_id: '*bastion'
       ports:
         - 22

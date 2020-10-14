@@ -36,9 +36,9 @@ aws:
     - Type
     - App
     - Env
-  whitelisted_ports_global:
+  allowed_ports_global:
     - 25
-  whitelisted_ports:
+  allowed_ports:
     - test_param_id: '*bastion'
       ports:
         - 22
@@ -54,6 +54,13 @@ gcp:
     - 1.16.13-gke.401
     - 1.17.9-gke.1504
     - 1.18.6-gke.3504
+  allowed_ports_global:
+    - 25
+  allowed_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222
 gsuite:
   domain: 'mygsuiteorg.com'
   min_number_of_owners: 2

@@ -62,7 +62,7 @@ def does_firewall_open_all_ports_to_all(firewall):
     return False
 
 
-def does_firewall_open_any_ports_to_all(firewall):
+def does_firewall_open_any_ports_to_all(firewall, allowed_ports=None):
     """
     Returns True if firewall has a rule to open any ports (except 80/443) to all. Excludes ICMP.
 
@@ -85,6 +85,9 @@ def does_firewall_open_any_ports_to_all(firewall):
     >>> does_firewall_open_any_ports_to_all({'sourceRanges': ['0.0.0.0/0'], 'allowed': [{'ports': ['22', '80', '443']}]})
     True
     """
+    if allowed_ports is None:
+        allowed_ports = []
+
     if does_firewall_open_all_ports_to_all(firewall):
         return True
 
@@ -98,7 +101,15 @@ def does_firewall_open_any_ports_to_all(firewall):
         if rule.get("IPProtocol", "") == "icmp":
             continue
         for port_rule in rule.get("ports"):
-            if port_rule not in ["80", "443"]:
+            try:
+                port_rule = int(port_rule)
+            except ValueError:
+                return True
+
+            if port_rule in allowed_ports:
+                continue
+
+            if port_rule not in [80, 443]:
                 return True
 
     return False
