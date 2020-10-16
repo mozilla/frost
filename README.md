@@ -281,8 +281,13 @@ aws:
   required_amis:
     - ami-00000000000000000
     - ami-55555555555555555
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for all instances
   allowed_ports_global:
     - 25
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for specific instances. In this example, we are allowing ports 22
+  # and 2222 for all security groups that include the word 'bastion' in them.
   allowed_ports:
     - test_param_id: '*bastion'
       ports:
@@ -296,8 +301,13 @@ gcp:
     - 1.16.13-gke.401
     - 1.17.9-gke.1504
     - 1.18.6-gke.3504
+  # Allowed ports for the test_firewall_opens_any_ports_to_all
+  # test for all firewalls
   allowed_ports_global:
     - 25
+  # Allowed ports for the test_firewall_opens_any_ports_to_all
+  # test for specific firewalls. In this example, we are allowing ports 22
+  # and 2222 for all firewalls that include the word 'bastion' in them.
   allowed_ports:
     - test_param_id: '*bastion'
       ports:
@@ -468,12 +478,12 @@ aws:
     - Type
     - App
     - Env
-  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
   # test for all instances
   allowed_ports_global:
     - 25
-  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
-  # test for specific instances. In this example, we are whitelisting ports 22
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for specific instances. In this example, we are allowing ports 22
   # and 2222 for all security groups that include the word 'bastion' in them.
   allowed_ports:
     - test_param_id: '*bastion'
