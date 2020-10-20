@@ -534,7 +534,7 @@ attached. This obviously has a high chance of false negatives.
 1. Create a virtualenv with `virtualenv venv --python python3`
 1. Activate the venv with `. ./venv/bin/activate`
 1. Install requirements with `pip install -r requirements.txt`
-1. Install frost with `python setup.py install`
+1. Install frost with `pip install --editable .`
 
 ### Goals
 
