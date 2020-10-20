@@ -16,8 +16,11 @@ that third party services are configured correctly. For example:
 
 ### Installing
 
-1. install [Python 3.8](https://www.python.org/downloads/)
-1. Run `pip install frost`
+1. Install [Python 3.8](https://www.python.org/downloads/)
+1. Create a virtualenv with `virtualenv venv --python python3`
+1. Activate the venv with `. ./venv/bin/activate`
+1. Install requirements with `pip install -r requirements.txt`
+1. Install frost with `python setup.py install`
 
 ### Usage
 
