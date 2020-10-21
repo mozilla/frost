@@ -1,1 +1,0 @@
-../ContributingDocumentation.rst

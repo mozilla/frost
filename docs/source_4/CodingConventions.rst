@@ -1,1 +1,0 @@
-../CodingConventions.rst
