@@ -18,6 +18,7 @@ Welcome to Frost's documentation!
    MozillaDeployment.rst
    NewServices.rst
    ContributingDocumentation.rst
+   UseCases.rst
 
 
 Indices and tables
