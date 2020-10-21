@@ -4,21 +4,34 @@
       - License, v. 2.0. If a copy of the MPL was not distributed with this
       - file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 
-Welcome to Frost's documentation!
+Frost's documentation!
 =================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Using Frost:
 
    Overview <readme-include.md>
    FAQ.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contributing:
+
    Architecture.rst
    CodingConventions.rst
    MozillaDeployment.rst
    NewServices.rst
    ContributingDocumentation.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: API:
+
+   Source (fully automated) <source/modules.rst>
+   Source (manual groupings) <Source.rst>
+
+`Source (only via index) <:ref:modindex>`
 
 Indices and tables
 ==================
