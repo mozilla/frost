@@ -48,8 +48,7 @@ extensions = [
 
 # autodoc extension config
 # from https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-# autodoc_mock_imports = ["pytest", "_pytest", "py"]
-autodoc_mock_imports = ["sqladmin"]
+autodoc_mock_imports = ["pytest", "_pytest", "py", "sqladmin", "dateutil"]
 ##autodoc_default_options = {
 ##    ##'members': 'var1, var2',
 ##    ##'member-order': 'bysource',

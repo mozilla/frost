@@ -44,6 +44,9 @@ doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
 	@# we regen the api docs every time -- they are not checked in.
 	sphinx-apidoc -f -o docs/source .
+	for module in frost aws gcp gsuite; do \
+		sphinx-apidoc -f -o docs/source/$$module $$module ; \
+	done
 	make -C docs clean html
 
 doc-preview: check_venv

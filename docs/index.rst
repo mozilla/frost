@@ -31,7 +31,8 @@ Frost's documentation!
    Source (fully automated) <source/modules.rst>
    Source (manual groupings) <Source.rst>
 
-`Source (only via index) <:ref:modindex>`
+:ref:`Source (only via index) <modindex>`
+
 
 Indices and tables
 ==================
