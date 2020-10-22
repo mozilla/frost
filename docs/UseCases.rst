@@ -6,7 +6,7 @@ Use Cases & Philosopy
 
     Until this document is reviewed and corrected, it is known to contain errors, especially w.r.t. philosopy.
 
-Philosopy
+Philosophy
 =========
 
 Frost is intended to build upon the pytest framework to provide extra features to support "infrastructure auditing".
@@ -23,7 +23,7 @@ Target Domain
 
 Frost is intended to simplify the process of auditing existing system configurations, when the configuration data is accessible via an API. Frost assumes that the test results (in JSON format) will be acted upon by a subsequent non-Frost process.
 
-Since, in general, the number of configuration items to check is not statically known when the test is writen or executed, some lesser used features of pytest are needed. In particular, the test collection phase often requires API calls to the service to discover the complete tree (or network) of configuration items to be checked. While uncommon in internet examples, dynamic test discovery is fully supported by pytest.
+Since, in general, the number of configuration items to check is not statically known when the test is writen or executed, some lesser used features of pytest are needed. In particular, the test collection phase often requires API calls to the service to discover the complete list of resources to be checked. While uncommon in internet examples, dynamic test discovery is fully supported by pytest.
 
 In practice, many of the same calls needed to determine the list of items may need to be repeated to collect the additional information needed by one or more tests. This leads to a tension between collecting all potentially needed data in the first (discovery) pass, or making many duplicate calls to the service as each test collects the additional information it requires.
 
