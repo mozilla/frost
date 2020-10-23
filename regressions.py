@@ -96,7 +96,7 @@ def add_regression_marker(item):
     """
     Adds regression markers as specified in the config file.
     """
-    if not item.get_marker("parametrize"):
+    if not item.get_closest_marker("parametrize"):
         warnings.warn(
             "Skipping regression checks for test without resource name {!r}".format(
                 item.name
@@ -107,7 +107,9 @@ def add_regression_marker(item):
     test_regressions = item.config.custom_config.regressions.get(
         item.originalname, None
     )
-    test_id = item._genid
+    # item is a _pytest.python.Function
+    # e.g. gsuite/admin/test_admin_user_is_inactive.py::test_admin_user_is_inactive[gsuiteuser@example.com]
+    test_id = item.nodeid
 
     if test_regressions:
         for regression_test_id in test_regressions:
