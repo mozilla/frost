@@ -8,10 +8,18 @@
 Source Code
 ===========
 
-.. warning:: Manual Maintenance Required
+Service Specific Code
+=====================
 
-   If we use this approach to the source, we will manually need to update it
-   everytime a new service is added.
+..
+   TODO: Add new modules to the table below, also in ../Makefile
+
+.. toctree::
+   :maxdepth: 2
+
+   source/aws/modules.rst
+   source/gcp/modules.rst
+   source/gsuite/modules.rst
 
 Frost and support code
 ======================
@@ -20,13 +28,3 @@ Frost and support code
    :maxdepth: 2
 
    source/frost/modules.rst
-
-Service Specific Code
-=====================
-
-.. toctree::
-   :maxdepth: 2
-
-   source/aws/modules.rst
-   source/gcp/modules.rst
-   source/gsuite/modules.rst

@@ -43,7 +43,9 @@ clean-python:
 doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
 	@# we regen the api docs every time -- they are not checked in.
-	sphinx-apidoc -f -o docs/source .
+	rm -rf docs/source
+	sphinx-apidoc --no-toc -o docs/source .
+	@# TODO: Add new service modules below also in docs/Source.rst
 	for module in frost aws gcp gsuite; do \
 		sphinx-apidoc -f -o docs/source/$$module $$module ; \
 	done

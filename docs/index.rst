@@ -28,10 +28,7 @@ Frost's documentation!
    :maxdepth: 2
    :caption: API:
 
-   Source (fully automated) <source/modules.rst>
-   Source (manual groupings) <Source.rst>
-
-:ref:`Source (only via index) <modindex>`
+   Source <Source.rst>
 
 
 Indices and tables
