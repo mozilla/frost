@@ -24,4 +24,4 @@ deploy:
     keep_history: true
     local_dir: docs/_build/html/
     on:
-      branch: code_view
+      branch: master
