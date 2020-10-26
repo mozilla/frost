@@ -86,7 +86,7 @@ class GCPClient:
                     .getIamPolicy(resource=project_id, body={})
                     .execute()
                 )
-                policies += resp
+                policies.append(resp)
             except HttpError as e:
                 if "has not been used in project" in e._get_reason():
                     continue
