@@ -39,11 +39,15 @@ class OrgInfo:
     _type: str = "OrgInfo"
     _revision: int = 1
 
+    @classmethod
+    def metadata_to_log(_) -> List[str]:
+        return ["name", "login", "requires_two_factor_authentication", "org_v4id"]
+
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
         """provide ID for pytest Parametrization."""
         if isinstance(val, (OrgInfo,)):
-            return f"{val.org_v4id}-{val.login}"
+            return f"{val.login}"
         return None
 
     @classmethod
@@ -202,6 +206,11 @@ def _in_offline_mode() -> bool:
         import conftest
 
         is_offline = conftest.get_client("github_client").is_offline()
+        if not is_offline:
+            # check for a valid GH_TOKEN here so we fail during test collection
+            # TODO: make sure this works in all scenarios
+            os.environ["GH_TOKEN"]
+
     except ImportError:
         pass
 
@@ -215,6 +224,7 @@ def _orgs_to_check() -> Set[str]:
     #   (aka doctest mode)
     if _in_offline_mode():
         return []
+    # DEV_HACK: find better way to insert dev default
     path_to_metadata = os.environ.get(
         "PATH_TO_METADATA", "~/repos/foxsec/master/services/metadata"
     )

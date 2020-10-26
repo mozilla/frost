@@ -510,7 +510,10 @@ def _repos_to_check() -> List[str]:
         return []
 
     # real work
-    path_to_metadata = os.environ["PATH_TO_METADATA"]
+    # DEV_HACK: find better way to insert dev default
+    path_to_metadata = os.environ.setdefault(
+        "PATH_TO_METADATA", "~/repos/foxsec/master/services/metadata"
+    )
     meta_dir = pathlib.Path(os.path.expanduser(path_to_metadata)).resolve()
     in_files = list(meta_dir.glob("*.json"))
 

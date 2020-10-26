@@ -42,7 +42,9 @@ def get_viewer(endpoint):
     "criteria", validate_compliance.required_criteria, ids=Criteria.idfn
 )
 def test_require_2fa(
-    gql_connection: Any, org_info: List[str], criteria: validate_compliance.Criteria,
+    gql_connection: Any,
+    org_info: List[OrgInfo],
+    criteria: validate_compliance.Criteria,
 ) -> None:
     # info = get_org_info(gql_connection, f"{org_to_check}")
     if org_info:

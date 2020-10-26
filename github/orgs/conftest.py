@@ -10,6 +10,8 @@
 # TODO: add sleep_* for 'core' functionality
 
 from functools import lru_cache
+from github.branches.validate_compliance import Criteria
+from github.orgs.retrieve_github_data import OrgInfo
 import os
 import pathlib
 
@@ -17,11 +19,16 @@ from typing import List, Set
 
 import subprocess  # nosec
 
-from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
+from sgqlc.endpoint.http import HTTPEndpoint
+
+from conftest import METADATA_KEYS  # noqa: I900
 
 
 from . import retrieve_github_data
 import conftest
+
+METADATA_KEYS.update(OrgInfo.metadata_to_log())
+METADATA_KEYS.update(Criteria.metadata_to_log())
 
 
 def orgs_to_check() -> Set[str]:

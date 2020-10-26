@@ -22,7 +22,6 @@ from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
 from . import retrieve_github_data
 
 # Needed to dynamically grab globals
-import conftest
 
 
 def repos_to_check() -> List[str]:
@@ -31,12 +30,16 @@ def repos_to_check() -> List[str]:
     #   While there is no network operation done here, we don't want to go
     #   poking around the file system if we're in "--offline" mode
     #   (e.g. doctest mode)
-    global github_client
+    import conftest
+
     if conftest.get_client("github").is_offline():
         return []
 
     # real work
-    path_to_metadata = os.environ["PATH_TO_METADATA"]
+    # DEV_HACK: find better way to insert dev default
+    path_to_metadata = os.environ.setdefault(
+        "PATH_TO_METADATA", "~/repos/foxsec/master/services/metadata"
+    )
     meta_dir = pathlib.Path(os.path.expanduser(path_to_metadata)).resolve()
     in_files = list(meta_dir.glob("*.json"))
 

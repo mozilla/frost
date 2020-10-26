@@ -16,6 +16,10 @@ class Criteria:
     slug: str  # id to match. alpha-numeric
     description: str  # Description of invalid
 
+    @classmethod
+    def metadata_to_log(_) -> List[str]:
+        return ["standard_number"]
+
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
         """provide ID for pytest Parametrization."""
