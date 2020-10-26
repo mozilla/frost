@@ -14,7 +14,8 @@ from github.client import GitHubClient
 
 import custom_config
 
-collect_ignore_glob = ["*.py"]
+# MERGE: DO NOT MERGE: -- for local testing only!
+# collect_ignore_glob = ["*.py"]
 
 botocore_client = None
 gcp_client = None
@@ -90,6 +91,7 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
+    global github_client
     global custom_config_global
 
     # run with -p 'no:cacheprovider'
@@ -176,7 +178,7 @@ def get_node_markers(node):
     return [m for m in node.iter_markers()]
 
 
-METADATA_KEYS = [
+METADATA_KEYS = {
     "DBInstanceArn",
     "DBInstanceIdentifier",
     "GroupId",
@@ -199,7 +201,7 @@ METADATA_KEYS = [
     "projectId",
     "role",
     "uniqueId",
-]
+}
 
 
 def serialize_datetimes(obj):
@@ -228,18 +230,26 @@ def serialize_datetimes(obj):
 
 
 def extract_metadata(resource):
-    return {
-        metadata_key: resource[metadata_key]
+    if isinstance(resource, (dict,)):
+        target = resource
+    else:
+        target = resource.__dict__
+    x = {
+        metadata_key: target[metadata_key]
         for metadata_key in METADATA_KEYS
-        if metadata_key in resource
+        if metadata_key in target
     }
+    return x
 
 
 def get_metadata_from_funcargs(funcargs):
     metadata = {}
     for k in funcargs:
-        if isinstance(funcargs[k], dict):
-            metadata = {**metadata, **extract_metadata(funcargs[k])}
+        if isinstance(funcargs[k], dict) or hasattr(funcargs[k], "__dict__"):
+            # DEV_HACK: remove interim steps
+            new = extract_metadata(funcargs[k])
+            metadata = {**metadata, **new}
+            # metadata = {**metadata, **extract_metadata(funcargs[k])}
     return metadata
 
 
