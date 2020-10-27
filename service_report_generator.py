@@ -55,7 +55,7 @@ from collections import defaultdict
 STATUSES_TO_LIST = ["fail", "warn", "err"]
 
 service_json_template = {
-    "name": "pytest",
+    "name": "frost",
     "tool_url": "https://github.com/mozilla/frost",
     "version": 1,
     "created_at": "",
