@@ -16,8 +16,8 @@ that third party services are configured correctly. For example:
 
 ### Installing
 
-1. install [Python 3.8](https://www.python.org/downloads/)
-1. Run `pip install frost`
+1. Install [Python 3.8](https://www.python.org/downloads/)
+1. Run `git clone git@github.com:mozilla/frost.git; cd frost; make install`
 
 ### Usage
 

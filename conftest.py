@@ -151,7 +151,9 @@ def gcp_config(pytestconfig):
 
 
 def pytest_runtest_setup(item):
-    """"""
+    """
+    Add custom markers to pytest tests.
+    """
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 
