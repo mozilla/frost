@@ -24,4 +24,5 @@ deploy:
     keep_history: true
     local_dir: docs/_build/html/
     on:
-      branch: master
+      ### DO NOT MERGE ###
+      branch: hwine/doc-new-service
