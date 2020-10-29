@@ -165,30 +165,89 @@ def get_node_markers(node):
     return [m for m in node.iter_markers()]
 
 
-METADATA_KEYS = [
-    "DBInstanceArn",
-    "DBInstanceIdentifier",
-    "GroupId",
-    "ImageId",
-    "InstanceId",
-    "LaunchTime",
-    "OwnerId",
-    "TagList",
-    "Tags",
-    "UserName",
-    "VolumeId",
-    "VpcId",
-    "__pytest_meta",
-    "displayName",
-    "id",
-    "kind",
-    "members",
-    "name",
-    "project",
-    "projectId",
-    "role",
-    "uniqueId",
-]
+# METADATA_KEYS are modified by services to specify which metadata is
+# relevant for the JSON output. It's unlikely that duplicate keys are
+# intended, so failfast
+# adapted from
+# https://stackoverflow.com/questions/41281346/how-to-raise-error-if-user-tries-to-enter-duplicate-entries-in-a-set-in-python/41281734#41281734
+class DuplicateKeyError(Exception):
+    pass
+
+
+class SingleSet(set):
+    """Set only allowing values to be added once
+
+    When addition of a duplicate value is detected, the `DuplicateKeyError`
+    exception will be raised, all non duplicate values are added to the set.
+
+    Raises:
+        DuplicateKeyError - when adding a value already in the set
+
+    >>> ss = SingleSet({1, 2, 3, 4})
+    >>> ss.add(3)
+    Traceback (most recent call last):
+    ...
+    conftest.DuplicateKeyError: Value 3 already present
+    >>> ss.update({4, 5, 6, 3})
+    Traceback (most recent call last):
+    ...
+    conftest.DuplicateKeyError: Value(s) {3, 4} already present
+    >>> ss
+    SingleSet({1, 2, 3, 4, 5, 6})
+    >>>
+
+    **BUG:**
+    - duplicate values on initialization are not detected
+    >>> ss = SingleSet({1, 2, 3, 4, 3, 2, 1})
+    >>> ss
+    SingleSet({1, 2, 3, 4})
+    """
+
+    def add(self, value):
+        if value in self:
+            raise DuplicateKeyError("Value {!r} already present".format(value))
+        super().add(value)
+
+    def update(self, values):
+        error_values = set()
+        for value in values:
+            if value in self:
+                error_values.add(value)
+        if error_values:
+            # we want the non-duplicate values added
+            super().update(values - error_values)
+            raise DuplicateKeyError(
+                "Value(s) {!r} already present".format(error_values)
+            )
+        super().update(values)
+
+
+METADATA_KEYS: SingleSet = SingleSet(
+    [
+        "DBInstanceArn",
+        "DBInstanceIdentifier",
+        "GroupId",
+        "ImageId",
+        "InstanceId",
+        "LaunchTime",
+        "OwnerId",
+        "TagList",
+        "Tags",
+        "UserName",
+        "VolumeId",
+        "VpcId",
+        "__pytest_meta",
+        "displayName",
+        "id",
+        "kind",
+        "members",
+        "name",
+        "project",
+        "projectId",
+        "role",
+        "uniqueId",
+    ]
+)
 
 
 def serialize_datetimes(obj):
