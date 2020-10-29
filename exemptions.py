@@ -125,11 +125,26 @@ def add_xfail_marker(item):
         return
 
     test_exemptions = item.config.custom_config.exemptions.get(item.originalname, None)
-    # item is a _pytest.python.Function
-    # e.g. gsuite/admin/test_admin_user_is_inactive.py::test_admin_user_is_inactive[gsuiteuser@example.com]
-    test_id = item.nodeid
+
+    test_id = item.name
+    try:
+        # test_admin_user_is_inactive[gsuiteuser@example.com]
+        test_id = item.name.split("[")[1][:-1]
+    except IndexError:
+        warnings.warn(
+            "Exemption check failed: was unable to parse parametrized test name:",
+            item.name,
+        )
+        return
 
     if test_exemptions:
+        if test_id in test_exemptions:
+            expiration, reason = test_exemptions[test_id]
+            item.add_marker(
+                pytest.mark.xfail(reason=reason, strict=True, expiration=expiration)
+            )
+            return
+
         # Check for any substring matchers
         for exemption_test_id in test_exemptions:
             if exemption_test_id.startswith("*"):
@@ -142,9 +157,3 @@ def add_xfail_marker(item):
                         )
                     )
                     return
-
-        if test_id in test_exemptions:
-            expiration, reason = test_exemptions[test_id]
-            item.add_marker(
-                pytest.mark.xfail(reason=reason, strict=True, expiration=expiration)
-            )

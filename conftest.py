@@ -12,8 +12,6 @@ from gsuite.client import GsuiteClient
 
 import custom_config
 
-collect_ignore_glob = ["*.py"]
-
 botocore_client = None
 gcp_client = None
 gsuite_client = None
@@ -153,7 +151,9 @@ def gcp_config(pytestconfig):
 
 
 def pytest_runtest_setup(item):
-    """"""
+    """
+    Add custom markers to pytest tests.
+    """
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 
