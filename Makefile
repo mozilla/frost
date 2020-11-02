@@ -56,8 +56,8 @@ doc-preview: check_venv
 	sphinx-autobuild $(AUTOBUILD_OPTS) "docs/" "docs/_build/html/" $(SPHINXOPTS) $(O)
 
 doctest: check_venv
-	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
-	 --doctest-modules -s --offline --debug-calls
+	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py) \
+		--doctest-modules -s --offline --debug-calls
 
 coverage: check_venv
 	frost test --cov-config .coveragerc --cov=. \
