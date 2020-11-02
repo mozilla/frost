@@ -9,5 +9,6 @@ pytest-json==0.4.0
 pytest-metadata==1.10.0
 pytest==6.0.2
 python-dateutil==2.7.5
-ruamel.yaml==0.15.85
+ruamel.yaml==0.16.12
+ruamel.yaml.clib==0.2.2
 wheel==0.33.1

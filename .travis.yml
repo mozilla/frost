@@ -1,6 +1,7 @@
 language: python
 python:
   - "3.8"
+  - "3.9"
 sudo: required
 
 install:
@@ -24,5 +25,4 @@ deploy:
     keep_history: true
     local_dir: docs/_build/html/
     on:
-      ### DO NOT MERGE ###
-      branch: hwine/doc-new-service
+      branch: master
