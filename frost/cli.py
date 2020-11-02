@@ -62,7 +62,9 @@ def run_pytest(ctx, pytest_args):
     --ignore-glob='*.py' to require explicit test specification
     """
     switch_to_frost_parent_directory()
-    pytest.main(["-s", "--debug-calls", "--ignore-glob='*.py'"] + list(pytest_args))
+    sys.exit(
+        pytest.main(["-s", "--debug-calls", "--ignore-glob='*.py'"] + list(pytest_args))
+    )
 
 
 if __name__ == "__main__":

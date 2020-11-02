@@ -27,7 +27,7 @@ def all_service_account_keys():
     for sa in service_accounts():
         for key in service_account_keys(sa):
             keys.append(key)
-    return key
+    return keys
 
 
 def project_iam_bindings():
