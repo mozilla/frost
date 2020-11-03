@@ -196,7 +196,7 @@ class SingleSet(set):
     SingleSet({1, 2, 3, 4, 5, 6})
     >>>
 
-    **BUG:**
+    **NB:**
     - duplicate values on initialization are not detected
     >>> ss = SingleSet({1, 2, 3, 4, 3, 2, 1})
     >>> ss
