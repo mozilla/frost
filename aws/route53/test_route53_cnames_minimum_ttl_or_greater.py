@@ -16,4 +16,4 @@ def test_route53_cnames_minimum_ttl_or_greater(cnames):
     """
     assert (
         int(cnames["TTL"]) >= MINIMUM_TTL
-    ), f"TTL is below the minimum of {MINIMUM_TTL}, it is current set to {cnames['TTL']}"
+    ), f"TTL is below the minimum of {MINIMUM_TTL}, it is currently set to {cnames['TTL']}"
