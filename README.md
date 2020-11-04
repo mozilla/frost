@@ -1,61 +1,137 @@
 # Frost
 
-![frost snowman logo](docs/frost-snowman-logo.png?raw=true)
+[![PyPI version](https://badge.fury.io/py/frost.svg)](https://badge.fury.io/py/frost)
+[![Documentation](https://img.shields.io/badge/Docs-gh--pages-yellowgreen.svg)](https://mozilla.github.com/frost/)
 
-Clients and [pytest](https://docs.pytest.org/en/latest/index.html)
-tests for checking that third party services the @foxsec team uses are
-configured correctly.
+![frost snowman logo](docs/frost-snowman-logo.png)
 
-We trust third party services to return their status correctly, but
-want to answer questions whether they are configured properly such as:
+HTTP clients and a wrapper around
+[pytest](https://docs.pytest.org/en/latest/index.html) tests to verify
+that third party services are configured correctly. For example:
 
 * Are our AWS DB snapshots publicly accessible?
-* Is there a dangling DNS entry in Route53?
-* Will someone get paged when an alert goes off?
+* Are there dangling DNS entries in Route53?
 
 ## Usage
 
-### Requirements
-
-* [docker](https://docs.docker.com/get-docker/)
-
 ### Installing
 
+1. Install [Python 3.8](https://www.python.org/downloads/)
+1. Run `git clone git@github.com:mozilla/frost.git; cd frost; make install`
+
+### Usage
+
 ```console
-docker pull mozilla/frost
+$ frost --help
+Usage: frost [OPTIONS] COMMAND [ARGS]...
+
+  FiRefox Operations Security Testing API clients and tests
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+  Commands:
+    list  Lists available test filenames packaged with frost.
+    test  Run pytest tests passing all trailing args to pytest.
+
+$ frost test --help
+Usage: frost test [OPTIONS] [PYTEST_ARGS]...
+
+  Run pytest tests passing all trailing args to pytest.
+
+  Adds the pytest args:
+
+  -s to disable capturing stdout
+  https://docs.pytest.org/en/latest/capture.html
+
+  and frost specific arg:
+
+  --debug-calls to print AWS API calls
+
+Options:
+  --help  Show this message and exit.
 ```
 
 ### Running
 
-```console
-docker run --rm mozilla/frost pytest -h
-```
-
 To fetch RDS resources from the cache or AWS API and check that
 backups are enabled for DB instances for [the configured aws
 profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html)
-named `default` in the `us-west-2` region run:
+named `default` in the `us-west-2` region
+
+
+1. find the test file path:
 
 ```console
-docker run --rm mozilla/frost pytest aws/rds/test_rds_db_instance_backup_enabled -s --aws-profiles default --debug-calls
+$ frost list | grep rds
+./aws/rds/test_rds_db_instance_backup_enabled.py
+./aws/rds/test_rds_db_snapshot_encrypted.py
+./aws/rds/test_rds_db_instance_is_postgres_with_invalid_certificate.py
+./aws/rds/test_rds_db_instance_encrypted.py
+./aws/rds/test_rds_db_security_group_does_not_grant_public_access.py
+./aws/rds/test_rds_db_instance_not_publicly_accessible_by_vpc_sg.py
+./aws/rds/test_rds_db_instance_minor_version_updates_enabled.py
+./aws/rds/test_rds_db_instance_is_multiaz.py
+./aws/rds/test_rds_db_snapshot_not_publicly_accessible.py
 ```
 
-The options include the pytest option:
+Note: **packaged frost tests are relative to the frost install**
 
-* [`-s`](https://docs.pytest.org/en/latest/capture.html) to disable capturing stdout so we can see the progress fetching AWS resources
+1. run the test:
+
+```console
+frost test aws/rds/test_rds_db_instance_backup_enabled.py --aws-profiles default
+```
 
 Frost adds the options:
 
-* `--debug-calls` for printing (with `-s`) API calls we make
 * `--aws-profiles` for selecting one or more AWS profiles to fetch resources for or the AWS default profile / `AWS_PROFILE` environment variable
+* `--aws-regions` for selecting one or more AWS regions to test as a CSV e.g. `us-east-1,us-west-2`. **defaults to all regions**
 * `--gcp-project-id` for selecting the GCP project to test. **Required for GCP tests**
 * `--offline` a flag to tell HTTP clients to not make requests and return empty params
 * [`--config`](#custom-test-config) path to test custom config file
 
-and produces output like the following showing a DB instance with backups disabled:
+and produces output showing calls to the AWS API and failing for a DB
+instance with backups disabled:
 
 ```console
-# TODO: add example output back
+============================================================ test session starts ============================================================
+platform linux -- Python 3.8.2, pytest-6.0.2, py-1.9.0, pluggy-0.13.1
+rootdir: /home/gguthe/frost
+plugins: json-0.4.0, cov-2.10.0, html-1.20.0, metadata-1.10.0
+collecting ... calling AWSAPICall(profile='default, region='ap-northeast-1', service='rds', method='describe_db_instances', args=[], kwargs={})
+calling AWSAPICall(profile='default, region='ap-northeast-2', service='rds', method='describe_db_instances', args=[], kwargs={})
+calling AWSAPICall(profile='default, region='ap-south-1', service='rds', method='describe_db_instances', args=[], kwargs={})
+calling AWSAPICall(profile='default, region='ap-southeast-1', service='rds', method='describe_db_instances', args=[], kwargs={})
+calling AWSAPICall(profile='default, region='ap-southeast-2', service='rds', method='describe_db_instances', args=[], kwargs={})
+...
+calling AWSAPICall(profile='default, region='us-west-2', service='rds', method='list_tags_for_resource', args=[], kwargs={'ResourceName': 'arn:aws:rds:us-west-2:redacted:db:test-db-ro-dev1'})
+collected 21 items
+
+aws/rds/test_rds_db_instance_backup_enabled.py F....................
+
+================================================================= FAILURES ==================================================================
+____________________________________ test_rds_db_instance_backup_enabled[test-db-ro-dev1] ___________________________________________________
+
+rds_db_instance = {'AllocatedStorage': 250, 'AutoMinorVersionUpgrade': True, 'AvailabilityZone': 'us-east-1a', 'BackupRetentionPeriod': 0, ..
+.}
+
+    @pytest.mark.rds
+    @pytest.mark.parametrize(
+        "rds_db_instance", rds_db_instances_with_tags(), ids=get_db_instance_id,
+    )
+    def test_rds_db_instance_backup_enabled(rds_db_instance):
+>       assert (
+            rds_db_instance["BackupRetentionPeriod"] > 0
+        ), "Backups disabled for {}".format(rds_db_instance["DBInstanceIdentifier"])
+E       AssertionError: Backups disabled for test-db-ro-dev1
+E       assert 0 > 0
+
+aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError
+========================================================== short test summary info ==========================================================
+FAILED aws/rds/test_rds_db_instance_backup_enabled.py::test_rds_db_instance_backup_enabled[test-db-ro-dev1] - AssertionError...
+======================================================= 2 failed, 21 passed in 14.32s =======================================================
 ```
 
 #### IAM Policy for frost
@@ -133,6 +209,7 @@ gcloud [--project <project name>] services enable sqladmin.googleapis.com
 #### Setting up GSuite tests
 
 Make sure to have an OAuth2 app created and have the `client_secret.json` file in `~/.credentials` and then run:
+
 ```
 make setup_gsuite
 ```
@@ -156,6 +233,7 @@ head .cache/v/pytest_aws:cloudservices-aws-stage:us-west-2:rds:describe_db_insta
 ```
 
 These files can be removed individually or all at once with [the pytest --cache-clear](https://docs.pytest.org/en/latest/cache.html#usage) option.
+The cache can be disabled entirely with [the pytest -p no:cacheprovider](https://stackoverflow.com/questions/47744076/preventing-pytest-from-creating-cache-directories-in-pycharm).
 
 ## Custom Test Config
 
@@ -203,9 +281,34 @@ aws:
   required_amis:
     - ami-00000000000000000
     - ami-55555555555555555
-  whitelisted_ports_global:
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for all instances
+  allowed_ports_global:
     - 25
-  whitelisted_ports:
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for specific instances. In this example, we are allowing ports 22
+  # and 2222 for all security groups that include the word 'bastion' in them.
+  allowed_ports:
+    - test_param_id: '*bastion'
+      ports:
+        - 22
+        - 2222
+gcp:
+  allowed_org_domains:
+    - mygsuiteorg.com
+  allowed_gke_versions:
+    - 1.15.12-gke.20
+    - 1.16.13-gke.401
+    - 1.17.9-gke.1504
+    - 1.18.6-gke.3504
+  # Allowed ports for the test_firewall_opens_any_ports_to_all
+  # test for all firewalls
+  allowed_ports_global:
+    - 25
+  # Allowed ports for the test_firewall_opens_any_ports_to_all
+  # test for specific firewalls. In this example, we are allowing ports 22
+  # and 2222 for all firewalls that include the word 'bastion' in them.
+  allowed_ports:
     - test_param_id: '*bastion'
       ports:
         - 22
@@ -315,7 +418,7 @@ And results in a severity and severity marker being included in the
 json metadata:
 
 ```console
-docker run --rm mozilla/frost pytest -s --aws-profiles stage --aws-require-tags Name Type App Stack aws/ec2/test_ec2_instance_has_required_tags.py --config config.yaml.example --json=report.json
+frost test -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json
 ...
 ```
 
@@ -350,21 +453,6 @@ python -m json.tool report.json
 ...
 ```
 
-### Test Regressions
-
-frost custom config format adds support for marking specific tests on specific resources as regressions.
-As with `severity` this does not modify the pytest results, but rather adds a marker that can be used when analyzing the results.
-
-The config looks like:
-```
-...
-regressions:
-  - test_name: test_ec2_security_group_opens_all_ports_to_all
-    test_param_id: '*mycustomgroup'
-    comment: this was remediated by ops team
-...
-```
-
 ### AWS Config
 
 frost has a suite of AWS tests. This section of the custom config includes configuration options specific
@@ -390,14 +478,14 @@ aws:
     - Type
     - App
     - Env
-  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
   # test for all instances
-  whitelisted_ports_global:
+  allowed_ports_global:
     - 25
-  # Whitelsited ports for the test_ec2_security_group_opens_specific_ports_to_all
-  # test for specific instances. In this example, we are whitelisting ports 22
+  # Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all
+  # test for specific instances. In this example, we are allowing ports 22
   # and 2222 for all security groups that include the word 'bastion' in them.
-  whitelisted_ports:
+  allowed_ports:
     - test_param_id: '*bastion'
       ports:
         - 22
@@ -461,14 +549,14 @@ attached. This obviously has a high chance of false negatives.
 ### Design
 
 Currently this is a monolithic pytest package, but should eventually
-[be extracted into a pytest plugin](#3) and with [separate dependent
-pytest plugins for each service](#4).
+[be extracted into a pytest plugin](https://github.com/mozilla/frost/issues/3) and with [separate dependent
+pytest plugins for each service](https://github.com/mozilla/frost/issues/4).
 
 API responses should fit on disk and in memory (i.e. don't use this
 for log processing or checking binaries for malware), and be safe to
 cache for minutes, hours, or days (i.e. probably don't use this for
 monitoring a streaming API) (NB: [bug for specifying data
-freshness](#5)).
+freshness](https://github.com/mozilla/frost/issues/5)).
 
 Additionally we want:
 
@@ -572,13 +660,13 @@ Notes:
 * we add markers for the services we're fetching data from
 
 
-1. Running it we see that one of the IPs is an AWS IP:
+1. Running `frost test` with the test file explicitly included we see that one of the IPs is an AWS IP:
 
 ```console
-docker run --rm mozilla/frost pytest httpbin/test_httpbin_ip_in_aws.py
+frost test httpbin/test_httpbin_ip_in_aws.py
 platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
 metadata: {'Python': '3.6.2', 'Platform': 'Darwin-15.6.0-x86_64-i386-64bit', 'Packages': {'pytest': '3.3.2', 'py': '1.5.2', 'pluggy': '0.6.0'}, 'Plugins': {'metadata': '1.5.1', 'json': '0.4.0', 'html': '1.16.1'}}
-rootdir: /Users/gguthe/mozilla/frost, inifile:
+rootdir: /Users/gguthe/frost, inifile:
 plugins: metadata-1.5.1, json-0.4.0, html-1.16.1
 collected 3 items
 

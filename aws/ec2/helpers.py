@@ -1,4 +1,5 @@
 from helpers import get_param_id
+from datetime import datetime
 
 
 def ip_permission_opens_all_ports(ipp):
@@ -209,7 +210,7 @@ def ec2_security_group_opens_all_ports_to_all(ec2_security_group):
 
 
 def ec2_security_group_opens_specific_ports_to_all(
-    ec2_security_group, whitelisted_ports=None
+    ec2_security_group, allowed_ports=None
 ):
     """
     Returns True if an ec2 security group includes a permission
@@ -236,8 +237,8 @@ def ec2_security_group_opens_specific_ports_to_all(
     >>> ec2_security_group_opens_specific_ports_to_all([])
     False
     """
-    if whitelisted_ports is None:
-        whitelisted_ports = []
+    if allowed_ports is None:
+        allowed_ports = []
 
     if "IpPermissions" not in ec2_security_group:
         return False
@@ -254,7 +255,7 @@ def ec2_security_group_opens_specific_ports_to_all(
             if from_port == to_port and from_port in [80, 443]:
                 continue
 
-            if from_port == to_port and from_port in whitelisted_ports:
+            if from_port == to_port and from_port in allowed_ports:
                 continue
 
             return True
@@ -367,3 +368,51 @@ def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     tags = ec2_instance.get("Tags", [])
     instance_tag_names = set(tag["Key"] for tag in tags if "Key" in tag)
     return required_tag_names - instance_tag_names
+
+
+def ebs_volume_attached_to_instance(ebs, volume_created_days_ago=90):
+    """
+    Check an ebs volume is attached to an instance. The "volume_created_days_ago"
+    parameter allows checking for volumes that were created that many days ago.
+    
+    >>> from datetime import datetime
+    >>> from datetime import timezone
+
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2020-09-11T19:45:22.116+00:00"), "State": "in-use"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2000-09-11T19:45:22.116+00:00"), "State": "in-use"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.now(timezone.utc), "State": "available"})
+    True
+    >>> ebs_volume_attached_to_instance({"CreateTime": datetime.fromisoformat("2000-09-11T19:45:22.116+00:00"), "State": "available"})
+    False
+    """
+    creation_time = ebs["CreateTime"]
+    now = datetime.now(tz=creation_time.tzinfo)
+
+    if (now - creation_time).days > volume_created_days_ago:
+        if ebs["State"] == "available":
+            return False
+
+    return True
+
+
+def ebs_snapshot_not_too_old(snapshot, snapshot_started_days_ago=365):
+    """
+    Check an ebs snapshot is created less than "snapshot_started_days_ago".
+
+    >>> from datetime import datetime
+    >>> from datetime import timezone
+    >>> from aws.ec2.helpers import ebs_snapshot_not_too_old
+    >>> ebs_snapshot_not_too_old({"StartTime": datetime.now(timezone.utc)})
+    True
+    >>> ebs_snapshot_not_too_old({"StartTime": datetime.fromisoformat("2019-09-11T19:45:22.116+00:00")})
+    False
+    """
+    start_time = snapshot["StartTime"]
+    now = datetime.now(tz=start_time.tzinfo)
+
+    if (now - start_time).days < snapshot_started_days_ago:
+        return True
+    else:
+        return False

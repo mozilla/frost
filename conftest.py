@@ -9,60 +9,66 @@ from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
-from heroku.client import HerokuAdminClient
 
 import custom_config
-
-
-collect_ignore_glob = ["*.py"]
 
 botocore_client = None
 gcp_client = None
 gsuite_client = None
-heroku_client = None
 custom_config_global = None
 
 
 def pytest_addoption(parser):
-    parser.addoption(
+    frost_parser = parser.getgroup("Frost", "Frost's custom arguments")
+    frost_parser.addoption(
         "--aws-profiles",
         nargs="*",
         help="Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].",
     )
 
-    parser.addoption(
-        "--gcp-project-id",
+    frost_parser.addoption(
+        "--aws-regions",
         type=str,
-        help="Set GCP project to test. Required for GCP tests.",
+        help="Set AWS regions to use as a comma separate list. Defaults to all available AWS regions",
+    )
+
+    frost_parser.addoption(
+        "--gcp-project-id", type=str, help="Set GCP project to test.",
+    )
+
+    frost_parser.addoption(
+        "--gcp-folder-id",
+        type=str,
+        help="Set GCP folder to test. Will test all projects under this folder.",
     )
 
     # While only used for Heroku at the moment, GitHub tests are soon to be
     # added, which will also need an "organization" option. Current plan is to
     # reuse this one.
-    parser.addoption(
+    frost_parser.addoption(
         "--organization",
         type=str,
         help="Set organization to test. Used for Heroku tests.",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--debug-calls", action="store_true", help="Log API calls. Requires -s"
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--debug-cache",
         action="store_true",
         help="Log whether API calls hit the cache. Requires -s",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--offline",
         action="store_true",
         default=False,
         help="Instruct service clients to return empty lists and not make HTTP requests.",
     )
 
-    parser.addoption(
+    frost_parser.addoption(
         "--config", type=argparse.FileType("r"), help="Path to the config file."
     )
 
@@ -71,19 +77,34 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
-    global heroku_client
     global custom_config_global
 
-    # monkeypatch cache.set to serialize datetime.datetime's
-    patch_cache_set(config)
+    # run with -p 'no:cacheprovider'
+    cache = config.cache if hasattr(config, "cache") else None
+    if cache:
+        # monkeypatch cache.set to serialize datetime.datetime's
+        patch_cache_set(config)
 
     profiles = config.getoption("--aws-profiles")
+    aws_regions = (
+        config.getoption("--aws-regions").split(",")
+        if config.getoption("--aws-regions")
+        else []
+    )
+
     project_id = config.getoption("--gcp-project-id")
+    folder_id = config.getoption("--gcp-folder-id")
+    if project_id is not None and folder_id is not None:
+        raise Exception(
+            "--gcp-project-id and --gcp-folder-id are mutually exclusive arguments"
+        )
+
     organization = config.getoption("--organization")
 
     botocore_client = BotocoreClient(
         profiles=profiles,
-        cache=config.cache,
+        regions=aws_regions,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -91,16 +112,8 @@ def pytest_configure(config):
 
     gcp_client = GCPClient(
         project_id=project_id,
-        cache=config.cache,
-        debug_calls=config.getoption("--debug-calls"),
-        debug_cache=config.getoption("--debug-cache"),
-        offline=config.getoption("--offline"),
-    )
-
-    heroku_client = HerokuAdminClient(
-        organization=organization,
-        # cache=config.cache,
-        cache=None,
+        folder_id=folder_id,
+        cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
         offline=config.getoption("--offline"),
@@ -132,8 +145,15 @@ def aws_config(pytestconfig):
     return pytestconfig.custom_config.aws
 
 
+@pytest.fixture
+def gcp_config(pytestconfig):
+    return pytestconfig.custom_config.gcp
+
+
 def pytest_runtest_setup(item):
-    """"""
+    """
+    Add custom markers to pytest tests.
+    """
     if not isinstance(item, DoctestItem):
         item.config.custom_config.add_markers(item)
 
@@ -145,28 +165,89 @@ def get_node_markers(node):
     return [m for m in node.iter_markers()]
 
 
-METADATA_KEYS = [
-    "DBInstanceArn",
-    "DBInstanceIdentifier",
-    "GroupId",
-    "ImageId",
-    "InstanceId",
-    "LaunchTime",
-    "OwnerId",
-    "TagList",
-    "Tags",
-    "UserName",
-    "VolumeId",
-    "VpcId",
-    "__pytest_meta",
-    "name",
-    "displayName",
-    "projectId",
-    "uniqueId",
-    "id",
-    "members",
-    "role",
-]
+# METADATA_KEYS are modified by services to specify which metadata is
+# relevant for the JSON output. It's unlikely that duplicate keys are
+# intended, so failfast
+# adapted from
+# https://stackoverflow.com/questions/41281346/how-to-raise-error-if-user-tries-to-enter-duplicate-entries-in-a-set-in-python/41281734#41281734
+class DuplicateKeyError(Exception):
+    pass
+
+
+class SingleSet(set):
+    """Set only allowing values to be added once
+
+    When addition of a duplicate value is detected, the `DuplicateKeyError`
+    exception will be raised, all non duplicate values are added to the set.
+
+    Raises:
+        DuplicateKeyError - when adding a value already in the set
+
+    >>> ss = SingleSet({1, 2, 3, 4})
+    >>> ss.add(3)
+    Traceback (most recent call last):
+    ...
+    conftest.DuplicateKeyError: Value 3 already present
+    >>> ss.update({4, 5, 6, 3})
+    Traceback (most recent call last):
+    ...
+    conftest.DuplicateKeyError: Value(s) {3, 4} already present
+    >>> ss
+    SingleSet({1, 2, 3, 4, 5, 6})
+    >>>
+
+    **NB:**
+    - duplicate values on initialization are not detected
+    >>> ss = SingleSet({1, 2, 3, 4, 3, 2, 1})
+    >>> ss
+    SingleSet({1, 2, 3, 4})
+    """
+
+    def add(self, value):
+        if value in self:
+            raise DuplicateKeyError("Value {!r} already present".format(value))
+        super().add(value)
+
+    def update(self, values):
+        error_values = set()
+        for value in values:
+            if value in self:
+                error_values.add(value)
+        if error_values:
+            # we want the non-duplicate values added
+            super().update(values - error_values)
+            raise DuplicateKeyError(
+                "Value(s) {!r} already present".format(error_values)
+            )
+        super().update(values)
+
+
+METADATA_KEYS: SingleSet = SingleSet(
+    [
+        "DBInstanceArn",
+        "DBInstanceIdentifier",
+        "GroupId",
+        "ImageId",
+        "InstanceId",
+        "LaunchTime",
+        "OwnerId",
+        "TagList",
+        "Tags",
+        "UserName",
+        "VolumeId",
+        "VpcId",
+        "__pytest_meta",
+        "displayName",
+        "id",
+        "kind",
+        "members",
+        "name",
+        "project",
+        "projectId",
+        "role",
+        "uniqueId",
+    ]
+)
 
 
 def serialize_datetimes(obj):
@@ -207,13 +288,6 @@ def get_metadata_from_funcargs(funcargs):
     for k in funcargs:
         if isinstance(funcargs[k], dict):
             metadata = {**metadata, **extract_metadata(funcargs[k])}
-    return metadata
-
-
-def get_metadata(function_args):
-    metadata = get_metadata_from_funcargs(function_args)
-    if gcp_client.get_project_id() != "":
-        metadata["gcp_project_id"] = gcp_client.get_project_id()
     return metadata
 
 
@@ -265,7 +339,7 @@ def pytest_runtest_makereport(item, call):
 
     # only add this during call instead of during any stage
     if report.when == "call" and not isinstance(item, DoctestItem):
-        metadata = get_metadata(item.funcargs)
+        metadata = get_metadata_from_funcargs(item.funcargs)
         markers = {n.name: serialize_marker(n) for n in get_node_markers(item)}
         severity = markers.get("severity", None) and markers.get("severity")["args"][0]
         regression = (

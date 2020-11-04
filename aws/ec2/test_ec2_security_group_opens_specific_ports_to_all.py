@@ -18,11 +18,11 @@ def test_ec2_security_group_opens_specific_ports_to_all(ec2_security_group, aws_
     inbound access on specific ports. Excluded ports are 80 and 443.
     """
     if ec2_security_group["InUse"]:
-        whitelisted_ports = aws_config.get_whitelisted_ports(
+        allowed_ports = aws_config.get_allowed_ports(
             ec2_security_group_test_id(ec2_security_group)
         )
         assert not ec2_security_group_opens_specific_ports_to_all(
-            ec2_security_group, whitelisted_ports
+            ec2_security_group, allowed_ports
         )
     else:
         pytest.skip("Security group not in use")

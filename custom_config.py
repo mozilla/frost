@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 
 import exemptions
 import severity
-import regressions
 
 
 class CustomConfig:
@@ -21,17 +20,17 @@ class CustomConfig:
 
         self.exemptions = exemptions.load(parsed_config.get("exemptions"))
         self.severities = severity.load(parsed_config.get("severities"))
-        self.regressions = regressions.load(parsed_config.get("regressions"))
 
     def add_markers(self, item):
         severity.add_severity_marker(item)
         exemptions.add_xfail_marker(item)
-        regressions.add_regression_marker(item)
 
 
 class CustomConfigMixin:
     def __init__(self, config):
         self.user_is_inactive = config.get("user_is_inactive", {})
+        self.allowed_ports_global = set(config.get("allowed_ports_global", []))
+        self.allowed_ports = config.get("allowed_ports", [])
 
     def no_activity_since(self):
         no_activity_since = self._parse_user_is_inactive_relative_time(
@@ -57,30 +56,11 @@ class CustomConfigMixin:
             weeks=+self.user_is_inactive[key].get("weeks", 0),
         )
 
+    def get_allowed_ports(self, test_id):
+        return self.get_allowed_ports_from_test_id(test_id) | self.allowed_ports_global
 
-class AWSConfig(CustomConfigMixin):
-    def __init__(self, config):
-        self.required_tags = frozenset(config.get("required_tags", []))
-        self.required_amis = frozenset(config.get("required_amis", []))
-        self.whitelisted_ports_global = set(config.get("whitelisted_ports_global", []))
-        self.whitelisted_ports = config.get("whitelisted_ports", [])
-        self.access_key_expires_after = config.get("access_key_expires_after", None)
-        self.admin_policies = frozenset(config.get("admin_policies", []))
-        self.admin_groups = frozenset(config.get("admin_groups", []))
-        self.owned_ami_account_ids = [
-            str(x) for x in config.get("owned_ami_account_ids", [])
-        ]
-        self.max_ami_age_in_days = config.get("max_ami_age_in_days", 180)
-        super().__init__(config)
-
-    def get_whitelisted_ports(self, test_id):
-        return (
-            self.get_whitelisted_ports_from_test_id(test_id)
-            | self.whitelisted_ports_global
-        )
-
-    def get_whitelisted_ports_from_test_id(self, test_id):
-        for rule in self.whitelisted_ports:
+    def get_allowed_ports_from_test_id(self, test_id):
+        for rule in self.allowed_ports:
             if rule["test_param_id"].startswith("*"):
                 substring = rule["test_param_id"][1:]
                 if re.search(substring, test_id):
@@ -90,6 +70,20 @@ class AWSConfig(CustomConfigMixin):
                 return set(rule["ports"])
 
         return set([])
+
+
+class AWSConfig(CustomConfigMixin):
+    def __init__(self, config):
+        self.required_tags = frozenset(config.get("required_tags", []))
+        self.required_amis = frozenset(config.get("required_amis", []))
+        self.access_key_expires_after = config.get("access_key_expires_after", None)
+        self.admin_policies = frozenset(config.get("admin_policies", []))
+        self.admin_groups = frozenset(config.get("admin_groups", []))
+        self.owned_ami_account_ids = [
+            str(x) for x in config.get("owned_ami_account_ids", [])
+        ]
+        self.max_ami_age_in_days = config.get("max_ami_age_in_days", 180)
+        super().__init__(config)
 
     def get_access_key_expiration_date(self):
         if self.access_key_expires_after is None:
@@ -102,10 +96,11 @@ class AWSConfig(CustomConfigMixin):
         )
 
 
-class GCPConfig:
+class GCPConfig(CustomConfigMixin):
     def __init__(self, config):
         self.allowed_org_domains = config.get("allowed_org_domains", [])
         self.allowed_gke_versions = config.get("allowed_gke_versions", [])
+        super().__init__(config)
 
 
 class GSuiteConfig(CustomConfigMixin):
