@@ -41,7 +41,10 @@ def get_client(profile, region, service):
     """
     session = get_session(profile)
 
-    if region not in session.get_available_regions(service):
+    if (
+        region not in session.get_available_regions(service)
+        and service not in SERVICES_WITHOUT_REGIONS
+    ):
         warnings.warn("service {} not available in {}".format(service, region))
 
     return session.create_client(service, region_name=region)
