@@ -18,7 +18,7 @@ def json_iso_datetimes(obj: Any) -> str:
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
 
-    raise TypeError("Unserializable type %s" % type(obj))
+    raise TypeError(f"Unserializable type {type(obj)}")
 
 
 def json_iso_datetime_string_to_datetime(obj: Dict[Any, Any]) -> Dict[Any, Any]:
