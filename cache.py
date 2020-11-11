@@ -7,7 +7,6 @@ import functools
 import json
 from typing import Any, Dict, Union, Tuple
 
-import py
 from dateutil.parser import isoparse
 import _pytest
 import _pytest.cacheprovider
