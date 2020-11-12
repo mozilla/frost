@@ -5,21 +5,23 @@ Patch for pytest cache to serialize datetime.datetime
 import datetime
 import functools
 import json
+from typing import Any, Dict, Union, Tuple
 
-import py
 from dateutil.parser import isoparse
+import _pytest
+import _pytest.cacheprovider
 
 
-def json_iso_datetimes(obj):
+def json_iso_datetimes(obj: Any) -> str:
     """JSON serializer for objects not serializable by default json
     module."""
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
 
-    raise TypeError("Unserializable type %s" % type(obj))
+    raise TypeError(f"Unserializable type {type(obj)}")
 
 
-def json_iso_datetime_string_to_datetime(obj):
+def json_iso_datetime_string_to_datetime(obj: Dict[Any, Any]) -> Dict[Any, Any]:
     """JSON object hook that converts object vals from ISO datetime
     strings to python datetime.datetime`s if possible."""
 
@@ -35,7 +37,11 @@ def json_iso_datetime_string_to_datetime(obj):
     return obj
 
 
-def datetime_encode_set(self, key, value):
+def datetime_encode_set(
+    self: _pytest.cacheprovider.Cache,
+    key: str,
+    value: Union[str, int, float, Dict[Any, Any], Tuple[Any]],
+) -> None:
     """save value for the given key.
 
     :param key: must be a ``/`` separated value. Usually the first
@@ -60,7 +66,9 @@ def datetime_encode_set(self, key, value):
             self._ensure_supporting_files()
 
 
-def datetime_encode_get(self, key, default):
+def datetime_encode_get(
+    self: _pytest.cacheprovider.Cache, key: str, default: Any
+) -> Any:
     """return cached value for the given key.  If no value
     was yet cached or the value cannot be read, the specified
     default is returned.
@@ -78,6 +86,8 @@ def datetime_encode_get(self, key, default):
         return default
 
 
-def patch_cache_set(config):
-    config.cache.set = functools.partial(datetime_encode_set, config.cache)
-    config.cache.get = functools.partial(datetime_encode_get, config.cache)
+def patch_cache_set(config: _pytest.config.Config) -> None:
+    assert config.cache, "pytest does not have a cache configured to patch"
+    # types ignored due to https://github.com/python/mypy/issues/2427
+    config.cache.set = functools.partial(datetime_encode_set, config.cache)  # type: ignore
+    config.cache.get = functools.partial(datetime_encode_get, config.cache)  # type: ignore
