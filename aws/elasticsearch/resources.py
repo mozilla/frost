@@ -4,6 +4,8 @@ from conftest import botocore_client
 def elasticsearch_domains():
     """
     http://botocore.readthedocs.io/en/latest/reference/services/es.html#ElasticsearchService.Client.describe_elasticsearch_domains
+
+    This test does not work properly when using multiple AWS accounts.
     """
     # You can only get 5 at a time.
     domains_list = list_elasticsearch_domains()
