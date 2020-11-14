@@ -132,18 +132,18 @@ def iam_admin_login_profiles():
 
 
 def iam_admin_mfa_devices():
-    "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
+    "https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
     return iam_mfa_devices(iam_admin_users())
 
 
 def iam_user_login_profiles():
     "http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile"
-    return iam_login_profiles([user for user in iam_users()])
+    return iam_login_profiles(iam_users())
 
 
 def iam_user_mfa_devices():
-    "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
-    return iam_mfa_devices([user for user in iam_users()])
+    "https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
+    return iam_mfa_devices(iam_users())
 
 
 def iam_login_profiles(users):
@@ -163,7 +163,7 @@ def iam_login_profiles(users):
 
 
 def iam_mfa_devices(users):
-    "botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
+    "https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices"
     return [
         botocore_client.get(
             "iam", "list_mfa_devices", [], {"UserName": user["UserName"]}

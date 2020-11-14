@@ -75,7 +75,7 @@ def rds_db_snapshots():
     )
 
 
-def rds_db_snapshots_attributes():
+def rds_db_snapshot_attributes():
     "http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshot_attributes"
     empty_attrs = {"DBSnapshotAttributesResult": {"DBSnapshotAttributes": []}}
     return [

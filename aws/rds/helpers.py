@@ -142,6 +142,24 @@ def get_db_security_group_arn(sg):
     return get_param_id(sg, "DBSecurityGroupArn")
 
 
+def get_rds_resource_id(resource):
+    if isinstance(resource, dict) and "DBInstanceIdentifier" in resource:
+        return get_db_instance_id(resource)
+    if isinstance(resource, dict) and "DBSnapshotArn" in resource:
+        return get_db_snapshot_arn(resource)
+    if isinstance(resource, dict) and "DBSecurityGroupArn" in resource:
+        return get_db_security_group_arn(resource)
+    if isinstance(resource, dict) and "AttributeName" in resource:
+        return get_param_id(resource, "AttributeName")
+
+    if isinstance(resource, list):
+        if len(resource) == 0:
+            return "empty"
+        return get_rds_resource_id(resource[0])
+
+    return None
+
+
 def rds_db_snapshot_not_too_old(snapshot, snapshot_created_days_ago=365):
     """
     Check a rds snapshot is created "snapshot_created_days_ago".

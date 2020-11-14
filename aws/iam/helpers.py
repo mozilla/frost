@@ -152,7 +152,10 @@ def get_iam_user_name(login):
     return get_param_id(login, "UserName")
 
 
-def get_iam_user_name_only(user):
-    if isinstance(user, dict) and "UserName" in user:
-        return get_iam_user_name(user)
+def get_iam_resource_id(resource):
+    if isinstance(resource, dict) and "UserName" in resource:
+        return get_iam_user_name(resource)
+    if isinstance(resource, list):
+        if len(resource) == 0:
+            return "empty"
     return None
