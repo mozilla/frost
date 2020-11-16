@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import os
-from collections import namedtuple
 import functools
 import itertools
+import os
+import warnings
+from collections import namedtuple
+from hashlib import md5
 from typing import (
     Any,
     Callable,
@@ -15,7 +17,6 @@ from typing import (
     NamedTuple,
     Union,
 )
-import warnings
 
 import _pytest.cacheprovider
 import botocore
@@ -79,6 +80,14 @@ def get_available_services(profile: Optional[str] = None) -> Iterable[str]:
     return services
 
 
+@functools.lru_cache()
+def get_account_id(profile: str) -> str:
+    sts = get_client(profile, "us-east-1", "sts")
+    identity = sts.get_caller_identity()
+    account_id: str = identity["Account"]
+    return account_id
+
+
 def full_results(
     client: botocore.client.BaseClient,
     method: str,
@@ -119,22 +128,28 @@ def cache_key(call: AWSAPICall) -> str:
     ... method='method_name',
     ... args=['arg1', 'arg2'],
     ... kwargs=dict(kwarg1=True)))
-    'pytest_aws:profile:region:service_name:method_name:arg1,arg2:kwarg1=True.json'
+    'pytest_aws/profile/region/service_name/method_name/9965c005f623cd9130dd5a6dbdee87de.json'
     """
-    return (
-        ":".join(
-            [
-                "pytest_aws",
-                str(call.profile),
-                str(call.region),
-                str(call.service),
-                str(call.method),
-                ",".join(call.args),
-                ",".join("{}={}".format(k, v) for (k, v) in call.kwargs.items()),
-            ]
-        )
-        + ".json"
+    path = "/".join(
+        [
+            "pytest_aws",
+            str(call.profile if call.profile is not None else get_account_id(None)),
+            str(call.region),
+            str(call.service),
+            str(call.method),
+        ]
     )
+
+    arguments = ":".join(
+        [
+            ",".join(call.args),
+            ",".join("{}={}".format(k, v) for (k, v) in call.kwargs.items()),
+        ]
+    )
+
+    filename = md5(str.encode(arguments)).hexdigest() + ".json"
+
+    return f"{path}/{filename}"
 
 
 def get_aws_resource(
