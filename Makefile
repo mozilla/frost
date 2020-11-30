@@ -68,7 +68,7 @@ doc-preview: check_venv
 		> $@
 
 doctest: check_venv .all_python_files.tmp
-	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $$(cat .all_python_files.tmp)
+	frost test -vv --doctest-modules -s --offline --debug-calls $$(cat .all_python_files.tmp)
 
 coverage: check_venv .all_python_files.tmp
 	frost test --cov-config .coveragerc --cov=. \

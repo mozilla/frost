@@ -7,9 +7,11 @@
 from github.branches.validate_compliance import Criteria
 from typing import Any, Optional
 
-from .retrieve_github_data import get_repo_branch_protections
+from .retrieve_github_data import BranchOfInterest, get_repo_branch_protections
+from .retrieve_github_data import repos_to_check
 from . import validate_compliance
-from .conftest import repos_to_check
+
+# from .conftest import repos_to_check
 
 
 import pytest
@@ -28,22 +30,19 @@ def idfn(val: Any) -> Optional[str]:
     "criteria", validate_compliance.required_criteria, ids=Criteria.idfn
 )
 def test_required_protections(
-    gql_connection: Any, repo_to_check: str, criteria: Criteria
+    gql_connection: Any, repo_to_check: BranchOfInterest, criteria: Criteria
 ) -> None:
-    line = repo_to_check
-    # for line in repos_to_check:
-    if "," in line:
-        url, branch = line.split(",")
-    else:
-        url, branch = line, None
-    owner, repo = url.split("/")[3:5]
-    protections = get_repo_branch_protections(gql_connection, f"{owner}/{repo}")
+    protections = get_repo_branch_protections(
+        gql_connection, f"{repo_to_check.owner}/{repo_to_check.repo}"
+    )
     rules = protections.protection_rules
 
     if not rules:
-        assert False, f"ERROR:SOGH001:{owner}/{repo}:{branch} has no branch protection"
+        assert (
+            False
+        ), f"ERROR:SOGH001:{repo_to_check.owner}/{repo_to_check.repo}:{repo_to_check.branch} has no branch protection"
     else:
         met, message = validate_compliance.validate_branch_protections(
-            protections, branch, criteria
+            protections, repo_to_check.branch, criteria
         )
         assert met, message

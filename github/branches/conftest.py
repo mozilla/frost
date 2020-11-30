@@ -9,6 +9,12 @@
 # TODO convert to logger output
 # TODO add sleep_* for 'core' functionality
 
+from github.branches.validate_compliance import Criteria
+from github.branches.retrieve_github_data import BranchOfInterest
+from conftest import METADATA_KEYS
+
+METADATA_KEYS.update(BranchOfInterest.metadata_to_log())
+METADATA_KEYS.update(Criteria.metadata_to_log())
 
 if __name__ == "__main__":
     # TODO add doctests

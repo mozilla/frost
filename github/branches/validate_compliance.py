@@ -52,7 +52,7 @@ def find_applicable_rules(
     result = []
     for rule in data.protection_rules:
         for ref_name in rule.matching_branches:
-            if branch == ref_name.name:
+            if branch == ref_name.branch_name:
                 result.append(rule)
                 break
     return result

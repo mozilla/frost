@@ -17,7 +17,7 @@ import os
 from dataclasses import dataclass, field
 import json
 import sys
-from typing import Any, Generator, List
+from typing import Any, Generator, Optional, List
 
 from sgqlc.operation import Operation  # noqa: I900
 from sgqlc.endpoint.http import HTTPEndpoint  # noqa: I900
@@ -42,8 +42,8 @@ logger = logging.getLogger(__name__)
 # BPR that actually matches a current branch.
 @dataclass
 class BranchName:
-    name: str
-    prefix: str
+    branch_name: str
+    branch_prefix: str
     _type: str = "BranchName"
     _revision: int = 1
 
@@ -57,8 +57,8 @@ class BranchName:
 
     def csv_row(self) -> List[str]:
         return [
-            self.name or None,
-            self.prefix or None,
+            self.branch_name or None,
+            self.branch_prefix or None,
         ]
 
     def flat_json(self) -> Generator:
@@ -125,17 +125,17 @@ class BranchProtectionRule:
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
 
-# Todo figure out how to avoid global
+# TODO figure out how to avoid global
 _collection_date: str = "1970-01-01"
 
 
 @dataclass
 class RepoBranchProtections:
-    default_branch_ref: str
     name_with_owner: str
-    owner_v4id: str
-    repo_v4id: str
-    repo_v3id: str
+    default_branch_ref: str = ""
+    owner_v4id: str = ""
+    repo_v4id: str = ""
+    repo_v3id: str = ""
     protection_rules: List[BranchProtectionRule] = field(default_factory=list)
     _type: str = "RepoBranchProtections"
     _revision: int = 1
@@ -181,6 +181,29 @@ class RepoBranchProtections:
         d = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
         d["day"] = _collection_date
         return d
+
+
+@dataclass
+class BranchOfInterest:
+    """
+    docstring
+    """
+
+    owner: str
+    repo: str
+    branch: str
+    status: str
+
+    @classmethod
+    def metadata_to_log(_) -> List[str]:
+        return ["owner", "repo", "branch", "status"]
+
+    @staticmethod
+    def idfn(val: Any) -> Optional[str]:
+        """provide ID for pytest Parametrization."""
+        if isinstance(val, (BranchOfInterest,)):
+            return f"{val.owner}/{val.repo}:{val.branch}"
+        return None
 
 
 def _add_protection_fields(node) -> None:
@@ -267,7 +290,7 @@ def get_nested_branch_data(endpoint, reponame):
     errors = d.get("errors")
     if errors:
         endpoint.report_download_errors(errors)
-        return RepoBranchProtections(reponame)
+        return RepoBranchProtections(name_with_owner=reponame)
 
     repodata = (op + d).repository
 
@@ -311,12 +334,14 @@ def get_nested_branch_data(endpoint, reponame):
             # op = create_rule_query()
             # gql_vars = {"$LAST_CURSOR": repodata}
             # pass
-            logger.error("Pagination needed for matching refs - not yet implemented")
+            logger.error(
+                f"Pagination needed for matching refs in {reponame}- not yet implemented"
+            )
             break
         elif repodata.branch_protection_rules.page_info.has_next_page:
             # we can't advance here until all matching refs are gathered
             logger.error(
-                "Pagination needed for branch protection rules - not yet implemented"
+                f"Pagination needed for branch protection rules in {reponame}- not yet implemented"
             )
             break
         else:
@@ -494,13 +519,17 @@ def _in_offline_mode() -> bool:
         import conftest
 
         is_offline = conftest.get_client("github_client").is_offline()
+        if not is_offline:
+            # check for a valid GH_TOKEN here so we fail during test collection
+            # TODO: make sure this works in all scenarios
+            os.environ["GH_TOKEN"]
     except ImportError:
         pass
 
     return is_offline
 
 
-def _repos_to_check() -> List[str]:
+def repos_to_check() -> List[BranchOfInterest]:
     # just shell out for now
     # TODO: fix ickiness
     #   While there is no network operation done here, we don't want to go
@@ -521,10 +550,11 @@ def _repos_to_check() -> List[str]:
         "jq",
         "-rc",
         """.codeRepositories[]
-                | select(.status == "active")
+                | select(.status != "deprecated")
                 | .url as $url
+                | .status as $status
                 | .branchesToProtect[] // ""
-                | [$url, . ]
+                | [$url, ., $status ]
                 | @csv
                 """,
         *in_files,
@@ -538,11 +568,12 @@ def _repos_to_check() -> List[str]:
         if x
     ]:
         if "," in line:
-            url, branch = line.split(",")
+            url, branch, status = line.split(",")
         else:
-            url, branch = line, None
+            url, branch = line, "", "unknown"
         owner, repo = url.split("/")[3:5]
-        owner_repo.append(f"{owner}/{repo}")
+        branch_info = BranchOfInterest(owner, repo, branch, status)
+        owner_repo.append(branch_info)
 
     return owner_repo
 
@@ -554,7 +585,9 @@ def main() -> int:
     args = parse_args()
     endpoint = get_connection(args.graphql_endpoint, args.token)
     if args.prod:
-        args.repo = _repos_to_check()
+        # DEVHACK should have way to preserve status from cli -- maybe filter
+        # in this comprehension?
+        args.repo = [f"{x.owner}/{x.repo}" for x in repos_to_check()]
     if not args.no_csv:
         if args.output:
             csv_out = csv.writer(open(args.output, "w"))
