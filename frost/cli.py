@@ -56,12 +56,15 @@ def run_pytest(ctx, pytest_args):
 
     -s to disable capturing stdout https://docs.pytest.org/en/latest/capture.html
 
-    and frost specific arg:
+    and frost specific args:
 
     --debug-calls to print AWS API calls
+    --ignore-glob='*.py' to require explicit test specification
     """
     switch_to_frost_parent_directory()
-    pytest.main(["-s", "--debug-calls"] + list(pytest_args))
+    sys.exit(
+        pytest.main(["-s", "--debug-calls", "--ignore-glob='*.py'"] + list(pytest_args))
+    )
 
 
 if __name__ == "__main__":

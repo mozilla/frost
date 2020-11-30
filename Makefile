@@ -16,6 +16,7 @@ PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSI
 		      you're running $(shell python3 -V))
 PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
 		      you're running $(shell python3 -V))
+AUTOBUILD_OPTS ?= --open-browser --port=0 --delay 5
 
 all: check_venv
 	frost test
@@ -54,6 +55,13 @@ clean-python:
 
 doc-build: check_venv
 	type sphinx-build || { echo "please run `make install-docs` to build docs"; false; }
+	@# we regen the api docs every time -- they are not checked in.
+	rm -rf docs/source
+	sphinx-apidoc --no-toc -o docs/source .
+	@# TODO: Add new service modules below also in docs/Source.rst
+	for module in frost aws gcp gsuite; do \
+		sphinx-apidoc -f -o docs/source/$$module $$module ; \
+	done
 	make -C docs clean html
 
 doc-preview: check_venv
@@ -62,6 +70,7 @@ doc-preview: check_venv
 
 # We need the list of all python file in several places, so only compute
 # it once.
+# TODO: move this to a Makefile variable
 .all_python_files.tmp:
 	find . -type d \( -name venv -o -name .??\* \) -prune \
 		-o -not -name setup.py -name \*.py -print \

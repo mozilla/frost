@@ -20,7 +20,7 @@ def clusters():
             "container",
             "projects.locations.clusters",
             results_key="clusters",
-            call_kwargs={"parent": f"projects/{project_id}/locations/-"},
+            call_kwargs={"parent": "projects/{}/locations/-".format(project_id)},
         )
     return results
 

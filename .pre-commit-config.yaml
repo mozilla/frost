@@ -18,11 +18,11 @@ repos:
     -   id: check-merge-conflict
     -   id: check-toml
 
--   repo: https://github.com/asottile/pyupgrade
-    rev: v2.7.2
-    hooks:
-    -   id: pyupgrade
-        args: ["--py38-plus"]
+## ## -   repo: https://github.com/asottile/pyupgrade
+## ##     rev: v2.7.2
+## ##     hooks:
+## ##     -   id: pyupgrade
+## ##         args: ["--py38-plus"]
 
 ## ## - repo: https://github.com/jumanjihouse/pre-commit-hooks
 ## ##   rev: master  # or specific git tag

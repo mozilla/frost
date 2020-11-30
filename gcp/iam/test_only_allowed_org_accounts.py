@@ -29,7 +29,9 @@ def test_only_allowed_org_accounts(iam_binding, allowed_org_domains):
 
     if iam_binding["role"] not in EXCLUDED_ROLES:
         for member in iam_binding["members"]:
-            if not member.startswith("serviceAccount"):
+            if not member.startswith("serviceAccount") and not member.startswith(
+                "deleted:serviceAccount"
+            ):
                 assert (
                     member.split("@")[-1] in allowed_org_domains
                 ), f"{member} was found and is not in the allowed_org_domains"

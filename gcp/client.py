@@ -86,7 +86,7 @@ class GCPClient:
                     .getIamPolicy(resource=project_id, body={})
                     .execute()
                 )
-                policies += resp
+                policies.append(resp)
             except HttpError as e:
                 if "has not been used in project" in e._get_reason():
                     continue
@@ -104,7 +104,9 @@ class GCPClient:
                 request = (
                     service.projects()
                     .locations()
-                    .getServerConfig(name=f"projects/{project_id}/locations/us-west1")
+                    .getServerConfig(
+                        name="projects/{}/locations/us-west1".format(project_id)
+                    )
                 )
                 resp = request.execute()
             except HttpError as e:
@@ -233,7 +235,9 @@ class GCPClient:
             api_entity = getattr(api_entity, entity)()
 
         if self.debug_calls:
-            print(f"calling {product}.{subproduct} for project {project_id}")
+            print(
+                "calling {}.{} for project {}".format(product, subproduct, project_id)
+            )
 
         if self._zone_aware(product, subproduct):
             results = []

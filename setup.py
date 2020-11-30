@@ -7,7 +7,7 @@ with open("README.md") as fh:
     long_description = fh.read()
 
 install_requires = [
-    line.split("==")[0] for line in open("requirements.txt") if ".git" not in line
+    line.split("==")[0] for line in open("requirements.txt", "r") if ".git" not in line
 ]
 
 setuptools.setup(
@@ -30,4 +30,5 @@ setuptools.setup(
     ],
     python_requires=">=3.8",
     entry_points={"console_scripts": ["frost=frost.cli:cli"],},
+    include_package_data=True,
 )
