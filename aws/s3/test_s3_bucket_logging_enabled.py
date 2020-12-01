@@ -1,6 +1,6 @@
 import pytest
 
-from aws.s3.helpers import get_s3_bucket_name
+from aws.s3.helpers import get_s3_resource_id
 from aws.s3.resources import s3_buckets, s3_buckets_logging
 
 
@@ -8,7 +8,7 @@ from aws.s3.resources import s3_buckets, s3_buckets_logging
 @pytest.mark.parametrize(
     ["s3_bucket", "s3_bucket_logging_enabled"],
     zip(s3_buckets(), s3_buckets_logging()),
-    ids=get_s3_bucket_name,
+    ids=get_s3_resource_id,
 )
 def test_s3_bucket_logging_enabled(s3_bucket, s3_bucket_logging_enabled):
     """
