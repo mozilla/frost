@@ -1,4 +1,7 @@
-def pytest_configure(config):
+from _pytest.config import Config
+
+
+def pytest_configure(config: Config) -> None:
     # register custom marks for aws services
     for svc_name in [
         "aws",

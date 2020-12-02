@@ -9,12 +9,16 @@ warnings.filterwarnings(
 
 
 def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
-    return (
-        ":".join(
-            ["pytest_gcp", project_id, version, product, subproduct, call, id_value]
-        )
-        + ".json"
-    )
+    """Returns the fullname (directory and filename) for a cached GCP API call.
+
+    >>> cache_key("123", "v1", "compute", "firewalls")
+    'pytest_gcp/123/v1/compute/firewalls/list:na.json'
+    >>> cache_key("123", "v1", "compute", "firewalls", "get", "321")
+    'pytest_gcp/123/v1/compute/firewalls/get:321.json'
+    """
+    path = "/".join(["pytest_gcp", project_id, version, product, subproduct])
+    filename = ":".join([call, id_value]) + ".json"
+    return f"{path}/{filename}"
 
 
 def get_all_projects_in_folder(folder_id=None):
@@ -86,7 +90,7 @@ class GCPClient:
                     .getIamPolicy(resource=project_id, body={})
                     .execute()
                 )
-                policies += resp
+                policies.append(resp)
             except HttpError as e:
                 if "has not been used in project" in e._get_reason():
                     continue
