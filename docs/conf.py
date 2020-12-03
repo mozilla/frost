@@ -43,6 +43,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinxcontrib.mermaid",
     "myst_parser",
 ]
 
