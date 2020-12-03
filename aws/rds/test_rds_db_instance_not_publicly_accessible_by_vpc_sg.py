@@ -16,7 +16,7 @@ from aws.rds.helpers import (
     zip(rds_db_instances_with_tags(), rds_db_instances_vpc_security_groups()),
     ids=lambda db: get_db_instance_id(db)
     if isinstance(db, dict) and "DBInstanceIdentifier" in db
-    else None,
+    else "secgroups",
 )
 def test_rds_db_instance_not_publicly_accessible_by_vpc_security_group(
     rds_db_instance, ec2_security_groups

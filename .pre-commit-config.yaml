@@ -51,7 +51,9 @@ repos:
       args:
       - "--skip"
       - "B101"          # use of assert
-      - --quiet
+      - "--baseline"
+      - ".bandit_baseline.json" # use of md5 for local filename
+      - "--quiet"
 
 - repo: https://github.com/Yelp/detect-secrets
   rev: v0.14.2
