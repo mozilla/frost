@@ -14,7 +14,7 @@ import logging
 from pprint import pprint
 from typing import List, Optional, Sequence, Tuple
 
-import argcomplete  # type: ignore
+# import argcomplete  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -236,7 +236,7 @@ def perform_action(action: Action) -> bool:
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, epilog=_epilog)
     parser.add_argument("json_file", help="frost json output")
-    argcomplete.autocomplete(parser)
+    # argcomplete.autocomplete(parser)
     args = parser.parse_args()
     return args
 

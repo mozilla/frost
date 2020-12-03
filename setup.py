@@ -3,7 +3,11 @@
 import setuptools
 from frost import SOURCE_URL, VERSION
 
-with open("README.md") as fh:
+desc_file = "README.md"
+if not os.path.exists(desc_file):
+    # hack for import when we're building docs - curdir is ./docs/
+    desc_file = "../" + desc_file
+with open(desc_file, "r") as fh:
     long_description = fh.read()
 
 install_requires = [

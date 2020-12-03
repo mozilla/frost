@@ -11,6 +11,7 @@
 # TODO: add sleep_* for 'core' functionality
 
 from conftest import github_client
+from dataclasses import dataclass
 from functools import lru_cache
 import logging
 import os
@@ -24,6 +25,7 @@ import conftest
 logger = logging.getLogger(__name__)
 # Data to move to config
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
+
 
 # Data collection routines -- these likely should be a separate python
 # package, as they are useful outside of frost as written

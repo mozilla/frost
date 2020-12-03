@@ -4,28 +4,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-from typing import Any, List, Optional, Tuple
-from dataclasses import dataclass
+from typing import List, Tuple
 
 from .retrieve_github_data import OrgInfo
-
-
-@dataclass
-class Criteria:
-    standard_number: str  # as defined in messages file. alpha-numeric
-    slug: str  # id to match. alpha-numeric
-    description: str  # whatever you want
-
-    @staticmethod
-    def idfn(val: Any) -> Optional[str]:
-        """provide ID for pytest Parametrization."""
-        if isinstance(val, (Criteria,)):
-            return f"{val.standard_number}-{val.slug}"
-        return None
-
-    def __str__(self: Any) -> str:
-        return f"{self.standard_number} {self.description}"
-
+from ..helpers import Criteria
 
 # define the criteria we care about. Identify each critera with a string that will
 # appear in the results.

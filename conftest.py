@@ -235,7 +235,7 @@ class SingleSet(set):
                 error_values.add(value)
         if error_values:
             # we want the non-duplicate values added
-            super().update(values - error_values)
+            super().update(set(values))
             raise DuplicateKeyError(
                 "Value(s) {!r} already present".format(error_values)
             )

@@ -14,7 +14,8 @@ PATH_TO_EXEMPTIONS=${PATH_TO_EXEMPTIONS:-$PWD/github/exemptions-github.yaml}
 
 PROFILE="github"
 
-pytest_json=results-$PROFILE-$TODAY.json
+pytest_json=pytest-results-$PROFILE-$TODAY.json
+frost_json=results-$PROFILE-$TODAY.json
 
 
 pytest --continue-on-collection-errors \
@@ -23,10 +24,11 @@ pytest --continue-on-collection-errors \
     --json="$pytest_json" \
     --config "${PATH_TO_EXEMPTIONS}" || true
 
+python service_report_generator.py --json-out "${frost_json}" "${pytest_json}"
 
-# post processing works directly with the output from pytest
-"$PATH_TO_SCRIPTS/manage_issues.py" "$pytest_json"
-"$PATH_TO_SCRIPTS/create_metrics.py" "$pytest_json"
+# post processing works with the modified output from pytest
+"$PATH_TO_SCRIPTS/manage_issues.py" "$frost_json"
+"$PATH_TO_SCRIPTS/create_metrics.py" "$frost_json"
 
 
 

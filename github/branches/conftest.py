@@ -9,7 +9,8 @@
 # TODO convert to logger output
 # TODO add sleep_* for 'core' functionality
 
-from github.branches.validate_compliance import Criteria
+# from github.branches.validate_compliance import Criteria
+from ..helpers import Criteria
 from github.branches.retrieve_github_data import BranchOfInterest
 from conftest import METADATA_KEYS
 

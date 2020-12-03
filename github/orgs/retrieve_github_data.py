@@ -31,7 +31,7 @@ _collection_date: str = "1970-01-01"
 # Collect and return information about organization protections
 @dataclass
 class OrgInfo:
-    name: str
+    org_name: str
     login: str
     requires_two_factor_authentication: bool
     org_v4id: str
@@ -41,7 +41,7 @@ class OrgInfo:
 
     @classmethod
     def metadata_to_log(_) -> List[str]:
-        return ["name", "login", "requires_two_factor_authentication", "org_v4id"]
+        return ["org_name", "login", "requires_two_factor_authentication", "org_v4id"]
 
     @staticmethod
     def idfn(val: Any) -> Optional[str]:
@@ -62,7 +62,7 @@ class OrgInfo:
         global _collection_date
         return [
             _collection_date,
-            self.name or None,
+            self.org_name or None,
             self.login or None,
             str(self.requires_two_factor_authentication) or None,
             self.org_v4id or None,
@@ -81,7 +81,7 @@ def create_operation(owner):
 
     We build the structure for:
       organization:
-        name (may contain spaces)
+        org_name (may contain spaces)
         login (no spaces)
         requires 2fa
     """
@@ -107,7 +107,7 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
     if errors:
         endpoint.report_download_errors(errors)
         return OrgInfo(
-            name="",
+            org_name="",
             login=org,
             requires_two_factor_authentication=False,
             org_v4id=None,
@@ -124,7 +124,7 @@ def get_org_info(endpoint: Any, org: str) -> OrgInfo:
 def extract_org_data(orgdata) -> OrgInfo:
     """extract relevant data from sgqlc structure."""
     org_data = OrgInfo(
-        name=orgdata.name,
+        org_name=orgdata.name,
         login=orgdata.login,
         requires_two_factor_authentication=orgdata.requires_two_factor_authentication,
         org_v4id=orgdata.id,
