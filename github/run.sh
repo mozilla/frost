@@ -27,8 +27,8 @@ pytest --continue-on-collection-errors \
 python service_report_generator.py --json-out "${frost_json}" "${pytest_json}"
 
 # post processing works with the modified output from pytest
-"$PATH_TO_SCRIPTS/manage_issues.py" "$frost_json"
-"$PATH_TO_SCRIPTS/create_metrics.py" "$frost_json"
+## "$PATH_TO_SCRIPTS/manage_issues.py" "$frost_json"
+## "$PATH_TO_SCRIPTS/create_metrics.py" "$frost_json"
 
 
 
