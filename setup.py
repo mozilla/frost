@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import setuptools
 from frost import SOURCE_URL, VERSION
 
