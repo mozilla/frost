@@ -8,14 +8,6 @@ AWS_PROFILE := default
 
 PYTEST_OPTS := ''
 
-# Prepare for python version checks
-PYTHON_MIN_VERSION := 3.8
-PYTHON_CUR_VERSION := $(shell python3 -V 2>/dev/null)
-PYTHON_GOOD := $(shell echo $(PYTHON_CUR_VERSION) | grep --silent $(PYTHON_MIN_VERSION) && echo true || echo false )
-PYTHON_VER_WARNING = $(warning Warning! Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python3 -V))
-PYTHON_VER_ERROR = $(error Frost supports Python $(PYTHON_MIN_VERSION), \
-		      you're running $(shell python3 -V))
 AUTOBUILD_OPTS ?= --open-browser --port=0 --delay 5
 
 all: check_venv
@@ -29,10 +21,6 @@ awsci: check_venv
 check_venv:
 ifeq ($(VIRTUAL_ENV),)
 	$(error "Run frost from a virtualenv (try 'make install && source venv/bin/activate')")
-else ifneq ($(PYTHON_GOOD),true)
-	$(PYTHON_VER_WARNING)
-else
-	@echo "Using $(PYTHON_CUR_VERSION)"
 endif
 
 check_conftest_imports:
@@ -70,7 +58,6 @@ doc-preview: check_venv
 
 # We need the list of all python file in several places, so only compute
 # it once.
-# TODO: move this to a Makefile variable
 .all_python_files.tmp:
 	find . -type d \( -name venv -o -name .??\* \) -prune \
 		-o -not -name setup.py -name \*.py -print \

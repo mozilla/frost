@@ -14,9 +14,6 @@ from github.client import GitHubClient
 
 import custom_config
 
-# MERGE: DO NOT MERGE: -- for local testing only!
-# collect_ignore_glob = ["*.py"]
-
 botocore_client = None
 gcp_client = None
 gsuite_client = None
@@ -296,9 +293,15 @@ def serialize_datetimes(obj):
 
 
 def extract_metadata(resource):
+    # In some cases, `resource` will "have a dict" rather than "be a
+    # dict". (e.g. DataClasses instances). We do require that
+    # those non-dict classes have a "real" dict as the value of their
+    # __dict__ instance variable. (Runtime exception if not.)
     if isinstance(resource, (dict,)):
+        # resource is (or inherits from) dict
         target = resource
     else:
+        # resource has an embedded dict that should be used
         target = resource.__dict__
     x = {
         metadata_key: target[metadata_key]
