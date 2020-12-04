@@ -18,11 +18,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
             git \
             jq
 
+COPY . /app
 WORKDIR /app
 
-
-COPY frost/* frost/
-COPY * ./
 RUN python setup.py install
 
 USER app
