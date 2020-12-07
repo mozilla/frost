@@ -14,7 +14,7 @@ from pathlib import Path
 # TODO: see if this file can be folded into frost's cli wrapper support.
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-import orgs.retrieve_github_data as org_retrieve_github_data
+from github.orgs import retrieve_github_data as org_retrieve_github_data
 from github.branches import retrieve_github_data as branch_retrieve_github_data
 
 if __name__ == "__main__":
