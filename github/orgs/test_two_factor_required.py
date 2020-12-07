@@ -12,30 +12,6 @@ from github.orgs.validate_compliance import Criteria
 from .retrieve_github_data import get_all_org_data, OrgInfo
 from . import validate_compliance
 
-# Debugging proper credentials can be challenging, so print out the
-# "viewer" ("authenticated user" in v3 parlance)
-viewer_login: str = "<unqueried>"
-
-
-def get_viewer(endpoint):
-    from sgqlc.operation import Operation  # noqa: I900
-    from github import github_schema as schema  # noqa: I900
-
-    global viewer_login
-    if viewer_login == "<unqueried>":
-        op = Operation(schema.Query)
-
-        org = op.viewer()
-        org.login()
-        d = endpoint(op)
-        errors = d.get("errors")
-        if errors:
-            viewer_login = "<unknown>"
-        else:
-            viewer_login = (op + d).viewer.login
-
-    return viewer_login
-
 
 @pytest.mark.parametrize("org_info", get_all_org_data(), ids=OrgInfo.idfn)
 @pytest.mark.parametrize(
@@ -46,7 +22,8 @@ def test_require_2fa(
     org_info: List[OrgInfo],
     criteria: validate_compliance.Criteria,
 ) -> None:
-    # info = get_org_info(gql_connection, f"{org_to_check}")
+    # we only care about orgs that exist for this criteria
+    # renamed orgs or stale data cases are handled in different tests
     if org_info:
         met, message = validate_compliance.validate_org_info(org_info, criteria)
         assert met, message

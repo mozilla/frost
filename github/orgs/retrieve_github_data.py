@@ -198,6 +198,23 @@ def parse_args():
     return args
 
 
+def validate_viewer(endpoint):
+    # Debugging proper credentials can be challenging, so print out the
+    # "viewer" ("authenticated user" in v3 parlance)
+
+    from sgqlc.operation import Operation  # noqa: I900
+    from github import github_schema as schema  # noqa: I900
+
+    op = Operation(schema.Query)
+
+    org = op.viewer()
+    org.login()
+    d = endpoint(op)
+    errors = d.get("errors")
+    if errors:
+        raise ValueError("Invalid GitHub credentials")
+
+
 def _in_offline_mode() -> bool:
     is_offline = False
     try:
@@ -209,6 +226,10 @@ def _in_offline_mode() -> bool:
         if not is_offline:
             # check for a valid GH_TOKEN here so we fail during test collection
             os.environ["GH_TOKEN"]
+            endpoint = get_connection(
+                DEFAULT_GRAPHQL_ENDPOINT, os.environ.get("GH_TOKEN")
+            )
+            validate_viewer(endpoint)
 
     except ImportError:
         pass
