@@ -5,16 +5,16 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/
 
 import sys
-import os
 from pathlib import Path
 
 
 # Pretend we're running from the root of frost
 # that lets us use absolute imports, and avoid "beyond package" errors
 # TODO: refactor to avoid this (may not be possible)
+# TODO: see if this file can be folded into frost's cli wrapper support.
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from github.orgs import retrieve_github_data as org_retrieve_github_data
+import orgs.retrieve_github_data as org_retrieve_github_data
 from github.branches import retrieve_github_data as branch_retrieve_github_data
 
 if __name__ == "__main__":

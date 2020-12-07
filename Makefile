@@ -46,7 +46,7 @@ doc-build: check_venv
 	@# we regen the api docs every time -- they are not checked in.
 	rm -rf docs/source
 	sphinx-apidoc --no-toc -o docs/source .
-	@# TODO: Add new service modules below also in docs/Source.rst
+	@# Add new service modules below also in docs/Source.rst
 	for module in frost aws gcp gsuite; do \
 		sphinx-apidoc -f -o docs/source/$$module $$module ; \
 	done

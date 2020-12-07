@@ -7,8 +7,10 @@
 # Fixtures to fetch data for the various GitHub branch checks
 
 # TODO: add doctests
-# TODO: convert to logger output
-# TODO: add sleep_* for 'core' functionality
+
+# Implementation decisions:
+# - defer adding rate limiting support until needed: https://github.com/mozilla/frost/issues/426
+
 
 from conftest import github_client
 from dataclasses import dataclass
@@ -38,12 +40,6 @@ def gql_connection():
         # however, we only check once inside a session. This allows import
         # of this module in other contexts, such as running doctests,
         # without irrelevant configuration
-
-        # TODO: see if omitting this check works
-        # PATH_TO_METADATA is only used during test collection under pytest, so
-        # there is no value in testing it here. This approach also assumes that
-        # our argparse code has added it to the environment if not present.
-        # os.environ["PATH_TO_METADATA"]
 
         token = os.environ["GH_TOKEN"]
         endpoint = HTTPEndpoint(

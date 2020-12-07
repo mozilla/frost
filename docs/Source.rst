@@ -12,7 +12,7 @@ Service Specific Code
 =====================
 
 ..
-   TODO: Add new modules to the table below, also in ../Makefile
+   Add new modules to the table below, also in ../Makefile
 
 .. toctree::
    :maxdepth: 2

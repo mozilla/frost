@@ -208,7 +208,6 @@ def _in_offline_mode() -> bool:
         is_offline = conftest.get_client("github_client").is_offline()
         if not is_offline:
             # check for a valid GH_TOKEN here so we fail during test collection
-            # TODO: make sure this works in all scenarios
             os.environ["GH_TOKEN"]
 
     except ImportError:

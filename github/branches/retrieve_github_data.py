@@ -27,7 +27,6 @@ from github import github_schema as schema  # noqa: I900
 DEFAULT_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 EXTENSION_TO_STRIP = ".git"
 
-# TODO use logger
 logger = logging.getLogger(__name__)
 
 
@@ -125,7 +124,7 @@ class BranchProtectionRule:
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
 
-# TODO figure out how to avoid global
+# DEV_HACK figure out how to avoid global
 _collection_date: str = "1970-01-01"
 
 
@@ -277,9 +276,6 @@ def create_rule_query():
     return op
 
 
-# TODO Should be able to produce iterator for lowest level data
-
-
 def get_nested_branch_data(endpoint, reponame):
     owner, name = reponame.split("/", 1)
     op = create_operation(owner, name)
@@ -313,10 +309,9 @@ def get_nested_branch_data(endpoint, reponame):
         )
         return has_more_rules or has_more_refs
 
-    # TODO determine better way to test
+    # DEV_HACK for testing manually, set fake_next_page to True
     fake_next_page = False
 
-    # TODO ensure errors are reported out to pytest when invoked from there
     while _more_to_do(repodata, fake_next_page):
         fake_next_page = False
         # Need to work from inside out.
@@ -326,14 +321,8 @@ def get_nested_branch_data(endpoint, reponame):
             for x in repodata.branch_protection_rules.nodes
         )
         if more_refs:
-            # # setup for more matching branches
-            # page_info = repodata.branch_protection_rules.nodes[0].matching_refs.page_info
-            # logger.info(
-            #     "Downloading extra matching nodes: branches=%s", page_info
-            # )
-            # op = create_rule_query()
-            # gql_vars = {"$LAST_CURSOR": repodata}
-            # pass
+            # pagination isn't implemented yet. Try upping the limits in the
+            # query to avoid tripping this error.
             logger.error(
                 f"Pagination needed for matching refs in {reponame}- not yet implemented"
             )
@@ -521,7 +510,6 @@ def _in_offline_mode() -> bool:
         is_offline = conftest.get_client("github_client").is_offline()
         if not is_offline:
             # check for a valid GH_TOKEN here so we fail during test collection
-            # TODO: make sure this works in all scenarios
             os.environ["GH_TOKEN"]
     except ImportError:
         pass
@@ -531,7 +519,6 @@ def _in_offline_mode() -> bool:
 
 def repos_to_check() -> List[BranchOfInterest]:
     # just shell out for now
-    # TODO: fix ickiness
     #   While there is no network operation done here, we don't want to go
     #   poking around the file system if we're in "--offline" mode
     #   (e.g. doctest mode)

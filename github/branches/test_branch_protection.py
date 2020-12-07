@@ -11,8 +11,6 @@ from .retrieve_github_data import BranchOfInterest, get_repo_branch_protections
 from .retrieve_github_data import repos_to_check
 from . import validate_compliance
 
-# from .conftest import repos_to_check
-
 
 import pytest
 
