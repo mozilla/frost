@@ -23,6 +23,7 @@ Frost's documentation!
    MozillaDeployment.rst
    NewServices.rst
    ContributingDocumentation.rst
+   UseCases.rst
 
 .. toctree::
    :maxdepth: 2
