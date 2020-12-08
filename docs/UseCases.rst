@@ -35,7 +35,7 @@ In practice, many of the same calls needed to determine the list of resources ma
 .. mermaid::
 
     sequenceDiagram
-        
+
         participant p1 as Path 1
         participant s as Service
         participant c as Pytest Managed Data
@@ -59,7 +59,7 @@ In practice, many of the same calls needed to determine the list of resources ma
 
     c-->>p2: resources for test
     p2->>+s: request data for resource
-    s->>-p2: data for test      
+    s->>-p2: data for test
 
     note over c: Results caching
 
@@ -75,7 +75,7 @@ Frost Supported Use Cases
 
 While Frost could be considered a wrapper around pytest, it is optimized to support the following use cases:
 
-- as part of an automated system, Frost will execute robustly, and  without user intervention, so folks can trust my reporting.
+- as part of an automated system, Frost will execute robustly, and without user intervention, so folks can trust my reporting.
 - as an SRE, I want to be able to easily create new suites of tests, so I can pay special attention to something for a while. (Maybe new service, service migration, etc)
 - as an SRE, I want to be able to easily add additional tests to a service, so new cloud features are monitored as we start to use them. (Or to apply lessons learned from an incident)
 - as a Frost Developer, I want to easily be able to develop support for a new service, so I don't have to re-implement the framework.
