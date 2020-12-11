@@ -1,5 +1,4 @@
 from conftest import botocore_client
-import re
 
 
 def sns_subscriptions():
@@ -22,21 +21,12 @@ def sns_topics():
     )
 
 
-def sns_parent_topic_exists(subscription):
-    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#subscription"
-    topicArn = ":".join(
-        re.split(":", subscription)[0:6]
-    )  # Naive method of divining topic from subscription
-    try:
-        botocore_client.get(
-            service_name="sns",
-            method_name="get_topic_attributes",
-            call_args=[],
-            call_kwargs={"TopicArn": topicArn},
-        )
-        return True
-    except:
-        return False
+def sns_topic_arns():
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
+    topicArns = {}
+    for x, y in enumerate(sns_topics()):
+        topicArns[y["TopicArn"]] = 1
+    return topicArns
 
 
 def sns_get_subscription_attrs(subscription):
