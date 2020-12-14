@@ -23,4 +23,4 @@ receive messages.  They are good candidates for removal.
     ids=lambda subscription: get_param_id(subscription, "SubscriptionArn"),
 )
 def test_sns_subscriptions_without_parent_topics(subscription, topics):
-    assert topics[subscription["TopicArn"]] == 1
+    assert subscription["TopicArn"] in topics

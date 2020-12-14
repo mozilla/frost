@@ -1,14 +1,21 @@
 import pytest
 from helpers import get_param_id
 
-from aws.sns.resources import sns_subscription_attributes
+from aws.sns.resources import sns_subscriptions_by_topic
 
 
 @pytest.mark.sns
-@pytest.mark.parametrize(
-    "subscription_attrs",
-    sns_subscription_attributes(),
-    ids=lambda subscription: get_param_id(subscription, "SubscriptionArn"),
+@pytest.mark.rationale(
+    """
+SNS Subscriptions in PendingConfirmation status cannot receive
+notifications. They are good candidates for removal, or confirmation.
+"""
 )
-def test_sns_pending_verified(subscription_attrs):
-    assert subscription_attrs["PendingConfirmation"] == "false"
+@pytest.mark.parametrize(
+    "topic",
+    sns_subscriptions_by_topic(),
+    ids=lambda topic: get_param_id(topic, "TopicArn"),
+)
+def test_sns_topics_without_subscriptions(topic):
+    for subscription in topic["Subscriptions"]:
+        assert subscription["SubscriptionArn"] != "PendingConfirmation"

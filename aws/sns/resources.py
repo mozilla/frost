@@ -1,6 +1,4 @@
-import botocore
 from conftest import botocore_client
-from botocore.errorfactory import ClientError
 
 
 def sns_subscriptions():
@@ -25,42 +23,7 @@ def sns_topics():
 
 def sns_topic_arns():
     "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
-    topicArns = {}
-    for x, y in enumerate(sns_topics()):
-        topicArns[y["TopicArn"]] = 1
-    return topicArns
-
-
-def sns_get_subscription_attrs(subscription):
-    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#subscription"
-    # This function catches the error thrown by the AWS API when attempting to query the attributes of
-    # a subscription that has no parent topic.
-    try:
-        attrs = (
-            botocore_client.get(
-                service_name="sns",
-                method_name="get_subscription_attributes",
-                call_args=[],
-                call_kwargs={"SubscriptionArn": subscription["SubscriptionArn"]},
-                profiles=[subscription["__pytest_meta"]["profile"]],
-                regions=[subscription["__pytest_meta"]["region"]],
-            )
-            .extract_key("Attributes")
-            .values()[0]
-        )
-        return attrs
-    except botocore.errorfactory.ClientError as e:
-        if e.response["Error"]["Code"] != "InvalidParameter":
-            raise
-    # except:
-    #    pass
-
-
-def sns_subscription_attributes():
-    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#subscription"
-    return [
-        sns_get_subscription_attrs(subscription) for subscription in sns_subscriptions()
-    ]
+    return {x["TopicArn"] for x in sns_topics()}
 
 
 def sns_subscriptions_by_topic():
