@@ -1,4 +1,6 @@
+import botocore
 from conftest import botocore_client
+from botocore.errorfactory import ClientError
 
 
 def sns_subscriptions():
@@ -47,8 +49,11 @@ def sns_get_subscription_attrs(subscription):
             .values()[0]
         )
         return attrs
-    except:
-        pass
+    except botocore.errorfactory.ClientError as e:
+        if e.response["Error"]["Code"] != "InvalidParameter":
+            raise
+    # except:
+    #    pass
 
 
 def sns_subscription_attributes():
