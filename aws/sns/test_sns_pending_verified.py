@@ -16,6 +16,6 @@ notifications. They are good candidates for removal, or confirmation.
     sns_subscriptions_by_topic(),
     ids=lambda topic: get_param_id(topic, "TopicArn"),
 )
-def test_sns_topics_without_subscriptions(topic):
+def test_sns_topics_with_subscriptions_pending_confirmation(topic):
     for subscription in topic["Subscriptions"]:
         assert subscription["SubscriptionArn"] != "PendingConfirmation"
