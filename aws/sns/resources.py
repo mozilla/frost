@@ -21,21 +21,9 @@ def sns_topics():
     )
 
 
-def sns_subscription_attributes():
-    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#subscription"
-    return [
-        botocore_client.get(
-            service_name="sns",
-            method_name="get_subscription_attributes",
-            call_args=[],
-            call_kwargs={"SubscriptionArn": subscription["SubscriptionArn"]},
-            profiles=[subscription["__pytest_meta"]["profile"]],
-            regions=[subscription["__pytest_meta"]["region"]],
-        )
-        .extract_key("Attributes")
-        .values()[0]
-        for subscription in sns_subscriptions()
-    ]
+def sns_topic_arns():
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic"
+    return {x["TopicArn"] for x in sns_topics()}
 
 
 def sns_subscriptions_by_topic():
