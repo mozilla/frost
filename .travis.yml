@@ -7,7 +7,7 @@ install:
   - make install install-docs
 
 script:
-  - make black check_conftest_imports doctest coverage doc-build
+  - (source venv/bin/activate && make black check_conftest_imports doctest coverage doc-build)
 
 deploy:
   - provider: pypi
