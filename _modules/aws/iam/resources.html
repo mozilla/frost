@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.iam.resources &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.iam.resources</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.iam.resources</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">botocore_client</span><span class="p">,</span> <span class="n">custom_config_global</span>
+
+
+<div class="viewcode-block" id="iam_users"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_users">[docs]</a><span class="k">def</span> <span class="nf">iam_users</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_users&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_users&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Users&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_admin_users"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_admin_users">[docs]</a><span class="k">def</span> <span class="nf">iam_admin_users</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">user</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">iam_users_with_policies_and_groups</span><span class="p">()</span> <span class="k">if</span> <span class="n">user_is_admin</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_inline_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_inline_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_inline_policies</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_user_policies&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_user_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;PolicyNames&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_managed_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_managed_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_managed_policies</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_user_policies&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_attached_user_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;AttachedPolicies&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_user_groups"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_user_groups">[docs]</a><span class="k">def</span> <span class="nf">iam_user_groups</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_groups_for_user&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Groups&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_user_group_inline_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_user_group_inline_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_user_group_inline_policies</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_group_policies&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_group_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;GroupName&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;GroupName&quot;</span><span class="p">]}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;PolicyNames&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">iam_user_groups</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_user_group_managed_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_user_group_managed_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_user_group_managed_policies</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_group_policies&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_attached_group_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;GroupName&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;GroupName&quot;</span><span class="p">]}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;AttachedPolicies&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">iam_user_groups</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_all_user_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_all_user_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_all_user_policies</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets all policies that can be attached to a user. This includes:</span>
+<span class="sd">        - Inline policies on the user</span>
+<span class="sd">        - Managed policies on the user</span>
+<span class="sd">        - Inline policies on the group that the user is in</span>
+<span class="sd">        - Managed policies on the group that the user is in</span>
+
+<span class="sd">    Inline policy API calls just return the name of the policy, so we create a single key dictionary to</span>
+<span class="sd">    allow for standard access to the policy name ({&#39;PolicyName&#39;: policy_name})</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inline</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">inline_policies</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">iam_inline_policies</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">iam_user_group_inline_policies</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">policies</span> <span class="ow">in</span> <span class="n">inline_policies</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">policy_name</span> <span class="ow">in</span> <span class="n">policies</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">policy_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">inline</span> <span class="o">+=</span> <span class="p">{</span><span class="s2">&quot;PolicyName&quot;</span><span class="p">:</span> <span class="n">policy_name</span><span class="p">}</span>
+
+    <span class="n">managed</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">policy</span>
+        <span class="k">for</span> <span class="n">policies</span> <span class="ow">in</span> <span class="n">iam_managed_policies</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">iam_user_group_managed_policies</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">policy</span> <span class="ow">in</span> <span class="n">policies</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">inline</span> <span class="o">+</span> <span class="n">managed</span></div>
+
+
+<div class="viewcode-block" id="iam_users_with_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_users_with_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_users_with_policies</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;Policies&quot;</span><span class="p">:</span> <span class="n">iam_all_user_policies</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">])},</span> <span class="o">**</span><span class="n">user</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">iam_users</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_users_with_policies_and_groups"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_users_with_policies_and_groups">[docs]</a><span class="k">def</span> <span class="nf">iam_users_with_policies_and_groups</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Users with their associated Policies and Groups&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;Groups&quot;</span><span class="p">:</span> <span class="n">iam_user_groups</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">])},</span> <span class="o">**</span><span class="n">user</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">iam_users_with_policies</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_admin_login_profiles"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_admin_login_profiles">[docs]</a><span class="k">def</span> <span class="nf">iam_admin_login_profiles</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile&quot;</span>
+    <span class="k">return</span> <span class="n">iam_login_profiles</span><span class="p">(</span><span class="n">iam_admin_users</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="iam_admin_mfa_devices"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_admin_mfa_devices">[docs]</a><span class="k">def</span> <span class="nf">iam_admin_mfa_devices</span><span class="p">():</span>
+    <span class="s2">&quot;https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices&quot;</span>
+    <span class="k">return</span> <span class="n">iam_mfa_devices</span><span class="p">(</span><span class="n">iam_admin_users</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="iam_user_login_profiles"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_user_login_profiles">[docs]</a><span class="k">def</span> <span class="nf">iam_user_login_profiles</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile&quot;</span>
+    <span class="k">return</span> <span class="n">iam_login_profiles</span><span class="p">(</span><span class="n">iam_users</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="iam_user_mfa_devices"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_user_mfa_devices">[docs]</a><span class="k">def</span> <span class="nf">iam_user_mfa_devices</span><span class="p">():</span>
+    <span class="s2">&quot;https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices&quot;</span>
+    <span class="k">return</span> <span class="n">iam_mfa_devices</span><span class="p">(</span><span class="n">iam_users</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="iam_login_profiles"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_login_profiles">[docs]</a><span class="k">def</span> <span class="nf">iam_login_profiles</span><span class="p">(</span><span class="n">users</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;get_login_profile&quot;</span><span class="p">,</span>
+            <span class="p">[],</span>
+            <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">]},</span>
+            <span class="n">result_from_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">error</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;LoginProfile&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;LoginProfile&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_mfa_devices"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_mfa_devices">[docs]</a><span class="k">def</span> <span class="nf">iam_mfa_devices</span><span class="p">(</span><span class="n">users</span><span class="p">):</span>
+    <span class="s2">&quot;https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_mfa_devices&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">]}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;MFADevices&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_roles"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_roles">[docs]</a><span class="k">def</span> <span class="nf">iam_roles</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_roles&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_roles&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Roles&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_all_role_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_all_role_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_all_role_policies</span><span class="p">(</span><span class="n">rolename</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;PolicyName&quot;</span><span class="p">:</span> <span class="n">policy_name</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">policy_name</span> <span class="ow">in</span> <span class="n">iam_role_inline_policies</span><span class="p">(</span><span class="n">rolename</span><span class="o">=</span><span class="n">rolename</span><span class="p">)</span>
+    <span class="p">]</span> <span class="o">+</span> <span class="n">iam_role_managed_policies</span><span class="p">(</span><span class="n">rolename</span><span class="o">=</span><span class="n">rolename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_roles_with_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_roles_with_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_roles_with_policies</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;Policies&quot;</span><span class="p">:</span> <span class="n">iam_all_role_policies</span><span class="p">(</span><span class="n">rolename</span><span class="o">=</span><span class="n">role</span><span class="p">[</span><span class="s2">&quot;RoleName&quot;</span><span class="p">])},</span> <span class="o">**</span><span class="n">role</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">iam_roles</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="iam_role_inline_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_role_inline_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_role_inline_policies</span><span class="p">(</span><span class="n">rolename</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_role_policies&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_role_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;RoleName&quot;</span><span class="p">:</span> <span class="n">rolename</span><span class="p">})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;PolicyNames&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_role_managed_policies"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_role_managed_policies">[docs]</a><span class="k">def</span> <span class="nf">iam_role_managed_policies</span><span class="p">(</span><span class="n">rolename</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_role_policies&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_attached_role_policies&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;RoleName&quot;</span><span class="p">:</span> <span class="n">rolename</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;AttachedPolicies&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_admin_roles"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_admin_roles">[docs]</a><span class="k">def</span> <span class="nf">iam_admin_roles</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">role</span> <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">iam_roles_with_policies</span><span class="p">()</span> <span class="k">if</span> <span class="n">user_is_admin</span><span class="p">(</span><span class="n">role</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="iam_access_keys_for_user"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_access_keys_for_user">[docs]</a><span class="k">def</span> <span class="nf">iam_access_keys_for_user</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+    <span class="s2">&quot;https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_access_keys&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;list_access_keys&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s2">&quot;UserName&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;AccessKeyMetadata&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_get_all_access_keys"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_get_all_access_keys">[docs]</a><span class="k">def</span> <span class="nf">iam_get_all_access_keys</span><span class="p">():</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">iam_access_keys_for_user</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">iam_users</span><span class="p">()],</span>
+        <span class="p">[],</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="iam_generate_credential_report"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_generate_credential_report">[docs]</a><span class="k">def</span> <span class="nf">iam_generate_credential_report</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_credential_report&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{},</span> <span class="n">do_not_cache</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">results</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;State&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="iam_get_credential_report"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_get_credential_report">[docs]</a><span class="k">def</span> <span class="nf">iam_get_credential_report</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_credential_report&quot;</span>
+    <span class="c1"># the story of the wack api</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">cred_report_state</span> <span class="o">=</span> <span class="n">iam_generate_credential_report</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cred_report_state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;STARTED&quot;</span><span class="p">,</span> <span class="s2">&quot;INPROGRESS&quot;</span><span class="p">]:</span>
+            <span class="k">break</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># We want this to blow up if it can&#39;t get the &quot;Content&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;get_credential_report&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{},</span> <span class="n">do_not_cache</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">results</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Content&quot;</span><span class="p">]</span>
+    <span class="n">decoded_content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">decoded_content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)))</span></div>
+
+
+<span class="c1"># (ajvb) I&#39;m not a big fan of this, but it seems to be the easiest way to</span>
+<span class="c1"># only have to call `get_credential_report` once since it is not easily cacheable.</span>
+<div class="viewcode-block" id="iam_admin_users_with_credential_report"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.iam_admin_users_with_credential_report">[docs]</a><span class="k">def</span> <span class="nf">iam_admin_users_with_credential_report</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns all &quot;admin&quot; users with an additional &quot;CredentialReport&quot; key,</span>
+<span class="sd">    which is a dict containing their row in the Credentials Report.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">admins</span> <span class="o">=</span> <span class="n">iam_admin_users</span><span class="p">()</span>
+    <span class="n">credential_report</span> <span class="o">=</span> <span class="n">iam_get_credential_report</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">admin</span> <span class="ow">in</span> <span class="n">admins</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">credential_report</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">admin</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]:</span>
+                <span class="n">admin</span><span class="p">[</span><span class="s2">&quot;CredentialReport&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">admins</span></div>
+
+
+<div class="viewcode-block" id="user_is_admin"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.user_is_admin">[docs]</a><span class="k">def</span> <span class="nf">user_is_admin</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">policy</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s2">&quot;Policies&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">policy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PolicyName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">custom_config_global</span><span class="o">.</span><span class="n">aws</span><span class="o">.</span><span class="n">admin_policies</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Groups&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GroupName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">custom_config_global</span><span class="o">.</span><span class="n">aws</span><span class="o">.</span><span class="n">admin_groups</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_all_users_that_can_access_aws_account"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.resources.get_all_users_that_can_access_aws_account">[docs]</a><span class="k">def</span> <span class="nf">get_all_users_that_can_access_aws_account</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns users with console or API access to an AWS account.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">profile_usernames</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">iam_user_login_profiles</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">]</span>
+    <span class="n">access_key_usernames</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">akey</span><span class="p">[</span><span class="s2">&quot;UserName&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">akey</span> <span class="ow">in</span> <span class="n">iam_get_all_access_keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">akey</span><span class="p">[</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Active&quot;</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">profile_usernames</span> <span class="o">+</span> <span class="n">access_key_usernames</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

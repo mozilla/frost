@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="aws package" href="aws.html" />
+    <link rel="prev" title="Source Code" href="../../Source.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aws.html" title="aws package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../Source.html" title="Source Code"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../Source.html" accesskey="U">Source Code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws">
+<h1>aws<a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aws.html">aws package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aws.autoscaling.html">aws.autoscaling package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.autoscaling.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.autoscaling.html#module-aws.autoscaling.resources">aws.autoscaling.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.autoscaling.html#module-aws.autoscaling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.cloudtrail.html">aws.cloudtrail package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.cloudtrail.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.cloudtrail.html#module-aws.cloudtrail.resources">aws.cloudtrail.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.cloudtrail.html#aws-cloudtrail-test-cloudtrail-enabled-in-all-regions-module">aws.cloudtrail.test_cloudtrail_enabled_in_all_regions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.cloudtrail.html#aws-cloudtrail-test-cloudtrail-log-validation-enabled-module">aws.cloudtrail.test_cloudtrail_log_validation_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.cloudtrail.html#module-aws.cloudtrail">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.ec2.html">aws.ec2 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#module-aws.ec2.helpers">aws.ec2.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#module-aws.ec2.resources">aws.ec2.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-all-eips-bound-module">aws.ec2.test_ec2_all_eips_bound module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-snapshot-not-too-old-module">aws.ec2.test_ec2_ebs_snapshot_not_too_old module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-snapshots-are-private-module">aws.ec2.test_ec2_ebs_snapshots_are_private module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-attached-to-instance-module">aws.ec2.test_ec2_ebs_volume_attached_to_instance module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-encrypted-module">aws.ec2.test_ec2_ebs_volume_encrypted module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-not-piops-module">aws.ec2.test_ec2_ebs_volume_not_piops module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-instance-has-required-tags-module">aws.ec2.test_ec2_instance_has_required_tags module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-instance-on-acceptable-ami-module">aws.ec2.test_ec2_instance_on_acceptable_ami module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-in-use-module">aws.ec2.test_ec2_security_group_in_use module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-module">aws.ec2.test_ec2_security_group_opens_all_ports module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_all module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-to-self-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_self module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-specific-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_specific_ports_to_all module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-vpc-flow-log-enabled-module">aws.ec2.test_ec2_vpc_flow_log_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.ec2.html#module-aws.ec2">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.elasticache.html">aws.elasticache package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticache.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticache.html#module-aws.elasticache.resources">aws.elasticache.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticache.html#module-aws.elasticache">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.elasticsearch.html">aws.elasticsearch package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticsearch.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticsearch.html#module-aws.elasticsearch.resources">aws.elasticsearch.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticsearch.html#aws-elasticsearch-test-elasticsearch-domains-have-logging-enabled-module">aws.elasticsearch.test_elasticsearch_domains_have_logging_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.elasticsearch.html#module-aws.elasticsearch">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.iam.html">aws.iam package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#module-aws.iam.helpers">aws.iam.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#module-aws.iam.resources">aws.iam.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-access-key-is-old-module">aws.iam.test_iam_access_key_is_old module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-admin-user-with-access-keys-module">aws.iam.test_iam_admin_user_with_access_keys module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-admin-user-without-mfa-module">aws.iam.test_iam_admin_user_without_mfa module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-cross-account-admin-roles-require-mfa-module">aws.iam.test_iam_cross_account_admin_roles_require_mfa module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-user-is-inactive-module">aws.iam.test_iam_user_is_inactive module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-user-without-mfa-module">aws.iam.test_iam_user_without_mfa module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.iam.html#module-aws.iam">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.rds.html">aws.rds package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#module-aws.rds.helpers">aws.rds.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#module-aws.rds.resources">aws.rds.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-backup-enabled-module">aws.rds.test_rds_db_instance_backup_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-encrypted-module">aws.rds.test_rds_db_instance_encrypted module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-is-multiaz-module">aws.rds.test_rds_db_instance_is_multiaz module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-is-postgres-with-invalid-certificate-module">aws.rds.test_rds_db_instance_is_postgres_with_invalid_certificate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-minor-version-updates-enabled-module">aws.rds.test_rds_db_instance_minor_version_updates_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-not-publicly-accessible-by-vpc-sg-module">aws.rds.test_rds_db_instance_not_publicly_accessible_by_vpc_sg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-storage-type-not-piops-module">aws.rds.test_rds_db_instance_storage_type_not_piops module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-security-group-does-not-grant-public-access-module">aws.rds.test_rds_db_security_group_does_not_grant_public_access module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-encrypted-module">aws.rds.test_rds_db_snapshot_encrypted module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-not-publicly-accessible-module">aws.rds.test_rds_db_snapshot_not_publicly_accessible module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-not-too-old-module">aws.rds.test_rds_db_snapshot_not_too_old module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.rds.html#module-aws.rds">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.redshift.html">aws.redshift package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.redshift.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.redshift.html#module-aws.redshift.helpers">aws.redshift.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.redshift.html#module-aws.redshift.resources">aws.redshift.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.redshift.html#aws-redshift-test-redshift-security-group-does-not-allow-all-ips-access-module">aws.redshift.test_redshift_security_group_does_not_allow_all_ips_access module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.redshift.html#module-aws.redshift">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.route53.html">aws.route53 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.route53.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.route53.html#module-aws.route53.resources">aws.route53.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.route53.html#aws-route53-test-route53-cnames-minimum-ttl-or-greater-module">aws.route53.test_route53_cnames_minimum_ttl_or_greater module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.route53.html#module-aws.route53">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.s3.html">aws.s3 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#module-aws.s3.helpers">aws.s3.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#module-aws.s3.resources">aws.s3.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-cors-disabled-module">aws.s3.test_s3_bucket_cors_disabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-does-not-grant-all-principals-all-actions-module">aws.s3.test_s3_bucket_does_not_grant_all_principals_all_actions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-has-life-cycle-policy-module">aws.s3.test_s3_bucket_has_life_cycle_policy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-logging-enabled-module">aws.s3.test_s3_bucket_logging_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-no-world-acl-module">aws.s3.test_s3_bucket_no_world_acl module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-versioning-enabled-module">aws.s3.test_s3_bucket_versioning_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-versioning-mfa-delete-enabled-module">aws.s3.test_s3_bucket_versioning_mfa_delete_enabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-web-hosting-disabled-module">aws.s3.test_s3_bucket_web_hosting_disabled module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.s3.html#module-aws.s3">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aws.sns.html">aws.sns package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#module-aws.sns.resources">aws.sns.resources module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-pending-verified-module">aws.sns.test_sns_pending_verified module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-subscriptions-without-topics-module">aws.sns.test_sns_subscriptions_without_topics module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-topics-without-subscriptions-module">aws.sns.test_sns_topics_without_subscriptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="aws.sns.html#module-aws.sns">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aws.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.html#module-aws.client">aws.client module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.html#module-aws.conftest">aws.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.html#module-aws">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../Source.html">Source Code</a>
+        <ul>
+          <li>Previous: <a href="../../Source.html" title="previous chapter">Source Code</a>
+          <li>Next: <a href="aws.html" title="next chapter">aws package</a></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

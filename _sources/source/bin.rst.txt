@@ -1,0 +1,18 @@
+bin package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   bin.auth
+
+Module contents
+---------------
+
+.. automodule:: bin
+   :members:
+   :undoc-members:
+   :show-inheritance:

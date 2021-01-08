@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>custom_config &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">custom_config</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for custom_config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+
+<span class="kn">from</span> <span class="nn">ruamel.yaml</span> <span class="kn">import</span> <span class="n">YAML</span>
+<span class="kn">from</span> <span class="nn">dateutil.relativedelta</span> <span class="kn">import</span> <span class="n">relativedelta</span>
+
+<span class="kn">import</span> <span class="nn">exemptions</span>
+<span class="kn">import</span> <span class="nn">severity</span>
+
+
+<div class="viewcode-block" id="CustomConfig"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfig">[docs]</a><span class="k">class</span> <span class="nc">CustomConfig</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_fd</span><span class="p">):</span>
+        <span class="n">parsed_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">config_fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">yaml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">()</span>
+            <span class="n">parsed_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_fd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aws</span> <span class="o">=</span> <span class="n">AWSConfig</span><span class="p">(</span><span class="n">parsed_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aws&quot;</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gcp</span> <span class="o">=</span> <span class="n">GCPConfig</span><span class="p">(</span><span class="n">parsed_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gcp&quot;</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gsuite</span> <span class="o">=</span> <span class="n">GSuiteConfig</span><span class="p">(</span><span class="n">parsed_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gsuite&quot;</span><span class="p">,</span> <span class="p">{}))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exemptions</span> <span class="o">=</span> <span class="n">exemptions</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">parsed_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exemptions&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">severities</span> <span class="o">=</span> <span class="n">severity</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">parsed_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severities&quot;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="CustomConfig.add_markers"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfig.add_markers">[docs]</a>    <span class="k">def</span> <span class="nf">add_markers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">severity</span><span class="o">.</span><span class="n">add_severity_marker</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">exemptions</span><span class="o">.</span><span class="n">add_xfail_marker</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CustomConfigMixin"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfigMixin">[docs]</a><span class="k">class</span> <span class="nc">CustomConfigMixin</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_is_inactive</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_is_inactive&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_ports_global</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed_ports_global&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_ports</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed_ports&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+<div class="viewcode-block" id="CustomConfigMixin.no_activity_since"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfigMixin.no_activity_since">[docs]</a>    <span class="k">def</span> <span class="nf">no_activity_since</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">no_activity_since</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_user_is_inactive_relative_time</span><span class="p">(</span>
+            <span class="s2">&quot;no_activity_since&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">no_activity_since</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">years</span><span class="o">=+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">no_activity_since</span></div>
+
+<div class="viewcode-block" id="CustomConfigMixin.created_after"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfigMixin.created_after">[docs]</a>    <span class="k">def</span> <span class="nf">created_after</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">created_after</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_user_is_inactive_relative_time</span><span class="p">(</span><span class="s2">&quot;created_after&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">created_after</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">weeks</span><span class="o">=+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">created_after</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_user_is_inactive_relative_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_is_inactive</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span>
+            <span class="n">years</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">user_is_inactive</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;years&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">months</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">user_is_inactive</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;months&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">weeks</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">user_is_inactive</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weeks&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CustomConfigMixin.get_allowed_ports"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfigMixin.get_allowed_ports">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_allowed_ports_from_test_id</span><span class="p">(</span><span class="n">test_id</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_ports_global</span></div>
+
+<div class="viewcode-block" id="CustomConfigMixin.get_allowed_ports_from_test_id"><a class="viewcode-back" href="../source/custom_config.html#custom_config.CustomConfigMixin.get_allowed_ports_from_test_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_ports_from_test_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_id</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_ports</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;test_param_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+                <span class="n">substring</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;test_param_id&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">substring</span><span class="p">,</span> <span class="n">test_id</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="s2">&quot;ports&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">test_id</span> <span class="o">==</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;test_param_id&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="s2">&quot;ports&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">set</span><span class="p">([])</span></div></div>
+
+
+<div class="viewcode-block" id="AWSConfig"><a class="viewcode-back" href="../source/custom_config.html#custom_config.AWSConfig">[docs]</a><span class="k">class</span> <span class="nc">AWSConfig</span><span class="p">(</span><span class="n">CustomConfigMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_tags</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required_tags&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_amis</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required_amis&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_key_expires_after</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;access_key_expires_after&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">admin_policies</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;admin_policies&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">admin_groups</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;admin_groups&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">owned_ami_account_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;owned_ami_account_ids&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ami_age_in_days</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_ami_age_in_days&quot;</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AWSConfig.get_access_key_expiration_date"><a class="viewcode-back" href="../source/custom_config.html#custom_config.AWSConfig.get_access_key_expiration_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_key_expiration_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_key_expires_after</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span><span class="n">years</span><span class="o">=+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span>
+            <span class="n">years</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">access_key_expires_after</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;years&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">months</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">access_key_expires_after</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;months&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">weeks</span><span class="o">=+</span><span class="bp">self</span><span class="o">.</span><span class="n">access_key_expires_after</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weeks&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GCPConfig"><a class="viewcode-back" href="../source/custom_config.html#custom_config.GCPConfig">[docs]</a><span class="k">class</span> <span class="nc">GCPConfig</span><span class="p">(</span><span class="n">CustomConfigMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_org_domains</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed_org_domains&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_gke_versions</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed_gke_versions&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GSuiteConfig"><a class="viewcode-back" href="../source/custom_config.html#custom_config.GSuiteConfig">[docs]</a><span class="k">class</span> <span class="nc">GSuiteConfig</span><span class="p">(</span><span class="n">CustomConfigMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_number_of_owners</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_number_of_owners&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PagerdutyConfig"><a class="viewcode-back" href="../source/custom_config.html#custom_config.PagerdutyConfig">[docs]</a><span class="k">class</span> <span class="nc">PagerdutyConfig</span><span class="p">(</span><span class="n">CustomConfigMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users_with_remote_access_monitoring</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;users_with_remote_access_monitoring&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bastion_users</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bastion_users&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alternate_usernames</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alternate_usernames&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    <ul>
+      <li><a href="index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

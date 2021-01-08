@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.rds package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="aws.redshift package" href="aws.redshift.html" />
+    <link rel="prev" title="aws.iam package" href="aws.iam.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aws.redshift.html" title="aws.redshift package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="aws.iam.html" title="aws.iam package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../Source.html" >Source Code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="modules.html" >aws</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="aws.html" accesskey="U">aws package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.rds package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws-rds-package">
+<h1>aws.rds package<a class="headerlink" href="#aws-rds-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.rds.helpers">
+<span id="aws-rds-helpers-module"></span><h2>aws.rds.helpers module<a class="headerlink" href="#module-aws.rds.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.rds.helpers.is_rds_db_snapshot_attr_public_access">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">is_rds_db_snapshot_attr_public_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rds_db_snapshot_attribute</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#is_rds_db_snapshot_attr_public_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.is_rds_db_snapshot_attr_public_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether a RDS snapshot attribute is:</p>
+<dl class="simple">
+<dt>{</dt><dd><p>“AttributeName”: “restore”,
+“AttributeValues”: [“random_aws_account_id”, “any”]</p>
+</dd>
+</dl>
+<p>}</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">({</span><span class="s2">&quot;AttributeName&quot;</span><span class="p">:</span> <span class="s2">&quot;restore&quot;</span><span class="p">,</span> <span class="s2">&quot;AttributeValues&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">({</span><span class="s2">&quot;AttributeName&quot;</span><span class="p">:</span> <span class="s2">&quot;restore&quot;</span><span class="p">,</span> <span class="s2">&quot;AttributeValues&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;aws_account_id&quot;</span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">({</span><span class="s2">&quot;AttributeName&quot;</span><span class="p">:</span> <span class="s2">&quot;restore&quot;</span><span class="p">,</span> <span class="s2">&quot;AttributeValues&quot;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">({</span><span class="s2">&quot;AttributeName&quot;</span><span class="p">:</span> <span class="s2">&quot;blorg&quot;</span><span class="p">,</span> <span class="s2">&quot;AttributeValues&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">([])</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">list indices must be integers or slices, not str</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;int&#39; object is not subscriptable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_attr_public_access</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;NoneType&#39; object is not subscriptable</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.does_rds_db_security_group_grant_public_access">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">does_rds_db_security_group_grant_public_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#does_rds_db_security_group_grant_public_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.does_rds_db_security_group_grant_public_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks an RDS instance for a DB security group with CIDRIP 0.0.0.0/0</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">does_rds_db_security_group_grant_public_access</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s2">&quot;IPRanges&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;CIDRIP&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1/32&quot;</span><span class="p">,</span> <span class="s2">&quot;Status&quot;</span><span class="p">:</span> <span class="s2">&quot;authorized&quot;</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">{</span><span class="s2">&quot;CIDRIP&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0.0/0&quot;</span><span class="p">,</span> <span class="s2">&quot;Status&quot;</span><span class="p">:</span> <span class="s2">&quot;authorized&quot;</span><span class="p">}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_rds_db_security_group_grant_public_access</span><span class="p">({</span><span class="s2">&quot;IPRanges&quot;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.does_vpc_security_group_grant_public_access">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">does_vpc_security_group_grant_public_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#does_vpc_security_group_grant_public_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.does_vpc_security_group_grant_public_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks an RDS instance for a VPC security groups with ingress permission ipv4 range 0.0.0.0/0 or ipv6 range :::/0</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">does_vpc_security_group_grant_public_access</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_vpc_security_group_grant_public_access</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_vpc_security_group_grant_public_access</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;192.168.1.0/0&#39;</span><span class="p">}]}]})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.is_rds_db_instance_encrypted">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">is_rds_db_instance_encrypted</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rds_db_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#is_rds_db_instance_encrypted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.is_rds_db_instance_encrypted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the RDS instance ‘StorageEncrypted’ value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_instance_encrypted</span><span class="p">({</span><span class="s1">&#39;StorageEncrypted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_instance_encrypted</span><span class="p">({</span><span class="s1">&#39;StorageEncrypted&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_instance_encrypted</span><span class="p">({})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;StorageEncrypted&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_instance_encrypted</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;int&#39; object is not subscriptable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_instance_encrypted</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;NoneType&#39; object is not subscriptable</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.is_rds_db_snapshot_encrypted">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">is_rds_db_snapshot_encrypted</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rds_db_snapshot</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#is_rds_db_snapshot_encrypted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.is_rds_db_snapshot_encrypted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the RDS snapshot ‘Encrypted’ value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_encrypted</span><span class="p">({</span><span class="s1">&#39;Encrypted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_encrypted</span><span class="p">({</span><span class="s1">&#39;Encrypted&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_encrypted</span><span class="p">({})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;Encrypted&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_encrypted</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;int&#39; object is not subscriptable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_rds_db_snapshot_encrypted</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;NoneType&#39; object is not subscriptable</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.get_db_instance_id">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">get_db_instance_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#get_db_instance_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.get_db_instance_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.get_db_snapshot_arn">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">get_db_snapshot_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snapshot</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#get_db_snapshot_arn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.get_db_snapshot_arn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.get_db_security_group_arn">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">get_db_security_group_arn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#get_db_security_group_arn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.get_db_security_group_arn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.get_rds_resource_id">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">get_rds_resource_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#get_rds_resource_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.get_rds_resource_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.helpers.rds_db_snapshot_not_too_old">
+<code class="sig-prename descclassname">aws.rds.helpers.</code><code class="sig-name descname">rds_db_snapshot_not_too_old</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snapshot</span></em>, <em class="sig-param"><span class="n">snapshot_created_days_ago</span><span class="o">=</span><span class="default_value">365</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/helpers.html#rds_db_snapshot_not_too_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.helpers.rds_db_snapshot_not_too_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check a rds snapshot is created “snapshot_created_days_ago”.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timezone</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rds_db_snapshot_not_too_old</span><span class="p">({</span><span class="s2">&quot;SnapshotCreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rds_db_snapshot_not_too_old</span><span class="p">({</span><span class="s2">&quot;SnapshotCreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2019-09-11T19:45:22.116+00:00&quot;</span><span class="p">)})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aws.rds.resources">
+<span id="aws-rds-resources-module"></span><h2>aws.rds.resources module<a class="headerlink" href="#module-aws.rds.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_instances">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_instances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_instances">http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_instances</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_instance_tags">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_instance_tags</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_instance_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_instance_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.list_tags_for_resource">http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.list_tags_for_resource</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_instances_with_tags">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_instances_with_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_instances_with_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_instances_with_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_instances_vpc_security_groups">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_instances_vpc_security_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_instances_vpc_security_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_instances_vpc_security_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups">http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_snapshots">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_snapshots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_snapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_snapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshots">http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshots</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_snapshot_attributes">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_snapshot_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_snapshot_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_snapshot_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshot_attributes">http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshot_attributes</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.rds.resources.rds_db_security_groups">
+<code class="sig-prename descclassname">aws.rds.resources.</code><code class="sig-name descname">rds_db_security_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/rds/resources.html#rds_db_security_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.rds.resources.rds_db_security_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_security_groups">http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_security_groups</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-backup-enabled-module">
+<h2>aws.rds.test_rds_db_instance_backup_enabled module<a class="headerlink" href="#aws-rds-test-rds-db-instance-backup-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-encrypted-module">
+<h2>aws.rds.test_rds_db_instance_encrypted module<a class="headerlink" href="#aws-rds-test-rds-db-instance-encrypted-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-is-multiaz-module">
+<h2>aws.rds.test_rds_db_instance_is_multiaz module<a class="headerlink" href="#aws-rds-test-rds-db-instance-is-multiaz-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-is-postgres-with-invalid-certificate-module">
+<h2>aws.rds.test_rds_db_instance_is_postgres_with_invalid_certificate module<a class="headerlink" href="#aws-rds-test-rds-db-instance-is-postgres-with-invalid-certificate-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-minor-version-updates-enabled-module">
+<h2>aws.rds.test_rds_db_instance_minor_version_updates_enabled module<a class="headerlink" href="#aws-rds-test-rds-db-instance-minor-version-updates-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-not-publicly-accessible-by-vpc-sg-module">
+<h2>aws.rds.test_rds_db_instance_not_publicly_accessible_by_vpc_sg module<a class="headerlink" href="#aws-rds-test-rds-db-instance-not-publicly-accessible-by-vpc-sg-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-instance-storage-type-not-piops-module">
+<h2>aws.rds.test_rds_db_instance_storage_type_not_piops module<a class="headerlink" href="#aws-rds-test-rds-db-instance-storage-type-not-piops-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-security-group-does-not-grant-public-access-module">
+<h2>aws.rds.test_rds_db_security_group_does_not_grant_public_access module<a class="headerlink" href="#aws-rds-test-rds-db-security-group-does-not-grant-public-access-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-snapshot-encrypted-module">
+<h2>aws.rds.test_rds_db_snapshot_encrypted module<a class="headerlink" href="#aws-rds-test-rds-db-snapshot-encrypted-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-snapshot-not-publicly-accessible-module">
+<h2>aws.rds.test_rds_db_snapshot_not_publicly_accessible module<a class="headerlink" href="#aws-rds-test-rds-db-snapshot-not-publicly-accessible-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-rds-test-rds-db-snapshot-not-too-old-module">
+<h2>aws.rds.test_rds_db_snapshot_not_too_old module<a class="headerlink" href="#aws-rds-test-rds-db-snapshot-not-too-old-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.rds">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws.rds" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">aws.rds package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-aws.rds.helpers">aws.rds.helpers module</a></li>
+<li><a class="reference internal" href="#module-aws.rds.resources">aws.rds.resources module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-backup-enabled-module">aws.rds.test_rds_db_instance_backup_enabled module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-encrypted-module">aws.rds.test_rds_db_instance_encrypted module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-is-multiaz-module">aws.rds.test_rds_db_instance_is_multiaz module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-is-postgres-with-invalid-certificate-module">aws.rds.test_rds_db_instance_is_postgres_with_invalid_certificate module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-minor-version-updates-enabled-module">aws.rds.test_rds_db_instance_minor_version_updates_enabled module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-not-publicly-accessible-by-vpc-sg-module">aws.rds.test_rds_db_instance_not_publicly_accessible_by_vpc_sg module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-instance-storage-type-not-piops-module">aws.rds.test_rds_db_instance_storage_type_not_piops module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-security-group-does-not-grant-public-access-module">aws.rds.test_rds_db_security_group_does_not_grant_public_access module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-snapshot-encrypted-module">aws.rds.test_rds_db_snapshot_encrypted module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-snapshot-not-publicly-accessible-module">aws.rds.test_rds_db_snapshot_not_publicly_accessible module</a></li>
+<li><a class="reference internal" href="#aws-rds-test-rds-db-snapshot-not-too-old-module">aws.rds.test_rds_db_snapshot_not_too_old module</a></li>
+<li><a class="reference internal" href="#module-aws.rds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../Source.html">Source Code</a>
+        <ul>
+      <li><a href="modules.html">aws</a>
+        <ul>
+      <li><a href="aws.html">aws package</a>
+        <ul>
+          <li>Previous: <a href="aws.iam.html" title="previous chapter">aws.iam package</a>
+          <li>Next: <a href="aws.redshift.html" title="next chapter">aws.redshift package</a></ul>
+      </li></ul>
+      </li></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

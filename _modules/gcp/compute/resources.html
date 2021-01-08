@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gcp.compute.resources &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gcp.compute.resources</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gcp.compute.resources</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">gcp_client</span>
+
+
+<div class="viewcode-block" id="firewalls"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.firewalls">[docs]</a><span class="k">def</span> <span class="nf">firewalls</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">&quot;compute&quot;</span><span class="p">,</span> <span class="s2">&quot;firewalls&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="networks"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.networks">[docs]</a><span class="k">def</span> <span class="nf">networks</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">&quot;compute&quot;</span><span class="p">,</span> <span class="s2">&quot;networks&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="instances"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.instances">[docs]</a><span class="k">def</span> <span class="nf">instances</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">&quot;compute&quot;</span><span class="p">,</span> <span class="s2">&quot;instances&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="clusters"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.clusters">[docs]</a><span class="k">def</span> <span class="nf">clusters</span><span class="p">():</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">project_id</span> <span class="ow">in</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">project_list</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">+=</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+            <span class="s2">&quot;container&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;projects.locations.clusters&quot;</span><span class="p">,</span>
+            <span class="n">results_key</span><span class="o">=</span><span class="s2">&quot;clusters&quot;</span><span class="p">,</span>
+            <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;parent&quot;</span><span class="p">:</span> <span class="s2">&quot;projects/</span><span class="si">{}</span><span class="s2">/locations/-&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">project_id</span><span class="p">)},</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="networks_with_instances"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.networks_with_instances">[docs]</a><span class="k">def</span> <span class="nf">networks_with_instances</span><span class="p">():</span>
+    <span class="n">allInstances</span> <span class="o">=</span> <span class="n">instances</span><span class="p">()</span>
+    <span class="n">in_use_networks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">():</span>
+        <span class="n">network</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">allInstances</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">network</span><span class="p">[</span><span class="s2">&quot;selfLink&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">interface</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">[</span><span class="s2">&quot;networkInterfaces&quot;</span><span class="p">]</span>
+            <span class="p">]:</span>
+                <span class="n">network</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">]):</span>
+            <span class="n">in_use_networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">in_use_networks</span></div>
+
+
+<div class="viewcode-block" id="in_use_firewalls"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.resources.in_use_firewalls">[docs]</a><span class="k">def</span> <span class="nf">in_use_firewalls</span><span class="p">():</span>
+    <span class="n">all_networks</span> <span class="o">=</span> <span class="n">networks_with_instances</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">firewall</span> <span class="ow">in</span> <span class="n">firewalls</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;disabled&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">all_networks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">network</span><span class="p">[</span><span class="s2">&quot;selfLink&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;network&quot;</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="p">[</span><span class="s2">&quot;instances&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">):</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">firewall</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.client &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.client</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">md5</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Generator</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">NamedTuple</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">_pytest.cacheprovider</span>
+<span class="kn">import</span> <span class="nn">botocore</span>
+<span class="kn">import</span> <span class="nn">botocore.exceptions</span>
+<span class="kn">import</span> <span class="nn">botocore.session</span>
+
+<span class="n">SERVICES_WITHOUT_REGIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;iam&quot;</span><span class="p">,</span> <span class="s2">&quot;s3&quot;</span><span class="p">,</span> <span class="s2">&quot;route53&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_session"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_session">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">botocore</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a new or cached botocore session for the AWS profile.&quot;&quot;&quot;</span>
+
+    <span class="c1"># If AWS_PROFILE is set and does not match what we want, unset this variable before</span>
+    <span class="c1"># we proceed.</span>
+    <span class="k">if</span> <span class="s2">&quot;AWS_PROFILE&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_PROFILE&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">profile</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;$AWS_PROFILE and --aws-profile do not match. Using --aws-profile value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">profile</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AWS_PROFILE&quot;</span><span class="p">]</span>
+
+    <span class="c1"># can raise botocore.exceptions.ProfileNotFound</span>
+    <span class="k">return</span> <span class="n">botocore</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_client"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_client">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_client</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">botocore</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">BaseClient</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a new or cached botocore service client for the AWS profile, region, and service.</span>
+
+<span class="sd">    Warns when a service is not available for a region, which means we</span>
+<span class="sd">    need to update botocore or skip that call for that region.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">region</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">get_available_regions</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">service</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SERVICES_WITHOUT_REGIONS</span>
+    <span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;service </span><span class="si">{}</span><span class="s2"> not available in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">region</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">create_client</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">region_name</span><span class="o">=</span><span class="n">region</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_available_profiles"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_available_profiles">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_available_profiles</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">profiles</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">(</span><span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">available_profiles</span>
+    <span class="k">return</span> <span class="n">profiles</span></div>
+
+
+<div class="viewcode-block" id="get_available_regions"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_available_regions">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_available_regions</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">regions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">(</span><span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">get_available_regions</span><span class="p">(</span><span class="s2">&quot;ec2&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">regions</span></div>
+
+
+<div class="viewcode-block" id="get_available_services"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_available_services">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_available_services</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">services</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">(</span><span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">)</span><span class="o">.</span><span class="n">get_available_services</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">services</span></div>
+
+
+<div class="viewcode-block" id="get_account_id"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_account_id">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_account_id</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">sts</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span> <span class="s2">&quot;sts&quot;</span><span class="p">)</span>
+    <span class="n">identity</span> <span class="o">=</span> <span class="n">sts</span><span class="o">.</span><span class="n">get_caller_identity</span><span class="p">()</span>
+    <span class="n">account_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">identity</span><span class="p">[</span><span class="s2">&quot;Account&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">account_id</span></div>
+
+
+<div class="viewcode-block" id="full_results"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.full_results">[docs]</a><span class="k">def</span> <span class="nf">full_results</span><span class="p">(</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">botocore</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">BaseClient</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Returns JSON results for an AWS botocore call. Flattens paginated results (if any).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">client</span><span class="o">.</span><span class="n">can_paginate</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+        <span class="n">paginator</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">full_result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">build_full_result</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">full_result</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">single_result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">single_result</span></div>
+
+
+<div class="viewcode-block" id="AWSAPICall"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.AWSAPICall">[docs]</a><span class="k">class</span> <span class="nc">AWSAPICall</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">region</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">service</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<span class="n">default_call</span> <span class="o">=</span> <span class="n">AWSAPICall</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="cache_key"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.cache_key">[docs]</a><span class="k">def</span> <span class="nf">cache_key</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">AWSAPICall</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the fullname (directory and filename) for an AWS API call.</span>
+
+<span class="sd">    &gt;&gt;&gt; cache_key(default_call._replace(</span>
+<span class="sd">    ... profile=&#39;profile&#39;,</span>
+<span class="sd">    ... region=&#39;region&#39;,</span>
+<span class="sd">    ... service=&#39;service_name&#39;,</span>
+<span class="sd">    ... method=&#39;method_name&#39;,</span>
+<span class="sd">    ... args=[&#39;arg1&#39;, &#39;arg2&#39;],</span>
+<span class="sd">    ... kwargs=dict(kwarg1=True)))</span>
+<span class="sd">    &#39;pytest_aws/profile/region/service_name/method_name/9965c005f623cd9130dd5a6dbdee87de.json&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;pytest_aws&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">profile</span> <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">get_account_id</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">region</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">service</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">method</span><span class="p">),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">arguments</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">args</span><span class="p">),</span>
+            <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">call</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">arguments</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="get_aws_resource"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.get_aws_resource">[docs]</a><span class="k">def</span> <span class="nf">get_aws_resource</span><span class="p">(</span>
+    <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">call_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">call_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_pytest</span><span class="o">.</span><span class="n">cacheprovider</span><span class="o">.</span><span class="n">Cache</span><span class="p">],</span>
+    <span class="n">profiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">regions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">result_from_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">debug_calls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">debug_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches and yields AWS API JSON responses for all profiles and regions (list params)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">profile</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">regions</span><span class="p">):</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">default_call</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+            <span class="n">profile</span><span class="o">=</span><span class="n">profile</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span>
+            <span class="n">service</span><span class="o">=</span><span class="n">service_name</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">method_name</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">call_args</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">call_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">debug_calls</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;calling&quot;</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ckey</span> <span class="o">=</span> <span class="n">cache_key</span><span class="p">(</span><span class="n">call</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ckey</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">debug_cache</span> <span class="ow">and</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;found cached value for&quot;</span><span class="p">,</span> <span class="n">ckey</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">get_client</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">profile</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">full_results</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">profile</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">profile</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">botocore</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ClientError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">result_from_error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">debug_calls</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;error fetching resource&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">result_from_error</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">debug_cache</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;setting cache value for&quot;</span><span class="p">,</span> <span class="n">ckey</span><span class="p">)</span>
+
+                <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ckey</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="BotocoreClient"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient">[docs]</a><span class="k">class</span> <span class="nc">BotocoreClient</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">,</span>
+        <span class="n">profiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">regions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">cache</span><span class="p">:</span> <span class="n">_pytest</span><span class="o">.</span><span class="n">cacheprovider</span><span class="o">.</span><span class="n">Cache</span><span class="p">,</span>
+        <span class="n">debug_calls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">debug_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">offline</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span> <span class="ow">or</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_calls</span> <span class="o">=</span> <span class="n">debug_calls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_cache</span> <span class="o">=</span> <span class="n">debug_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline</span> <span class="o">=</span> <span class="n">offline</span>
+
+        <span class="k">if</span> <span class="n">offline</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;us-east-1&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">regions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="n">regions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="n">get_available_regions</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="BotocoreClient.get_regions"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.get_regions">[docs]</a>    <span class="k">def</span> <span class="nf">get_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span></div>
+
+<div class="viewcode-block" id="BotocoreClient.get"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">,</span>
+        <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">call_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">call_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">profiles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">result_from_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">do_not_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">:</span>
+
+        <span class="c1"># TODO:</span>
+        <span class="c1"># For services that don&#39;t have the concept of regions,</span>
+        <span class="c1"># we don&#39;t want to do the exact same test N times where</span>
+        <span class="c1"># N is the number of regions. But the below hardcoding</span>
+        <span class="c1"># is not a very clean solution to this.</span>
+        <span class="k">if</span> <span class="n">service_name</span> <span class="ow">in</span> <span class="n">SERVICES_WITHOUT_REGIONS</span><span class="p">:</span>
+            <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;us-east-1&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">get_aws_resource</span><span class="p">(</span>
+                    <span class="n">service_name</span><span class="p">,</span>
+                    <span class="n">method_name</span><span class="p">,</span>
+                    <span class="n">call_args</span><span class="p">,</span>
+                    <span class="n">call_kwargs</span><span class="p">,</span>
+                    <span class="n">profiles</span><span class="o">=</span><span class="n">profiles</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="p">,</span>
+                    <span class="n">regions</span><span class="o">=</span><span class="n">regions</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">,</span>
+                    <span class="n">cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">do_not_cache</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">result_from_error</span><span class="o">=</span><span class="n">result_from_error</span><span class="p">,</span>
+                    <span class="n">debug_calls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug_calls</span><span class="p">,</span>
+                    <span class="n">debug_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug_cache</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="BotocoreClient.values"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the wrapped value</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = []</span>
+<span class="sd">        &gt;&gt;&gt; c.values()</span>
+<span class="sd">        []</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span></div>
+
+<div class="viewcode-block" id="BotocoreClient.extract_key"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.extract_key">[docs]</a>    <span class="k">def</span> <span class="nf">extract_key</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From an iterable of dicts returns the value with the given</span>
+<span class="sd">        keys discarding other values:</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;id&#39;: 1}, {&#39;id&#39;: 2}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;id&#39;).results</span>
+<span class="sd">        [1, 2]</span>
+
+<span class="sd">        When the key does not exist it returns the second arg which defaults to None:</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;id&#39;: 1}, {}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;id&#39;).results</span>
+<span class="sd">        [1, None]</span>
+
+
+<span class="sd">        Propagates the &#39;__pytest_meta&#39; key to dicts and lists of dicts:</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;Attrs&#39;: {&#39;Name&#39;: &#39;Test&#39;}, &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;Attrs&#39;).results</span>
+<span class="sd">        [{&#39;Name&#39;: &#39;Test&#39;, &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;Tags&#39;: [{&#39;Name&#39;: &#39;Test&#39;, &#39;Value&#39;: &#39;Tag&#39;}], &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;Tags&#39;).results</span>
+<span class="sd">        [[{&#39;Name&#39;: &#39;Test&#39;, &#39;Value&#39;: &#39;Tag&#39;, &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]]</span>
+
+<span class="sd">        But not to primitives:</span>
+
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;PolicyNames&#39;: [&#39;P1&#39;, &#39;P2&#39;]}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;PolicyNames&#39;).results</span>
+<span class="sd">        [[&#39;P1&#39;, &#39;P2&#39;]]</span>
+
+
+<span class="sd">        Errors when the outer dict is missing a meta key:</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;Attrs&#39;: {&#39;Name&#39;: &#39;Test&#39;}}]</span>
+<span class="sd">        &gt;&gt;&gt; c.extract_key(&#39;Attrs&#39;)</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        KeyError: &#39;__pytest_meta&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+            <span class="n">keyed_result</span> <span class="o">=</span> <span class="n">default</span>
+
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="n">keyed_result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keyed_result</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">keyed_result</span><span class="p">:</span>
+                        <span class="c1"># Added for IAM inline policies call, as it</span>
+                        <span class="c1"># returns a list of strings.</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="n">item</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keyed_result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">keyed_result</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">]</span>
+
+            <span class="c1"># skip setting metadata for primitives</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">keyed_result</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="BotocoreClient.flatten"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Flattens one level of a nested list:</span>
+
+<span class="sd">        &gt;&gt;&gt; c = BotocoreClient([None], None, None, None, None, offline=True)</span>
+<span class="sd">        &gt;&gt;&gt; c.results = [[&#39;A&#39;, 1], [&#39;B&#39;]]</span>
+<span class="sd">        &gt;&gt;&gt; c.flatten().values()</span>
+<span class="sd">        [&#39;A&#39;, 1, &#39;B&#39;]</span>
+
+<span class="sd">        Only works for a list of lists:</span>
+
+<span class="sd">        &gt;&gt;&gt; c.results = [{&#39;A&#39;: 1}, {&#39;B&#39;: 2}]</span>
+<span class="sd">        &gt;&gt;&gt; c.flatten().values()</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        TypeError: can only concatenate list (not &quot;dict&quot;) to list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="BotocoreClient.debug"><a class="viewcode-back" href="../../source/aws/aws.html#aws.client.BotocoreClient.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BotocoreClient&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

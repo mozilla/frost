@@ -1,0 +1,7 @@
+severity module
+===============
+
+.. automodule:: severity
+   :members:
+   :undoc-members:
+   :show-inheritance:

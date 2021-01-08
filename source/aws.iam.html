@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.iam package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.iam package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws-iam-package">
+<h1>aws.iam package<a class="headerlink" href="#aws-iam-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.iam.helpers">
+<span id="aws-iam-helpers-module"></span><h2>aws.iam.helpers module<a class="headerlink" href="#module-aws.iam.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.iam.helpers.user_is_inactive">
+<code class="sig-prename descclassname">aws.iam.helpers.</code><code class="sig-name descname">user_is_inactive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iam_user</span></em>, <em class="sig-param"><span class="n">no_activity_since</span></em>, <em class="sig-param"><span class="n">created_after</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/helpers.html#user_is_inactive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.helpers.user_is_inactive" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns False if any of these are true:</dt><dd><ul class="simple">
+<li><p>The user was created after the passed in “created_after” datetime.</p></li>
+<li><p>The user has used either potentially active access keys since the date
+that is “no_activity_since”</p></li>
+<li><p>The user has logged into the AWS console since the date that is
+“no_activity_since”</p></li>
+</ul>
+</dd>
+</dl>
+<p>else it will return True.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">no_activity_since</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">created_after</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>User considered active due to being created after the created_after datetime.
+&gt;&gt;&gt; user_is_inactive({‘user_creation_time’: ‘2018-01-10’}, created_after, no_activity_since)
+False</p>
+<p>User considered active due to usage of access key 1 after no_activity_since
+&gt;&gt;&gt; user_is_inactive({
+…     ‘user_creation_time’: ‘2016-01-10’,
+…     ‘access_key_1_active’: ‘true’,
+…     ‘access_key_1_last_used_date’: ‘2017-06-01’,
+… }, no_activity_since, created_after)
+False</p>
+<p>User considered active due to usage of access key 2 after no_activity_since
+&gt;&gt;&gt; user_is_inactive({
+…     ‘user_creation_time’: ‘2010-01-10’,
+…     ‘access_key_1_active’: ‘true’,
+…     ‘access_key_1_last_used_date’: ‘2014-06-01’,
+…     ‘access_key_2_active’: ‘true’,
+…     ‘access_key_2_last_used_date’: ‘2017-02-01’,
+… }, no_activity_since, created_after)
+False</p>
+<p>User considered active due to usage of password after no_activity_since
+&gt;&gt;&gt; user_is_inactive({
+…     ‘user_creation_time’: ‘2010-01-10’,
+…     ‘access_key_1_active’: ‘true’,
+…     ‘access_key_1_last_used_date’: ‘2014-06-01’,
+…     ‘access_key_2_active’: ‘false’,
+…     ‘access_key_2_last_used_date’: ‘N/A’,
+…     ‘password_enabled’: ‘true’,
+…     ‘password_last_used’: ‘2017-09-01’,
+… }, no_activity_since, created_after)
+False</p>
+<p>User considered inactive due to the only usage (access key 1) being before no_activity_since
+and user being created before created_after
+&gt;&gt;&gt; user_is_inactive({
+…     ‘user_creation_time’: ‘2016-01-10’,
+…     ‘access_key_1_active’: ‘true’,
+…     ‘access_key_1_last_used_date’: ‘2016-06-01’,
+…     ‘access_key_2_active’: ‘false’,
+…     ‘access_key_2_last_used_date’: ‘N/A’,
+…     ‘password_enabled’: ‘false’,
+…     ‘password_last_used’: ‘N/A’,
+… }, no_activity_since, created_after)
+True</p>
+<p>User considered inactive due to the only usage (password) being before no_activity_since
+and user being created before created_after
+&gt;&gt;&gt; user_is_inactive({
+…     ‘user_creation_time’: ‘2016-01-10’,
+…     ‘access_key_1_active’: ‘false’,
+…     ‘access_key_1_last_used_date’: ‘N/A’,
+…     ‘access_key_2_active’: ‘false’,
+…     ‘access_key_2_last_used_date’: ‘N/A’,
+…     ‘password_enabled’: ‘true’,
+…     ‘password_last_used’: ‘2016-06-01’,
+… }, no_activity_since, created_after)
+True</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.helpers.is_credential_active">
+<code class="sig-prename descclassname">aws.iam.helpers.</code><code class="sig-name descname">is_credential_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">credential_active</span></em>, <em class="sig-param"><span class="n">credential_last_used</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/helpers.html#is_credential_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.helpers.is_credential_active" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.helpers.is_access_key_expired">
+<code class="sig-prename descclassname">aws.iam.helpers.</code><code class="sig-name descname">is_access_key_expired</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iam_access_key</span></em>, <em class="sig-param"><span class="n">access_key_expiration_date</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/helpers.html#is_access_key_expired"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.helpers.is_access_key_expired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares the CreateDate of the access key with the datetime object passed
+in as <cite>access_key_expiration_date</cite> and returns True if the CreateDate is
+before the <cite>access_key_expiration_date</cite> datetime object.</p>
+<p>Returns False if the Status of the key is not <cite>Active</cite>, as though it may
+have expired, it cannot be used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">access_key_expiration_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_access_key_expired</span><span class="p">({</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Inactive&#39;</span><span class="p">},</span> <span class="n">access_key_expiration_date</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_access_key_expired</span><span class="p">({</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span> <span class="s1">&#39;CreateDate&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">)},</span> <span class="n">access_key_expiration_date</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_access_key_expired</span><span class="p">({</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span> <span class="s1">&#39;CreateDate&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">)},</span> <span class="n">access_key_expiration_date</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_access_key_expired</span><span class="p">({</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span> <span class="s1">&#39;CreateDate&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)},</span> <span class="n">access_key_expiration_date</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_access_key_expired</span><span class="p">({</span><span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span> <span class="s1">&#39;CreateDate&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">)},</span> <span class="n">access_key_expiration_date</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.helpers.get_iam_user_name">
+<code class="sig-prename descclassname">aws.iam.helpers.</code><code class="sig-name descname">get_iam_user_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">login</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/helpers.html#get_iam_user_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.helpers.get_iam_user_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.helpers.get_iam_resource_id">
+<code class="sig-prename descclassname">aws.iam.helpers.</code><code class="sig-name descname">get_iam_resource_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/helpers.html#get_iam_resource_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.helpers.get_iam_resource_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-aws.iam.resources">
+<span id="aws-iam-resources-module"></span><h2>aws.iam.resources module<a class="headerlink" href="#module-aws.iam.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.iam.resources.iam_users">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_users</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_users" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_users">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_users</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_admin_users">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_admin_users</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_admin_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_admin_users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_inline_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_inline_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_inline_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_inline_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_user_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_user_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_managed_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_managed_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_managed_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_managed_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_user_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_user_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_user_groups">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_user_groups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_user_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_user_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_groups_for_user</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_user_group_inline_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_user_group_inline_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_user_group_inline_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_user_group_inline_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_group_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_group_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_user_group_managed_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_user_group_managed_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_user_group_managed_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_user_group_managed_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_group_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_group_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_all_user_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_all_user_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_all_user_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_all_user_policies" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Gets all policies that can be attached to a user. This includes:</dt><dd><ul class="simple">
+<li><p>Inline policies on the user</p></li>
+<li><p>Managed policies on the user</p></li>
+<li><p>Inline policies on the group that the user is in</p></li>
+<li><p>Managed policies on the group that the user is in</p></li>
+</ul>
+</dd>
+</dl>
+<p>Inline policy API calls just return the name of the policy, so we create a single key dictionary to
+allow for standard access to the policy name ({‘PolicyName’: policy_name})</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_users_with_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_users_with_policies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_users_with_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_users_with_policies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_users_with_policies_and_groups">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_users_with_policies_and_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_users_with_policies_and_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_users_with_policies_and_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Users with their associated Policies and Groups</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_admin_login_profiles">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_admin_login_profiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_admin_login_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_admin_login_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_admin_mfa_devices">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_admin_mfa_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_admin_mfa_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_admin_mfa_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices">https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_user_login_profiles">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_user_login_profiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_user_login_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_user_login_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_user_mfa_devices">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_user_mfa_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_user_mfa_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_user_mfa_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices">https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_login_profiles">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_login_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">users</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_login_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_login_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_login_profile</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_mfa_devices">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_mfa_devices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">users</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_mfa_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_mfa_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices">https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_mfa_devices</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_roles">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_roles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_roles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_roles" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_roles">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_roles</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_all_role_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_all_role_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rolename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_all_role_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_all_role_policies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_roles_with_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_roles_with_policies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_roles_with_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_roles_with_policies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_role_inline_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_role_inline_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rolename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_role_inline_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_role_inline_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_role_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_role_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_role_managed_policies">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_role_managed_policies</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rolename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_role_managed_policies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_role_managed_policies" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_role_policies">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_attached_role_policies</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_admin_roles">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_admin_roles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_admin_roles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_admin_roles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_access_keys_for_user">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_access_keys_for_user</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_access_keys_for_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_access_keys_for_user" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_access_keys">https://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.list_access_keys</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_get_all_access_keys">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_get_all_access_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_get_all_access_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_get_all_access_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_generate_credential_report">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_generate_credential_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_generate_credential_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_generate_credential_report" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.generate_credential_report</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_get_credential_report">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_get_credential_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_get_credential_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_get_credential_report" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_credential_report">http://botocore.readthedocs.io/en/latest/reference/services/iam.html#IAM.Client.get_credential_report</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.iam_admin_users_with_credential_report">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">iam_admin_users_with_credential_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#iam_admin_users_with_credential_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.iam_admin_users_with_credential_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all “admin” users with an additional “CredentialReport” key,
+which is a dict containing their row in the Credentials Report.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.user_is_admin">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">user_is_admin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#user_is_admin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.user_is_admin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.iam.resources.get_all_users_that_can_access_aws_account">
+<code class="sig-prename descclassname">aws.iam.resources.</code><code class="sig-name descname">get_all_users_that_can_access_aws_account</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/iam/resources.html#get_all_users_that_can_access_aws_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.iam.resources.get_all_users_that_can_access_aws_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns users with console or API access to an AWS account.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="aws-iam-test-iam-access-key-is-old-module">
+<h2>aws.iam.test_iam_access_key_is_old module<a class="headerlink" href="#aws-iam-test-iam-access-key-is-old-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-iam-test-iam-admin-user-with-access-keys-module">
+<h2>aws.iam.test_iam_admin_user_with_access_keys module<a class="headerlink" href="#aws-iam-test-iam-admin-user-with-access-keys-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-iam-test-iam-admin-user-without-mfa-module">
+<h2>aws.iam.test_iam_admin_user_without_mfa module<a class="headerlink" href="#aws-iam-test-iam-admin-user-without-mfa-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-iam-test-iam-cross-account-admin-roles-require-mfa-module">
+<h2>aws.iam.test_iam_cross_account_admin_roles_require_mfa module<a class="headerlink" href="#aws-iam-test-iam-cross-account-admin-roles-require-mfa-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-iam-test-iam-user-is-inactive-module">
+<h2>aws.iam.test_iam_user_is_inactive module<a class="headerlink" href="#aws-iam-test-iam-user-is-inactive-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-iam-test-iam-user-without-mfa-module">
+<h2>aws.iam.test_iam_user_without_mfa module<a class="headerlink" href="#aws-iam-test-iam-user-without-mfa-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.iam">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws.iam" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">aws.iam package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-aws.iam.helpers">aws.iam.helpers module</a></li>
+<li><a class="reference internal" href="#module-aws.iam.resources">aws.iam.resources module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-access-key-is-old-module">aws.iam.test_iam_access_key_is_old module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-admin-user-with-access-keys-module">aws.iam.test_iam_admin_user_with_access_keys module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-admin-user-without-mfa-module">aws.iam.test_iam_admin_user_without_mfa module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-cross-account-admin-roles-require-mfa-module">aws.iam.test_iam_cross_account_admin_roles_require_mfa module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-user-is-inactive-module">aws.iam.test_iam_user_is_inactive module</a></li>
+<li><a class="reference internal" href="#aws-iam-test-iam-user-without-mfa-module">aws.iam.test_iam_user_without_mfa module</a></li>
+<li><a class="reference internal" href="#module-aws.iam">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>exemptions &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">exemptions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for exemptions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../source/exemptions.html#exemptions.load">[docs]</a><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Marks tests as xfail based on test name and ID.</span>
+
+<span class="sd">    Parses the exemptions section of the conf file and returns a two level dict with format:</span>
+
+<span class="sd">    {&lt;test_name&gt;:</span>
+<span class="sd">        {&lt;test_id&gt;: (&lt;exemption expiration&gt;, &lt;exemption reason&gt;)</span>
+<span class="sd">        ...</span>
+<span class="sd">        }</span>
+<span class="sd">    ...</span>
+<span class="sd">    }</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; load([</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;foo-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2050, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow foo&#39;</span>
+<span class="sd">    ... }</span>
+<span class="sd">    ... ]) == {&#39;test_foo&#39;: {&#39;foo-id&#39;: (&#39;2050-01-01&#39;, &#39;in prod never allow foo&#39;)}}</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; load([</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;*test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;foo-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2050, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow foo&#39;</span>
+<span class="sd">    ... }</span>
+<span class="sd">    ... ]) == {&#39;*test_foo&#39;: {&#39;foo-id&#39;: (&#39;2050-01-01&#39;, &#39;in prod never allow foo&#39;)}}</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; load([</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;foo-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2050, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow foo&#39;</span>
+<span class="sd">    ... },</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;bar-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2050, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow bar&#39;</span>
+<span class="sd">    ... }</span>
+<span class="sd">    ... ]) == {</span>
+<span class="sd">    ... &#39;test_foo&#39;: {</span>
+<span class="sd">    ... &#39;foo-id&#39;: (&#39;2050-01-01&#39;, &#39;in prod never allow foo&#39;),</span>
+<span class="sd">    ... &#39;bar-id&#39;: (&#39;2050-01-01&#39;, &#39;in prod never allow bar&#39;)}}</span>
+<span class="sd">    True</span>
+
+
+<span class="sd">    Duplicate test name and IDs are ignored with a warning:</span>
+
+<span class="sd">    &gt;&gt;&gt; load([</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;foo-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2050, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow foo&#39;</span>
+<span class="sd">    ... },</span>
+<span class="sd">    ... {</span>
+<span class="sd">    ... &#39;test_name&#39;: &#39;test_foo&#39;,</span>
+<span class="sd">    ... &#39;test_param_id&#39;: &#39;foo-id&#39;,</span>
+<span class="sd">    ... &#39;expiration_day&#39;: date(2051, 1, 1),</span>
+<span class="sd">    ... &#39;reason&#39;: &#39;in prod never allow foo another&#39;</span>
+<span class="sd">    ... }</span>
+<span class="sd">    ... ]) == {&#39;test_foo&#39;: {&#39;foo-id&#39;: (&#39;2050-01-01&#39;, &#39;in prod never allow foo&#39;)}}</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; # UserWarning: Exemptions: test_name: test_foo | test_id: foo-id | Skipping duplicate test name and ID</span>
+
+<span class="sd">    Does not check that test name and IDs exist (since names might not</span>
+<span class="sd">    be collected and IDs can require an HTTP call).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">processed_rules</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rules</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">processed_rules</span>
+
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+        <span class="n">test_name</span><span class="p">,</span> <span class="n">test_id</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;test_name&quot;</span><span class="p">],</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;test_param_id&quot;</span><span class="p">]</span>
+        <span class="n">expiration</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;expiration_day&quot;</span><span class="p">],</span> <span class="n">rule</span><span class="p">[</span><span class="s2">&quot;reason&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">expiration</span> <span class="o">&lt;</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Exemptions: test_name: </span><span class="si">{}</span><span class="s2"> | test_id: </span><span class="si">{}</span><span class="s2"> | Skipping rule with expiration day in the past </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">test_name</span><span class="p">,</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">expiration</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">test_id</span> <span class="ow">in</span> <span class="n">processed_rules</span><span class="p">[</span><span class="n">test_name</span><span class="p">]:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Exemptions: test_name: </span><span class="si">{}</span><span class="s2"> | test_id: </span><span class="si">{}</span><span class="s2"> | Skipping duplicate test name and ID&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">test_name</span><span class="p">,</span> <span class="n">test_id</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">processed_rules</span><span class="p">[</span><span class="n">test_name</span><span class="p">][</span><span class="n">test_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">expiration</span><span class="p">),</span> <span class="n">reason</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">processed_rules</span></div>
+
+
+<div class="viewcode-block" id="add_xfail_marker"><a class="viewcode-back" href="../source/exemptions.html#exemptions.add_xfail_marker">[docs]</a><span class="k">def</span> <span class="nf">add_xfail_marker</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds xfail markers for test names and ids specified in the exemptions conf.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="o">.</span><span class="n">get_closest_marker</span><span class="p">(</span><span class="s2">&quot;parametrize&quot;</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Skipping exemption checks for test without resource name </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">test_exemptions</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">custom_config</span><span class="o">.</span><span class="n">exemptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">originalname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">test_id</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># test_admin_user_is_inactive[gsuiteuser@example.com]</span>
+        <span class="n">test_id</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Exemption check failed: was unable to parse parametrized test name:&quot;</span><span class="p">,</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">test_exemptions</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">test_id</span> <span class="ow">in</span> <span class="n">test_exemptions</span><span class="p">:</span>
+            <span class="n">expiration</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">test_exemptions</span><span class="p">[</span><span class="n">test_id</span><span class="p">]</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">add_marker</span><span class="p">(</span>
+                <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">xfail</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">expiration</span><span class="o">=</span><span class="n">expiration</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check for any substring matchers</span>
+        <span class="k">for</span> <span class="n">exemption_test_id</span> <span class="ow">in</span> <span class="n">test_exemptions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exemption_test_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+                <span class="n">substring</span> <span class="o">=</span> <span class="n">exemption_test_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">substring</span><span class="p">,</span> <span class="n">test_id</span><span class="p">):</span>
+                    <span class="n">expiration</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">test_exemptions</span><span class="p">[</span><span class="n">exemption_test_id</span><span class="p">]</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">add_marker</span><span class="p">(</span>
+                        <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">xfail</span><span class="p">(</span>
+                            <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">expiration</span><span class="o">=</span><span class="n">expiration</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    <ul>
+      <li><a href="index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

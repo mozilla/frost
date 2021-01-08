@@ -1,0 +1,21 @@
+bin.auth package
+================
+
+Submodules
+----------
+
+bin.auth.setup\_gsuite module
+-----------------------------
+
+.. automodule:: bin.auth.setup_gsuite
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: bin.auth
+   :members:
+   :undoc-members:
+   :show-inheritance:

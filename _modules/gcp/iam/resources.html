@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gcp.iam.resources &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gcp.iam.resources</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gcp.iam.resources</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">gcp_client</span>
+
+
+<div class="viewcode-block" id="service_accounts"><a class="viewcode-back" href="../../../source/gcp/gcp.iam.html#gcp.iam.resources.service_accounts">[docs]</a><span class="k">def</span> <span class="nf">service_accounts</span><span class="p">():</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">project_id</span> <span class="ow">in</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">project_list</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">+=</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+            <span class="s2">&quot;iam&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;projects.serviceAccounts&quot;</span><span class="p">,</span>
+            <span class="n">results_key</span><span class="o">=</span><span class="s2">&quot;accounts&quot;</span><span class="p">,</span>
+            <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;projects/&quot;</span> <span class="o">+</span> <span class="n">project_id</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="service_account_keys"><a class="viewcode-back" href="../../../source/gcp/gcp.iam.html#gcp.iam.resources.service_account_keys">[docs]</a><span class="k">def</span> <span class="nf">service_account_keys</span><span class="p">(</span><span class="n">service_account</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+        <span class="s2">&quot;iam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;projects.serviceAccounts.keys&quot;</span><span class="p">,</span>
+        <span class="n">results_key</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span>
+        <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">service_account</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="all_service_account_keys"><a class="viewcode-back" href="../../../source/gcp/gcp.iam.html#gcp.iam.resources.all_service_account_keys">[docs]</a><span class="k">def</span> <span class="nf">all_service_account_keys</span><span class="p">():</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sa</span> <span class="ow">in</span> <span class="n">service_accounts</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">service_account_keys</span><span class="p">(</span><span class="n">sa</span><span class="p">):</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">keys</span></div>
+
+
+<div class="viewcode-block" id="project_iam_bindings"><a class="viewcode-back" href="../../../source/gcp/gcp.iam.html#gcp.iam.resources.project_iam_bindings">[docs]</a><span class="k">def</span> <span class="nf">project_iam_bindings</span><span class="p">():</span>
+    <span class="n">bindings</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">policies</span> <span class="o">=</span> <span class="n">gcp_client</span><span class="o">.</span><span class="n">get_project_iam_policies</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">policy</span> <span class="ow">in</span> <span class="n">policies</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">policy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bindings&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">bindings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">binding</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bindings</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

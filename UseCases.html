@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Use Cases &amp; Philosophy &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Source Code" href="Source.html" />
+    <link rel="prev" title="Contributing Documentation" href="ContributingDocumentation.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Source.html" title="Source Code"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ContributingDocumentation.html" title="Contributing Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Use Cases &amp; Philosophy</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="use-cases-philosophy">
+<h1>Use Cases &amp; Philosophy<a class="headerlink" href="#use-cases-philosophy" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Incorrect Information below</p>
+<p>Until this document is reviewed and corrected, it is known to contain errors, especially w.r.t. philosopy.</p>
+</div>
+<div class="section" id="philosophy">
+<h2>Philosophy<a class="headerlink" href="#philosophy" title="Permalink to this headline">¶</a></h2>
+<p>Frost is intended to build upon the pytest framework to provide extra features to support “infrastructure auditing”.</p>
+<p>The added features include:</p>
+<ul class="simple">
+<li><p>providing a standard way to inject meta data in the JSON test result file.</p></li>
+<li><p>providing a CLI wrapper (the <code class="docutils literal notranslate"><span class="pre">frost</span></code> program) to simplify execution of tests within the full supported frost environment.</p></li>
+</ul>
+<p>Note that the added features are all extensions to the normal pytest operations. Therefore, all tests can be executed directly from pytest. This can be highly useful for adhoc queries, and the development of new tests.</p>
+<div class="section" id="target-domain">
+<h3>Target Domain<a class="headerlink" href="#target-domain" title="Permalink to this headline">¶</a></h3>
+<p>Frost is intended to simplify the process of auditing existing system configurations, when the configuration data is accessible via an API. While any pytest compliant test <em>can</em> be driven via Frost, Frost is optimized for processing auditing controls and providing a report of the current state.</p>
+<p>Since, in general, the number of configuration resources to check is not statically known when the test is written or executed, some lesser used features of pytest are needed. In particular, the test collection phase often requires API calls to the service to discover the complete list of resources to be checked. While uncommon in internet pytest examples, dynamic test discovery is fully supported by pytest.</p>
+<p>In practice, many of the same calls needed to determine the list of resources may need to be repeated to collect the additional information needed by one or more tests. This leads to a tension between collecting all potentially needed data in the first (discovery) pass, or making many duplicate calls to the service as each test collects the additional information it requires. This leads to 2 common data collection paths:</p>
+<ul class="simple">
+<li><p>Path 1: Frost service API clients collect all need resources during the test collection phase, and caches the responses for use by other tests within the same run of Frost and (optionally) by subsequent runs of Frost. All test output is delivered in a JSON file for subsequent processing as appropriate.</p></li>
+<li><p>Path 2: Frost service builds the list of resources to be audited during the test collection phase. The current system state is collected via API calls during the test.</p></li>
+</ul>
+<script>mermaid.initialize({startOnLoad:true});</script><div class="mermaid">
+            sequenceDiagram
+
+    participant p1 as Path 1
+    participant s as Service
+    participant c as Pytest Managed Data
+    participant p2 as Path 2
+
+note over p1, p2: Test Collection Phase
+note over p1: AWS, gSuite, ...
+    p1-&gt;&gt;+s: enumerate resources and data
+    s-&gt;&gt;-p1: all data
+    p1 -&gt;&gt; c: resources &amp; data
+
+note over c: Pytest Data Caching
+note over p2: GitHub (new)
+    p2-&gt;&gt;+s: enumerate resources
+    s-&gt;&gt;-p2: all resources
+    p2-&gt;&gt;c: resources
+
+note over p1, p2: Test Execution Phase
+
+c--&gt;&gt;p1: data for test
+
+c--&gt;&gt;p2: resources for test
+p2-&gt;&gt;+s: request data for resource
+s-&gt;&gt;-p2: data for test
+
+note over c: Results caching
+
+    p1-&gt;&gt;c: test results
+    p2-&gt;&gt;c: test results
+
+note over p1, p2: Paths rejoin here for test output processing
+        </div><p>In both cases, all test output is delivered in a JSON file for subsequent processing as appropriate.</p>
+</div>
+</div>
+<div class="section" id="frost-supported-use-cases">
+<h2>Frost Supported Use Cases<a class="headerlink" href="#frost-supported-use-cases" title="Permalink to this headline">¶</a></h2>
+<p>While Frost could be considered a wrapper around pytest, it is optimized to support the following use cases:</p>
+<ul class="simple">
+<li><p>as part of an automated system, Frost will execute robustly, and without user intervention, so folks can trust my reporting.</p></li>
+<li><p>as an SRE, I want to be able to easily create new suites of tests, so I can pay special attention to something for a while. (Maybe new service, service migration, etc)</p></li>
+<li><p>as an SRE, I want to be able to easily add additional tests to a service, so new cloud features are monitored as we start to use them. (Or to apply lessons learned from an incident)</p></li>
+<li><p>as a Frost Developer, I want to easily be able to develop support for a new service, so I don’t have to re-implement the framework.</p></li>
+<li><p>as a SecOps incident responder, I want to quickly obtain easy-to-understand status of a specific account or subsystems, so I can eliminate, or focus in on, aspects of the system that appear abnormal.</p></li>
+</ul>
+<div class="section" id="unsupported-use-cases">
+<h3>Unsupported Use Cases<a class="headerlink" href="#unsupported-use-cases" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-add-away admonition">
+<p class="admonition-title">Add away</p>
+<p>Fair game to add out of scope use cases here, including moving down from above.</p>
+</div>
+<p>The following use cases are explicitly out of scope for Frost.</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">Use Cases &amp; Philosophy</a><ul>
+<li><a class="reference internal" href="#philosophy">Philosophy</a><ul>
+<li><a class="reference internal" href="#target-domain">Target Domain</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#frost-supported-use-cases">Frost Supported Use Cases</a><ul>
+<li><a class="reference internal" href="#unsupported-use-cases">Unsupported Use Cases</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="ContributingDocumentation.html" title="previous chapter">Contributing Documentation</a>
+          <li>Next: <a href="Source.html" title="next chapter">Source Code</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

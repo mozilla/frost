@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>service_report_generator module &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">service_report_generator module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-service_report_generator">
+<span id="service-report-generator-module"></span><h1>service_report_generator module<a class="headerlink" href="#module-service_report_generator" title="Permalink to this headline">¶</a></h1>
+<p>Transform results and metadata from a pytest report JSON output and writes Service JSON reports.</p>
+<p>Pytest Service JSON format:</p>
+<dl>
+<dt>{</dt><dd><p>‘name’: ‘pytest’,
+‘tool_url’: ‘<a class="reference external" href="https://github.com/mozilla/frost">https://github.com/mozilla/frost</a>’,
+‘version’: 1,
+‘created_at’: ‘2000-01-01 15:50:00.123123’,
+‘meanings’: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>‘pass’: {</dt><dd><p>‘short’: ‘pass’,    // text that _could_ be used in a badge
+‘long’: ‘Test passed / no issues found.’</p>
+</dd>
+</dl>
+<p>},
+‘warn’: {</p>
+<blockquote>
+<div><p>‘short’: ‘warn’,
+‘long’: ‘Expected test failures, either due to test-level xfail/xpass markers or exemptions.’</p>
+</div></blockquote>
+<p>},
+‘fail’: {</p>
+<blockquote>
+<div><p>‘short’: ‘fail’,
+‘long’: ‘Critical test failure that should never happen e.g. publicly accessible DB snapshot,’</p>
+<blockquote>
+<div><p>‘ user without MFA in prod.’</p>
+</div></blockquote>
+</div></blockquote>
+<p>},
+‘err’: {</p>
+<blockquote>
+<div><p>‘short’: ‘err’,
+‘long’: ‘Error fetching an resource from AWS.’</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+<p>},
+‘results’: [</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{</dt><dd><p>‘test_name’:  # unparametrized pytest test name
+‘resource_name’: # best effort at resource name
+‘name’:
+‘status’:
+‘value’:
+‘reason’:  # pytest test outcome reason if any (e.g. resource fetch failed)
+‘markers’:  # pytest markers on the test e.g. aws service, ruleset
+‘metadata’:  # additional metadata on the resource being tested
+‘rationale’: # (optional) rationale behind the test. (null if not set)
+‘description’: # (optional) description of the test (null if not set)
+‘severity’: # (optional) severity of the test (null if not set)
+‘regression’: # (optional) regression comment (null if not set)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>]</p>
+</dd>
+</dl>
+<p>}</p>
+<dl class="py function">
+<dt id="service_report_generator.parse_args">
+<code class="sig-prename descclassname">service_report_generator.</code><code class="sig-name descname">parse_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/service_report_generator.html#parse_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#service_report_generator.parse_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="service_report_generator.get_test_status">
+<code class="sig-prename descclassname">service_report_generator.</code><code class="sig-name descname">get_test_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">outcome</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/service_report_generator.html#get_test_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#service_report_generator.get_test_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="service_report_generator.get_resource_name">
+<code class="sig-prename descclassname">service_report_generator.</code><code class="sig-name descname">get_resource_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/service_report_generator.html#get_resource_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#service_report_generator.get_resource_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="service_report_generator.get_result_for_test">
+<code class="sig-prename descclassname">service_report_generator.</code><code class="sig-name descname">get_result_for_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">test</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/service_report_generator.html#get_result_for_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#service_report_generator.get_result_for_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="service_report_generator.pytest_json_to_service_json">
+<code class="sig-prename descclassname">service_report_generator.</code><code class="sig-name descname">pytest_json_to_service_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pytest_json</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/service_report_generator.html#pytest_json_to_service_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#service_report_generator.pytest_json_to_service_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

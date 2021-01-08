@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>conftest &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">conftest</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for conftest</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">from</span> <span class="nn">_pytest.doctest</span> <span class="kn">import</span> <span class="n">DoctestItem</span>
+<span class="kn">from</span> <span class="nn">_pytest.mark</span> <span class="kn">import</span> <span class="n">Mark</span><span class="p">,</span> <span class="n">MarkDecorator</span>
+<span class="kn">from</span> <span class="nn">cache</span> <span class="kn">import</span> <span class="n">patch_cache_set</span>
+<span class="kn">from</span> <span class="nn">aws.client</span> <span class="kn">import</span> <span class="n">BotocoreClient</span>
+<span class="kn">from</span> <span class="nn">gcp.client</span> <span class="kn">import</span> <span class="n">GCPClient</span>
+<span class="kn">from</span> <span class="nn">gsuite.client</span> <span class="kn">import</span> <span class="n">GsuiteClient</span>
+
+<span class="kn">import</span> <span class="nn">custom_config</span>
+
+<span class="n">botocore_client</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">gcp_client</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">gsuite_client</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">custom_config_global</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="pytest_addoption"><a class="viewcode-back" href="../source/conftest.html#conftest.pytest_addoption">[docs]</a><span class="k">def</span> <span class="nf">pytest_addoption</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">frost_parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">getgroup</span><span class="p">(</span><span class="s2">&quot;Frost&quot;</span><span class="p">,</span> <span class="s2">&quot;Frost&#39;s custom arguments&quot;</span><span class="p">)</span>
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--aws-profiles&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set default AWS profiles to use. Defaults to the current AWS profile i.e. [None].&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--aws-regions&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set AWS regions to use as a comma separate list. Defaults to all available AWS regions&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--gcp-project-id&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set GCP project to test.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--gcp-folder-id&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set GCP folder to test. Will test all projects under this folder.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># While only used for Heroku at the moment, GitHub tests are soon to be</span>
+    <span class="c1"># added, which will also need an &quot;organization&quot; option. Current plan is to</span>
+    <span class="c1"># reuse this one.</span>
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--organization&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set organization to test. Used for Heroku tests.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--debug-calls&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Log API calls. Requires -s&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--debug-cache&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Log whether API calls hit the cache. Requires -s&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--offline&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Instruct service clients to return empty lists and not make HTTP requests.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">frost_parser</span><span class="o">.</span><span class="n">addoption</span><span class="p">(</span>
+        <span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the config file.&quot;</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pytest_configure"><a class="viewcode-back" href="../source/conftest.html#conftest.pytest_configure">[docs]</a><span class="k">def</span> <span class="nf">pytest_configure</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">botocore_client</span>
+    <span class="k">global</span> <span class="n">gcp_client</span>
+    <span class="k">global</span> <span class="n">gsuite_client</span>
+    <span class="k">global</span> <span class="n">custom_config_global</span>
+
+    <span class="c1"># run with -p &#39;no:cacheprovider&#39;</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cache</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;cache&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cache</span><span class="p">:</span>
+        <span class="c1"># monkeypatch cache.set to serialize datetime.datetime&#39;s</span>
+        <span class="n">patch_cache_set</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--aws-profiles&quot;</span><span class="p">)</span>
+    <span class="n">aws_regions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--aws-regions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--aws-regions&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">[]</span>
+    <span class="p">)</span>
+
+    <span class="n">project_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--gcp-project-id&quot;</span><span class="p">)</span>
+    <span class="n">folder_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--gcp-folder-id&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">project_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">folder_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;--gcp-project-id and --gcp-folder-id are mutually exclusive arguments&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">organization</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--organization&quot;</span><span class="p">)</span>
+
+    <span class="n">botocore_client</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">(</span>
+        <span class="n">profiles</span><span class="o">=</span><span class="n">profiles</span><span class="p">,</span>
+        <span class="n">regions</span><span class="o">=</span><span class="n">aws_regions</span><span class="p">,</span>
+        <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+        <span class="n">debug_calls</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--debug-calls&quot;</span><span class="p">),</span>
+        <span class="n">debug_cache</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--debug-cache&quot;</span><span class="p">),</span>
+        <span class="n">offline</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--offline&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">gcp_client</span> <span class="o">=</span> <span class="n">GCPClient</span><span class="p">(</span>
+        <span class="n">project_id</span><span class="o">=</span><span class="n">project_id</span><span class="p">,</span>
+        <span class="n">folder_id</span><span class="o">=</span><span class="n">folder_id</span><span class="p">,</span>
+        <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+        <span class="n">debug_calls</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--debug-calls&quot;</span><span class="p">),</span>
+        <span class="n">debug_cache</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--debug-cache&quot;</span><span class="p">),</span>
+        <span class="n">offline</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--offline&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">custom_config_global</span> <span class="o">=</span> <span class="n">custom_config</span><span class="o">.</span><span class="n">CustomConfig</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">))</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">custom_config</span> <span class="o">=</span> <span class="n">custom_config_global</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span> <span class="k">if</span> <span class="s2">&quot;gsuite&quot;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">):</span>
+            <span class="n">gsuite_client</span> <span class="o">=</span> <span class="n">GsuiteClient</span><span class="p">(</span>
+                <span class="n">domain</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">custom_config</span><span class="o">.</span><span class="n">gsuite</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
+                <span class="n">offline</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">getoption</span><span class="p">(</span><span class="s2">&quot;--offline&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gsuite_client</span> <span class="o">=</span> <span class="n">GsuiteClient</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">gsuite_client</span> <span class="o">=</span> <span class="n">GsuiteClient</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># register custom marker for rationale (used in report)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">addinivalue_line</span><span class="p">(</span>
+        <span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rationale(reason): (optional) rationale behind the test. (null if not set)&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="aws_config"><a class="viewcode-back" href="../source/conftest.html#conftest.aws_config">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">aws_config</span><span class="p">(</span><span class="n">pytestconfig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pytestconfig</span><span class="o">.</span><span class="n">custom_config</span><span class="o">.</span><span class="n">aws</span></div>
+
+
+<div class="viewcode-block" id="gcp_config"><a class="viewcode-back" href="../source/conftest.html#conftest.gcp_config">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">gcp_config</span><span class="p">(</span><span class="n">pytestconfig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pytestconfig</span><span class="o">.</span><span class="n">custom_config</span><span class="o">.</span><span class="n">gcp</span></div>
+
+
+<div class="viewcode-block" id="pytest_runtest_setup"><a class="viewcode-back" href="../source/conftest.html#conftest.pytest_runtest_setup">[docs]</a><span class="k">def</span> <span class="nf">pytest_runtest_setup</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add custom markers to pytest tests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">DoctestItem</span><span class="p">):</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">custom_config</span><span class="o">.</span><span class="n">add_markers</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+
+<span class="c1"># Reporting</span>
+
+
+<div class="viewcode-block" id="get_node_markers"><a class="viewcode-back" href="../source/conftest.html#conftest.get_node_markers">[docs]</a><span class="k">def</span> <span class="nf">get_node_markers</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">iter_markers</span><span class="p">()]</span></div>
+
+
+<span class="c1"># METADATA_KEYS are modified by services to specify which metadata is</span>
+<span class="c1"># relevant for the JSON output. It&#39;s unlikely that duplicate keys are</span>
+<span class="c1"># intended, so failfast</span>
+<span class="c1"># adapted from</span>
+<span class="c1"># https://stackoverflow.com/questions/41281346/how-to-raise-error-if-user-tries-to-enter-duplicate-entries-in-a-set-in-python/41281734#41281734</span>
+<div class="viewcode-block" id="DuplicateKeyError"><a class="viewcode-back" href="../source/conftest.html#conftest.DuplicateKeyError">[docs]</a><span class="k">class</span> <span class="nc">DuplicateKeyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SingleSet"><a class="viewcode-back" href="../source/conftest.html#conftest.SingleSet">[docs]</a><span class="k">class</span> <span class="nc">SingleSet</span><span class="p">(</span><span class="nb">set</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set only allowing values to be added once</span>
+
+<span class="sd">    When addition of a duplicate value is detected, the `DuplicateKeyError`</span>
+<span class="sd">    exception will be raised, all non duplicate values are added to the set.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        DuplicateKeyError - when adding a value already in the set</span>
+
+<span class="sd">    &gt;&gt;&gt; ss = SingleSet({1, 2, 3, 4})</span>
+<span class="sd">    &gt;&gt;&gt; ss.add(3)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    conftest.DuplicateKeyError: Value 3 already present</span>
+<span class="sd">    &gt;&gt;&gt; ss.update({4, 5, 6, 3})</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    conftest.DuplicateKeyError: Value(s) {3, 4} already present</span>
+<span class="sd">    &gt;&gt;&gt; ss</span>
+<span class="sd">    SingleSet({1, 2, 3, 4, 5, 6})</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+
+<span class="sd">    **NB:**</span>
+<span class="sd">    - duplicate values on initialization are not detected</span>
+<span class="sd">    &gt;&gt;&gt; ss = SingleSet({1, 2, 3, 4, 3, 2, 1})</span>
+<span class="sd">    &gt;&gt;&gt; ss</span>
+<span class="sd">    SingleSet({1, 2, 3, 4})</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SingleSet.add"><a class="viewcode-back" href="../source/conftest.html#conftest.SingleSet.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DuplicateKeyError</span><span class="p">(</span><span class="s2">&quot;Value </span><span class="si">{!r}</span><span class="s2"> already present&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SingleSet.update"><a class="viewcode-back" href="../source/conftest.html#conftest.SingleSet.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">error_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">error_values</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error_values</span><span class="p">:</span>
+            <span class="c1"># we want the non-duplicate values added</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">error_values</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DuplicateKeyError</span><span class="p">(</span>
+                <span class="s2">&quot;Value(s) </span><span class="si">{!r}</span><span class="s2"> already present&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error_values</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div></div>
+
+
+<span class="n">METADATA_KEYS</span><span class="p">:</span> <span class="n">SingleSet</span> <span class="o">=</span> <span class="n">SingleSet</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="s2">&quot;DBInstanceArn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DBInstanceIdentifier&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GroupId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ImageId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;InstanceId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;LaunchTime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OwnerId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TagList&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Tags&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;UserName&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;VolumeId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;VpcId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__pytest_meta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;displayName&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;members&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;project&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;projectId&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;uniqueId&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="serialize_datetimes"><a class="viewcode-back" href="../source/conftest.html#conftest.serialize_datetimes">[docs]</a><span class="k">def</span> <span class="nf">serialize_datetimes</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Serializes datetimes to ISO format strings.</span>
+
+<span class="sd">    Used on report test_metadata since pytest-json doesn&#39;t let us pass</span>
+<span class="sd">    options to the serializer.</span>
+
+<span class="sd">    &gt;&gt;&gt; from datetime import datetime</span>
+<span class="sd">    &gt;&gt;&gt; serialize_datetimes({datetime(2000, 1, 1): -1})</span>
+<span class="sd">    {&#39;2000-01-01T00:00:00&#39;: -1}</span>
+<span class="sd">    &gt;&gt;&gt; serialize_datetimes({&#39;foo&#39;: datetime(2000, 1, 1)})</span>
+<span class="sd">    {&#39;foo&#39;: &#39;2000-01-01T00:00:00&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">serialize_datetimes</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">new_obj</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_obj</span><span class="p">[</span><span class="n">serialize_datetimes</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">serialize_datetimes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_obj</span>
+
+    <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="extract_metadata"><a class="viewcode-back" href="../source/conftest.html#conftest.extract_metadata">[docs]</a><span class="k">def</span> <span class="nf">extract_metadata</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">metadata_key</span><span class="p">:</span> <span class="n">resource</span><span class="p">[</span><span class="n">metadata_key</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">METADATA_KEYS</span>
+        <span class="k">if</span> <span class="n">metadata_key</span> <span class="ow">in</span> <span class="n">resource</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_metadata_from_funcargs"><a class="viewcode-back" href="../source/conftest.html#conftest.get_metadata_from_funcargs">[docs]</a><span class="k">def</span> <span class="nf">get_metadata_from_funcargs</span><span class="p">(</span><span class="n">funcargs</span><span class="p">):</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">funcargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">funcargs</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">extract_metadata</span><span class="p">(</span><span class="n">funcargs</span><span class="p">[</span><span class="n">k</span><span class="p">])}</span>
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="serialize_marker"><a class="viewcode-back" href="../source/conftest.html#conftest.serialize_marker">[docs]</a><span class="k">def</span> <span class="nf">serialize_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="p">(</span><span class="n">MarkDecorator</span><span class="p">,</span> <span class="n">Mark</span><span class="p">)):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;...skipped...&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">marker</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;parametrize&quot;</span> <span class="k">else</span> <span class="n">marker</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;...skipped...&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">marker</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;parametrize&quot;</span> <span class="k">else</span> <span class="n">marker</span><span class="o">.</span><span class="n">kwargs</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">marker</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unexpected Marker type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">repr</span><span class="p">(</span><span class="n">marker</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_outcome_and_reason"><a class="viewcode-back" href="../source/conftest.html#conftest.get_outcome_and_reason">[docs]</a><span class="k">def</span> <span class="nf">get_outcome_and_reason</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">markers</span><span class="p">,</span> <span class="n">call</span><span class="p">):</span>
+    <span class="n">xfail</span> <span class="o">=</span> <span class="s2">&quot;xfail&quot;</span> <span class="ow">in</span> <span class="n">markers</span>
+    <span class="n">xpass</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">passed</span> <span class="ow">and</span> <span class="n">xfail</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">call</span><span class="o">.</span><span class="n">excinfo</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">excinfo</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">excinfo</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;errored&quot;</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">excinfo</span>
+    <span class="k">elif</span> <span class="n">xpass</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;xpassed&quot;</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="s2">&quot;xfail&quot;</span><span class="p">][</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">xfail</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;xfailed&quot;</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="s2">&quot;xfail&quot;</span><span class="p">][</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">report</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># passed, failed, skipped</span></div>
+
+
+<div class="viewcode-block" id="clean_docstring"><a class="viewcode-back" href="../source/conftest.html#conftest.clean_docstring">[docs]</a><span class="k">def</span> <span class="nf">clean_docstring</span><span class="p">(</span><span class="n">docstr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms a docstring into a properly formatted single line string.</span>
+
+<span class="sd">    &gt;&gt;&gt; clean_docstring(&quot;\\nfoo\\n    bar\\n&quot;)</span>
+<span class="sd">    &#39;foo bar&#39;</span>
+<span class="sd">    &gt;&gt;&gt; clean_docstring(&quot;foo bar&quot;)</span>
+<span class="sd">    &#39;foo bar&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">docstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">word</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pytest_runtest_makereport"><a class="viewcode-back" href="../source/conftest.html#conftest.pytest_runtest_makereport">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">hookwrapper</span>
+<span class="k">def</span> <span class="nf">pytest_runtest_makereport</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">call</span><span class="p">):</span>
+    <span class="n">outcome</span> <span class="o">=</span> <span class="k">yield</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+
+    <span class="c1"># only add this during call instead of during any stage</span>
+    <span class="k">if</span> <span class="n">report</span><span class="o">.</span><span class="n">when</span> <span class="o">==</span> <span class="s2">&quot;call&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">DoctestItem</span><span class="p">):</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_metadata_from_funcargs</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">funcargs</span><span class="p">)</span>
+        <span class="n">markers</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">serialize_marker</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">get_node_markers</span><span class="p">(</span><span class="n">item</span><span class="p">)}</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;severity&quot;</span><span class="p">)[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">regression</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;regression&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;regression&quot;</span><span class="p">)[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">outcome</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">get_outcome_and_reason</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">markers</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+        <span class="n">rationale</span> <span class="o">=</span> <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rationale&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">clean_docstring</span><span class="p">(</span>
+            <span class="n">markers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rationale&quot;</span><span class="p">)[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="ow">and</span> <span class="n">clean_docstring</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="c1"># add json metadata</span>
+        <span class="n">report</span><span class="o">.</span><span class="n">test_metadata</span> <span class="o">=</span> <span class="n">serialize_datetimes</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">markers</span><span class="o">=</span><span class="n">markers</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+                <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span>  <span class="c1"># &#39;passed&#39;, &#39;failed&#39;, &#39;skipped&#39;, &#39;xfailed&#39;, &#39;xskipped&#39;, or &#39;errored&#39;</span>
+                <span class="n">parametrized_name</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">rationale</span><span class="o">=</span><span class="n">rationale</span><span class="p">,</span>
+                <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+                <span class="n">regression</span><span class="o">=</span><span class="n">regression</span><span class="p">,</span>
+                <span class="n">unparametrized_name</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">originalname</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    <ul>
+      <li><a href="index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

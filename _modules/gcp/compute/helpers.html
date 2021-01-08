@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gcp.compute.helpers &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gcp.compute.helpers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for gcp.compute.helpers</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="does_firewall_open_all_ports_to_any"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.helpers.does_firewall_open_all_ports_to_any">[docs]</a><span></span><span class="k">def</span> <span class="nf">does_firewall_open_all_ports_to_any</span><span class="p">(</span><span class="n">firewall</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if firewall has a rule to open all ports to any source. Excludes ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_any({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_any({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;1&#39;, &#39;2&#39;, &#39;300&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_any({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_any({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_any({&#39;sourceRanges&#39;: [&#39;10.0.0.5/32&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">does_firewall_open_all_ports_to_all</span><span class="p">(</span><span class="n">firewall</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sourceRanges&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IPProtocol&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;icmp&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ports&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">port_rule</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ports&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">port_rule</span> <span class="o">==</span> <span class="s2">&quot;0-65535&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="does_firewall_open_all_ports_to_all"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.helpers.does_firewall_open_all_ports_to_all">[docs]</a><span class="k">def</span> <span class="nf">does_firewall_open_all_ports_to_all</span><span class="p">(</span><span class="n">firewall</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if firewall has a rule to open all ports to all. Excludes ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_all({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_all({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_all({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_all_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sourceRanges&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="s2">&quot;0.0.0.0/0&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;sourceRanges&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IPProtocol&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;icmp&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ports&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">port_rule</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ports&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">port_rule</span> <span class="o">==</span> <span class="s2">&quot;0-65535&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="does_firewall_open_any_ports_to_all"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.helpers.does_firewall_open_any_ports_to_all">[docs]</a><span class="k">def</span> <span class="nf">does_firewall_open_any_ports_to_all</span><span class="p">(</span><span class="n">firewall</span><span class="p">,</span> <span class="n">allowed_ports</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if firewall has a rule to open any ports (except 80/443) to all. Excludes ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;0-65535&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;1.1.1.1/1&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;123&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;123&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;80&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;443&#39;]}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; does_firewall_open_any_ports_to_all({&#39;sourceRanges&#39;: [&#39;0.0.0.0/0&#39;], &#39;allowed&#39;: [{&#39;ports&#39;: [&#39;22&#39;, &#39;80&#39;, &#39;443&#39;]}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">allowed_ports</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">allowed_ports</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">does_firewall_open_all_ports_to_all</span><span class="p">(</span><span class="n">firewall</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sourceRanges&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="s2">&quot;0.0.0.0/0&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;sourceRanges&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">firewall</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IPProtocol&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;icmp&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">port_rule</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ports&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">port_rule</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port_rule</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">port_rule</span> <span class="ow">in</span> <span class="n">allowed_ports</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">port_rule</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">443</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="firewall_id"><a class="viewcode-back" href="../../../source/gcp/gcp.compute.html#gcp.compute.helpers.firewall_id">[docs]</a><span class="k">def</span> <span class="nf">firewall_id</span><span class="p">(</span><span class="n">firewall</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A getter fn for test ids for Firewalls&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">firewall</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">firewall</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

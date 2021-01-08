@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gsuite.admin package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="frost" href="../frost/modules.html" />
+    <link rel="prev" title="gsuite package" href="gsuite.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../frost/modules.html" title="frost"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gsuite.html" title="gsuite package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../Source.html" >Source Code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="modules.html" >gsuite</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="gsuite.html" accesskey="U">gsuite package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gsuite.admin package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gsuite-admin-package">
+<h1>gsuite.admin package<a class="headerlink" href="#gsuite-admin-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gsuite.admin.helpers">
+<span id="gsuite-admin-helpers-module"></span><h2>gsuite.admin.helpers module<a class="headerlink" href="#module-gsuite.admin.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gsuite.admin.helpers.user_is_inactive">
+<code class="sig-prename descclassname">gsuite.admin.helpers.</code><code class="sig-name descname">user_is_inactive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">no_activity_since</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/helpers.html#user_is_inactive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.helpers.user_is_inactive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compares the lastLoginTime with no_activity_since.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gsuite.admin.helpers.owners_of_a_group">
+<code class="sig-prename descclassname">gsuite.admin.helpers.</code><code class="sig-name descname">owners_of_a_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">members</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/helpers.html#owners_of_a_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.helpers.owners_of_a_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of owners from a list of group members</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gsuite.admin.helpers.is_owner_of_group">
+<code class="sig-prename descclassname">gsuite.admin.helpers.</code><code class="sig-name descname">is_owner_of_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/helpers.html#is_owner_of_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.helpers.is_owner_of_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a member of a group is an owner with a status of ‘ACTIVE’.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-gsuite.admin.resources">
+<span id="gsuite-admin-resources-module"></span><h2>gsuite.admin.resources module<a class="headerlink" href="#module-gsuite.admin.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gsuite.admin.resources.list_users">
+<code class="sig-prename descclassname">gsuite.admin.resources.</code><code class="sig-name descname">list_users</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/resources.html#list_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.resources.list_users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gsuite.admin.resources.list_groups">
+<code class="sig-prename descclassname">gsuite.admin.resources.</code><code class="sig-name descname">list_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/resources.html#list_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.resources.list_groups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gsuite.admin.resources.list_members_of_group">
+<code class="sig-prename descclassname">gsuite.admin.resources.</code><code class="sig-name descname">list_members_of_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/resources.html#list_members_of_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.resources.list_members_of_group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gsuite.admin.resources.list_groups_and_members">
+<code class="sig-prename descclassname">gsuite.admin.resources.</code><code class="sig-name descname">list_groups_and_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/gsuite/admin/resources.html#list_groups_and_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gsuite.admin.resources.list_groups_and_members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gsuite-admin-test-admin-user-is-inactive-module">
+<h2>gsuite.admin.test_admin_user_is_inactive module<a class="headerlink" href="#gsuite-admin-test-admin-user-is-inactive-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="gsuite-admin-test-groups-have-enough-owners-module">
+<h2>gsuite.admin.test_groups_have_enough_owners module<a class="headerlink" href="#gsuite-admin-test-groups-have-enough-owners-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gsuite.admin">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-gsuite.admin" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">gsuite.admin package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-gsuite.admin.helpers">gsuite.admin.helpers module</a></li>
+<li><a class="reference internal" href="#module-gsuite.admin.resources">gsuite.admin.resources module</a></li>
+<li><a class="reference internal" href="#gsuite-admin-test-admin-user-is-inactive-module">gsuite.admin.test_admin_user_is_inactive module</a></li>
+<li><a class="reference internal" href="#gsuite-admin-test-groups-have-enough-owners-module">gsuite.admin.test_groups_have_enough_owners module</a></li>
+<li><a class="reference internal" href="#module-gsuite.admin">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../Source.html">Source Code</a>
+        <ul>
+      <li><a href="modules.html">gsuite</a>
+        <ul>
+      <li><a href="gsuite.html">gsuite package</a>
+        <ul>
+          <li>Previous: <a href="gsuite.html" title="previous chapter">gsuite package</a>
+          <li>Next: <a href="../frost/modules.html" title="next chapter">frost</a></ul>
+      </li></ul>
+      </li></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

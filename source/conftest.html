@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>conftest module &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">conftest module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-conftest">
+<span id="conftest-module"></span><h1>conftest module<a class="headerlink" href="#module-conftest" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="conftest.pytest_addoption">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">pytest_addoption</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parser</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#pytest_addoption"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.pytest_addoption" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.pytest_configure">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">pytest_configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#pytest_configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.pytest_configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.aws_config">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">aws_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pytestconfig</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#aws_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.aws_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.gcp_config">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">gcp_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pytestconfig</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#gcp_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.gcp_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.pytest_runtest_setup">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">pytest_runtest_setup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#pytest_runtest_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.pytest_runtest_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add custom markers to pytest tests.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="conftest.get_node_markers">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">get_node_markers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#get_node_markers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.get_node_markers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt id="conftest.DuplicateKeyError">
+<em class="property">exception </em><code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">DuplicateKeyError</code><a class="reference internal" href="../_modules/conftest.html#DuplicateKeyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.DuplicateKeyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="conftest.SingleSet">
+<em class="property">class </em><code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">SingleSet</code><a class="reference internal" href="../_modules/conftest.html#SingleSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.SingleSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></p>
+<p>Set only allowing values to be added once</p>
+<p>When addition of a duplicate value is detected, the <cite>DuplicateKeyError</cite>
+exception will be raised, all non duplicate values are added to the set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>DuplicateKeyError - when adding a value already in the set</strong> – </p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span> <span class="o">=</span> <span class="n">SingleSet</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">conftest.DuplicateKeyError</span>: <span class="n">Value 3 already present</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">conftest.DuplicateKeyError</span>: <span class="n">Value(s) {3, 4} already present</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ss</span>
+<span class="go">SingleSet({1, 2, 3, 4, 5, 6})</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p><strong>NB:</strong>
+- duplicate values on initialization are not detected
+&gt;&gt;&gt; ss = SingleSet({1, 2, 3, 4, 3, 2, 1})
+&gt;&gt;&gt; ss
+SingleSet({1, 2, 3, 4})</p>
+<dl class="py method">
+<dt id="conftest.SingleSet.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#SingleSet.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.SingleSet.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an element to a set.</p>
+<p>This has no effect if the element is already present.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="conftest.SingleSet.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#SingleSet.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.SingleSet.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a set with the union of itself and others.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="conftest.serialize_datetimes">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">serialize_datetimes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#serialize_datetimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.serialize_datetimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializes datetimes to ISO format strings.</p>
+<p>Used on report test_metadata since pytest-json doesn’t let us pass
+options to the serializer.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">serialize_datetimes</span><span class="p">({</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+<span class="go">{&#39;2000-01-01T00:00:00&#39;: -1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">serialize_datetimes</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)})</span>
+<span class="go">{&#39;foo&#39;: &#39;2000-01-01T00:00:00&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="conftest.extract_metadata">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">extract_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#extract_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.extract_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.get_metadata_from_funcargs">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">get_metadata_from_funcargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">funcargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#get_metadata_from_funcargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.get_metadata_from_funcargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.serialize_marker">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">serialize_marker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">marker</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#serialize_marker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.serialize_marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.get_outcome_and_reason">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">get_outcome_and_reason</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">report</span></em>, <em class="sig-param"><span class="n">markers</span></em>, <em class="sig-param"><span class="n">call</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#get_outcome_and_reason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.get_outcome_and_reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="conftest.clean_docstring">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">clean_docstring</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">docstr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#clean_docstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.clean_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a docstring into a properly formatted single line string.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clean_docstring</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">foo</span><span class="se">\n</span><span class="s2">    bar</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">&#39;foo bar&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">clean_docstring</span><span class="p">(</span><span class="s2">&quot;foo bar&quot;</span><span class="p">)</span>
+<span class="go">&#39;foo bar&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="conftest.pytest_runtest_makereport">
+<code class="sig-prename descclassname">conftest.</code><code class="sig-name descname">pytest_runtest_makereport</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em>, <em class="sig-param"><span class="n">call</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conftest.html#pytest_runtest_makereport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#conftest.pytest_runtest_makereport" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

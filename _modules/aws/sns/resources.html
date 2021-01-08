@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.sns.resources &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.sns.resources</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.sns.resources</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">botocore_client</span>
+
+
+<div class="viewcode-block" id="sns_subscriptions"><a class="viewcode-back" href="../../../source/aws/aws.sns.html#aws.sns.resources.sns_subscriptions">[docs]</a><span class="k">def</span> <span class="nf">sns_subscriptions</span><span class="p">():</span>
+    <span class="s2">&quot;https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#subscription&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sns&quot;</span><span class="p">,</span> <span class="s2">&quot;list_subscriptions&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Subscriptions&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sns_topics"><a class="viewcode-back" href="../../../source/aws/aws.sns.html#aws.sns.resources.sns_topics">[docs]</a><span class="k">def</span> <span class="nf">sns_topics</span><span class="p">():</span>
+    <span class="s2">&quot;https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sns&quot;</span><span class="p">,</span> <span class="s2">&quot;list_topics&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Topics&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sns_topic_arns"><a class="viewcode-back" href="../../../source/aws/aws.sns.html#aws.sns.resources.sns_topic_arns">[docs]</a><span class="k">def</span> <span class="nf">sns_topic_arns</span><span class="p">():</span>
+    <span class="s2">&quot;https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;TopicArn&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sns_topics</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="sns_subscriptions_by_topic"><a class="viewcode-back" href="../../../source/aws/aws.sns.html#aws.sns.resources.sns_subscriptions_by_topic">[docs]</a><span class="k">def</span> <span class="nf">sns_subscriptions_by_topic</span><span class="p">():</span>
+    <span class="s2">&quot;https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html#topic&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="s2">&quot;Subscriptions&quot;</span><span class="p">:</span> <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;sns&quot;</span><span class="p">,</span>
+                    <span class="n">method_name</span><span class="o">=</span><span class="s2">&quot;list_subscriptions_by_topic&quot;</span><span class="p">,</span>
+                    <span class="n">call_args</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TopicArn&quot;</span><span class="p">:</span> <span class="n">topic</span><span class="p">[</span><span class="s2">&quot;TopicArn&quot;</span><span class="p">]},</span>
+                    <span class="n">profiles</span><span class="o">=</span><span class="p">[</span><span class="n">topic</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;profile&quot;</span><span class="p">]],</span>
+                    <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="n">topic</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;region&quot;</span><span class="p">]],</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;Subscriptions&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="o">**</span><span class="n">topic</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">sns_topics</span><span class="p">()</span>
+    <span class="p">]</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

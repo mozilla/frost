@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contributing Documentation &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Use Cases &amp; Philosophy" href="UseCases.html" />
+    <link rel="prev" title="Adding a New Service" href="NewServices.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="UseCases.html" title="Use Cases &amp; Philosophy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="NewServices.html" title="Adding a New Service"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Contributing Documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="contributing-documentation">
+<h1>Contributing Documentation<a class="headerlink" href="#contributing-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Frost documentation may be written in either <a class="reference external" href="https://en.wikipedia.org/wiki/ReStructuredText">restructured text</a> or <a class="reference external" href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> (<a class="reference external" href="https://en.wikipedia.org/wiki/Markdown#CommonMark">Common Mark</a> syntax). All input is rendered into HTML with <a class="reference external" href="https://www.sphinx-doc.org">Sphinx</a>.</p>
+<div class="section" id="create-a-new-documentation-branch">
+<h2>Create a new documentation branch<a class="headerlink" href="#create-a-new-documentation-branch" title="Permalink to this headline">¶</a></h2>
+<p>Use a descriptive branch name that describes the changes, such as: <strong>adding_new_toaster_doc_section</strong>.</p>
+<p>Create a new branch (assumes you already have configured SSH keys for your GitHub account):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone git@github.com:mozilla/frost.git</span>
+<span class="go">cd frost</span>
+<span class="go">git checkout -b my_descriptive_documentation_branch</span>
+<span class="go">make install-docs</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="make-documentation-changes-in-branch">
+<h2>Make documentation changes in branch<a class="headerlink" href="#make-documentation-changes-in-branch" title="Permalink to this headline">¶</a></h2>
+<p>While editing the documentation, you may find it useful to run an “autobuilder”. That will allow you to review the completed documentation as you save your work. To activate the autobuilder, open a new terminal window, then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">frost</span>
+<span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<span class="n">made</span> <span class="n">doc</span><span class="o">-</span><span class="n">preview</span>
+</pre></div>
+</div>
+<p>You will want to terminate the autobuilder prior to doing the final checks below. Just enter ctrl-C in the terminal window running autobuilder. (A number of parameters can be used to adjust the behavior of the autobuilder. Run <code class="docutils literal notranslate"><span class="pre">sphinx-autobuilder</span> <span class="pre">--help</span></code> for a list, and set the environment variable <code class="docutils literal notranslate"><span class="pre">AUTOBUILD_OPTS</span></code> to override.)</p>
+<p>Remember that any new sections will need to be listed in the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html">table of contents</a> in the <a class="reference external" href="https://github.com/mozilla/frost/blame/master/docs/index.rst#L10-L18">index.rst file</a>.</p>
+</div>
+<div class="section" id="build-docs-and-read-over-changes">
+<h2>Build docs and read over changes<a class="headerlink" href="#build-docs-and-read-over-changes" title="Permalink to this headline">¶</a></h2>
+<p>The following steps will give you a clean build of the final version of all the docs. You can view those by opening <code class="docutils literal notranslate"><span class="pre">/path/to/frost/docs/_build/html/index.html</span></code> in a browser.</p>
+<p>build:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pwd</span> <span class="c1"># Should be the main frost directory.</span>
+<span class="n">make</span> <span class="n">doc</span><span class="o">-</span><span class="n">build</span>
+</pre></div>
+</div>
+<p>Read over your changes using your <a class="reference external" href="https://getfirefox.com">favorite web browser</a> by going to a <a class="reference external" href="https://en.wikipedia.org/wiki/File_URI_scheme">file:// URL</a> for the <strong>index.html</strong> file.</p>
+<p>URL:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="s2">&quot;file://$(pwd)/_build/html/index.html&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="commit-and-review">
+<h2>Commit and review<a class="headerlink" href="#commit-and-review" title="Permalink to this headline">¶</a></h2>
+<p>Commit:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s1">&#39;Adding new documentation section on video toasters&#39;</span>
+<span class="n">git</span> <span class="n">push</span>
+</pre></div>
+</div>
+<p>The first time you push, the URL for creating a PR will be shown in the terminal. If you missed that, display your branch on the web, and create the PR.</p>
+<p>File a <a class="reference external" href="https://github.com/mozilla/frost/pulls">PR</a> and request a review from a <a class="reference external" href="https://github.com/mozilla/frost/graphs/contributors">code owner</a>.</p>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">Contributing Documentation</a><ul>
+<li><a class="reference internal" href="#create-a-new-documentation-branch">Create a new documentation branch</a></li>
+<li><a class="reference internal" href="#make-documentation-changes-in-branch">Make documentation changes in branch</a></li>
+<li><a class="reference internal" href="#build-docs-and-read-over-changes">Build docs and read over changes</a></li>
+<li><a class="reference internal" href="#commit-and-review">Commit and review</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="NewServices.html" title="previous chapter">Adding a New Service</a>
+          <li>Next: <a href="UseCases.html" title="next chapter">Use Cases &amp; Philosophy</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

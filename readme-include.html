@@ -1,0 +1,837 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Frost &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="FAQ.html" />
+    <link rel="prev" title="Frost’s documentation!" href="index.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="FAQ.html" title="Frequently Asked Questions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Frost’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Frost</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frost">
+<h1>Frost<a class="headerlink" href="#frost" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://badge.fury.io/py/frost"><img alt="PyPI version" src="https://badge.fury.io/py/frost.svg" /></a>
+<a class="reference external" href="https://mozilla.github.com/frost/"><img alt="Documentation" src="https://img.shields.io/badge/Docs-gh--pages-yellowgreen.svg" /></a></p>
+<p><img alt="frost snowman logo" src="_images/frost-snowman-logo.png" /></p>
+<p>HTTP clients and a wrapper around
+<a class="reference external" href="https://docs.pytest.org/en/latest/index.html">pytest</a> tests to verify
+that third party services are configured correctly. For example:</p>
+<ul class="simple">
+<li><p>Are our AWS DB snapshots publicly accessible?</p></li>
+<li><p>Are there dangling DNS entries in Route53?</p></li>
+</ul>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing">
+<h3>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h3>
+<ol class="simple">
+<li><p>Install <a class="reference external" href="https://www.python.org/downloads/">Python 3.8</a></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:mozilla/frost.git;</span> <span class="pre">cd</span> <span class="pre">frost;</span> <span class="pre">make</span> <span class="pre">install</span></code></p></li>
+</ol>
+</div>
+<div class="section" id="id1">
+<h3>Usage<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> frost --help
+<span class="go">Usage: frost [OPTIONS] COMMAND [ARGS]...</span>
+
+<span class="go">  FiRefox Operations Security Testing API clients and tests</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version  Show the version and exit.</span>
+<span class="go">  --help     Show this message and exit.</span>
+
+<span class="go">  Commands:</span>
+<span class="go">    list  Lists available test filenames packaged with frost.</span>
+<span class="go">    test  Run pytest tests passing all trailing args to pytest.</span>
+
+<span class="gp">$</span> frost <span class="nb">test</span> --help
+<span class="go">Usage: frost test [OPTIONS] [PYTEST_ARGS]...</span>
+
+<span class="go">  Run pytest tests passing all trailing args to pytest.</span>
+
+<span class="go">  Adds the pytest args:</span>
+
+<span class="go">  -s to disable capturing stdout</span>
+<span class="go">  https://docs.pytest.org/en/latest/capture.html</span>
+
+<span class="go">  and frost specific arg:</span>
+
+<span class="go">  --debug-calls to print AWS API calls</span>
+
+<span class="go">Options:</span>
+<span class="go">  --help  Show this message and exit.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running">
+<h3>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h3>
+<p>To fetch RDS resources from the cache or AWS API and check that
+backups are enabled for DB instances for <a class="reference external" href="https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html">the configured aws
+profile</a>
+named <code class="docutils literal notranslate"><span class="pre">default</span></code> in the <code class="docutils literal notranslate"><span class="pre">us-west-2</span></code> region</p>
+<ol class="simple">
+<li><p>find the test file path:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> frost list <span class="p">|</span> grep rds
+<span class="go">./aws/rds/test_rds_db_instance_backup_enabled.py</span>
+<span class="go">./aws/rds/test_rds_db_snapshot_encrypted.py</span>
+<span class="go">./aws/rds/test_rds_db_instance_is_postgres_with_invalid_certificate.py</span>
+<span class="go">./aws/rds/test_rds_db_instance_encrypted.py</span>
+<span class="go">./aws/rds/test_rds_db_security_group_does_not_grant_public_access.py</span>
+<span class="go">./aws/rds/test_rds_db_instance_not_publicly_accessible_by_vpc_sg.py</span>
+<span class="go">./aws/rds/test_rds_db_instance_minor_version_updates_enabled.py</span>
+<span class="go">./aws/rds/test_rds_db_instance_is_multiaz.py</span>
+<span class="go">./aws/rds/test_rds_db_snapshot_not_publicly_accessible.py</span>
+</pre></div>
+</div>
+<p>Note: <strong>packaged frost tests are relative to the frost install</strong></p>
+<ol class="simple">
+<li><p>run the test:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">frost test aws/rds/test_rds_db_instance_backup_enabled.py --aws-profiles default</span>
+</pre></div>
+</div>
+<p>Frost adds the options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--aws-profiles</span></code> for selecting one or more AWS profiles to fetch resources for or the AWS default profile / <code class="docutils literal notranslate"><span class="pre">AWS_PROFILE</span></code> environment variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--aws-regions</span></code> for selecting one or more AWS regions to test as a CSV e.g. <code class="docutils literal notranslate"><span class="pre">us-east-1,us-west-2</span></code>. <strong>defaults to all regions</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gcp-project-id</span></code> for selecting the GCP project to test. <strong>Required for GCP tests</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--offline</span></code> a flag to tell HTTP clients to not make requests and return empty params</p></li>
+<li><p><a class="reference external" href="#custom-test-config"><code class="docutils literal notranslate"><span class="pre">--config</span></code></a> path to test custom config file</p></li>
+</ul>
+<p>and produces output showing calls to the AWS API and failing for a DB
+instance with backups disabled:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">============================================================ test session starts ============================================================</span>
+<span class="go">platform linux -- Python 3.8.2, pytest-6.0.2, py-1.9.0, pluggy-0.13.1</span>
+<span class="go">rootdir: /home/gguthe/frost</span>
+<span class="go">plugins: json-0.4.0, cov-2.10.0, html-1.20.0, metadata-1.10.0</span>
+<span class="go">collecting ... calling AWSAPICall(profile=&#39;default, region=&#39;ap-northeast-1&#39;, service=&#39;rds&#39;, method=&#39;describe_db_instances&#39;, args=[], kwargs={})</span>
+<span class="go">calling AWSAPICall(profile=&#39;default, region=&#39;ap-northeast-2&#39;, service=&#39;rds&#39;, method=&#39;describe_db_instances&#39;, args=[], kwargs={})</span>
+<span class="go">calling AWSAPICall(profile=&#39;default, region=&#39;ap-south-1&#39;, service=&#39;rds&#39;, method=&#39;describe_db_instances&#39;, args=[], kwargs={})</span>
+<span class="go">calling AWSAPICall(profile=&#39;default, region=&#39;ap-southeast-1&#39;, service=&#39;rds&#39;, method=&#39;describe_db_instances&#39;, args=[], kwargs={})</span>
+<span class="go">calling AWSAPICall(profile=&#39;default, region=&#39;ap-southeast-2&#39;, service=&#39;rds&#39;, method=&#39;describe_db_instances&#39;, args=[], kwargs={})</span>
+<span class="go">...</span>
+<span class="go">calling AWSAPICall(profile=&#39;default, region=&#39;us-west-2&#39;, service=&#39;rds&#39;, method=&#39;list_tags_for_resource&#39;, args=[], kwargs={&#39;ResourceName&#39;: &#39;arn:aws:rds:us-west-2:redacted:db:test-db-ro-dev1&#39;})</span>
+<span class="go">collected 21 items</span>
+
+<span class="go">aws/rds/test_rds_db_instance_backup_enabled.py F....................</span>
+
+<span class="go">================================================================= FAILURES ==================================================================</span>
+<span class="go">____________________________________ test_rds_db_instance_backup_enabled[test-db-ro-dev1] ___________________________________________________</span>
+
+<span class="go">rds_db_instance = {&#39;AllocatedStorage&#39;: 250, &#39;AutoMinorVersionUpgrade&#39;: True, &#39;AvailabilityZone&#39;: &#39;us-east-1a&#39;, &#39;BackupRetentionPeriod&#39;: 0, ..</span>
+<span class="go">.}</span>
+
+<span class="go">    @pytest.mark.rds</span>
+<span class="go">    @pytest.mark.parametrize(</span>
+<span class="go">        &quot;rds_db_instance&quot;, rds_db_instances_with_tags(), ids=get_db_instance_id,</span>
+<span class="go">    )</span>
+<span class="go">    def test_rds_db_instance_backup_enabled(rds_db_instance):</span>
+<span class="gp">&gt;</span>       assert <span class="o">(</span>
+<span class="go">            rds_db_instance[&quot;BackupRetentionPeriod&quot;] &gt; 0</span>
+<span class="go">        ), &quot;Backups disabled for {}&quot;.format(rds_db_instance[&quot;DBInstanceIdentifier&quot;])</span>
+<span class="go">E       AssertionError: Backups disabled for test-db-ro-dev1</span>
+<span class="go">E       assert 0 &gt; 0</span>
+
+<span class="go">aws/rds/test_rds_db_instance_backup_enabled.py:12: AssertionError</span>
+<span class="go">========================================================== short test summary info ==========================================================</span>
+<span class="go">FAILED aws/rds/test_rds_db_instance_backup_enabled.py::test_rds_db_instance_backup_enabled[test-db-ro-dev1] - AssertionError...</span>
+<span class="go">======================================================= 2 failed, 21 passed in 14.32s =======================================================</span>
+</pre></div>
+</div>
+<div class="section" id="iam-policy-for-frost">
+<h4>IAM Policy for frost<a class="headerlink" href="#iam-policy-for-frost" title="Permalink to this headline">¶</a></h4>
+<p>The below policy will allow you to run all AWS tests in frost against all resources in your account.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;Statement&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;Sid&quot;</span><span class="p">:</span> <span class="s2">&quot;PytestServicesReadOnly&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Action&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;autoscaling:DescribeLaunchConfigurations&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cloudtrail:DescribeTrails&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeFlowLogs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeInstances&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeSecurityGroups&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeSnapshotAttribute&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeSnapshots&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeVolumes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ec2:DescribeVpcs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elasticache:DescribeCacheClusters&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elasticloadbalancing:DescribeLoadBalancers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;es:DescribeElasticsearchDomains&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;es:ListDomainNames&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:GenerateCredentialReport&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:GetCredentialReport&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:GetLoginProfile&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListAccessKeys&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListAttachedGroupPolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListAttachedRolePolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListAttachedUserPolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListGroupPolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListGroupsForUser&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListMFADevices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListRolePolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListRoles&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListUserPolicies&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;iam:ListUsers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rds:DescribeDbInstances&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rds:DescribeDbSecurityGroups&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rds:DescribeDbSnapshotAttributes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rds:DescribeDbSnapshots&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rds:ListTagsForResource&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;redshift:DescribeClusterSecurityGroups&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;redshift:DescribeClusters&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketAcl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketCORS&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketLogging&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketPolicy&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketVersioning&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:GetBucketWebsite&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:ListAllMyBuckets&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;s3:ListBucket&quot;</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;Effect&quot;</span><span class="p">:</span> <span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Resource&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-up-gcp-tests">
+<h4>Setting up GCP tests<a class="headerlink" href="#setting-up-gcp-tests" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="enabling-required-api-s-for-your-project">
+<h5>Enabling required API’s for your project<a class="headerlink" href="#enabling-required-api-s-for-your-project" title="Permalink to this headline">¶</a></h5>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gcloud</span> <span class="p">[</span><span class="o">--</span><span class="n">project</span> <span class="o">&lt;</span><span class="n">project</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">services</span> <span class="n">enable</span> <span class="n">bigquery</span><span class="o">-</span><span class="n">json</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span>
+<span class="n">gcloud</span> <span class="p">[</span><span class="o">--</span><span class="n">project</span> <span class="o">&lt;</span><span class="n">project</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">services</span> <span class="n">enable</span> <span class="n">cloudresourcemanager</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span>
+<span class="n">gcloud</span> <span class="p">[</span><span class="o">--</span><span class="n">project</span> <span class="o">&lt;</span><span class="n">project</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">services</span> <span class="n">enable</span> <span class="n">compute</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span>
+<span class="n">gcloud</span> <span class="p">[</span><span class="o">--</span><span class="n">project</span> <span class="o">&lt;</span><span class="n">project</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span> <span class="n">services</span> <span class="n">enable</span> <span class="n">sqladmin</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="setting-up-gsuite-tests">
+<h4>Setting up GSuite tests<a class="headerlink" href="#setting-up-gsuite-tests" title="Permalink to this headline">¶</a></h4>
+<p>Make sure to have an OAuth2 app created and have the <code class="docutils literal notranslate"><span class="pre">client_secret.json</span></code> file in <code class="docutils literal notranslate"><span class="pre">~/.credentials</span></code> and then run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">setup_gsuite</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="caching">
+<h3>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h3>
+<p>The AWS client will use AWS API JSON responses when available and save them using AWS profile, region, service name, service method, <a class="reference external" href="http://botocore.readthedocs.io/">botocore</a> args and kwargs in the cache key to filenames with the format <code class="docutils literal notranslate"><span class="pre">.cache/v/pytest_aws:&lt;aws</span> <span class="pre">profile&gt;:&lt;aws</span> <span class="pre">region&gt;:&lt;aws</span> <span class="pre">service&gt;:&lt;service</span> <span class="pre">method&gt;:&lt;args&gt;:&lt;kwargs&gt;.json</span></code> e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">head</span> <span class="o">.</span><span class="n">cache</span><span class="o">/</span><span class="n">v</span><span class="o">/</span><span class="n">pytest_aws</span><span class="p">:</span><span class="n">cloudservices</span><span class="o">-</span><span class="n">aws</span><span class="o">-</span><span class="n">stage</span><span class="p">:</span><span class="n">us</span><span class="o">-</span><span class="n">west</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span><span class="n">rds</span><span class="p">:</span><span class="n">describe_db_instances</span><span class="p">::</span><span class="o">.</span><span class="n">json</span>
+<span class="p">{</span>
+    <span class="s2">&quot;DBInstances&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;AllocatedStorage&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;AutoMinorVersionUpgrade&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;AvailabilityZone&quot;</span><span class="p">:</span> <span class="s2">&quot;us-west-2c&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BackupRetentionPeriod&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;CACertificateIdentifier&quot;</span><span class="p">:</span> <span class="s2">&quot;rds-ca-2015&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CopyTagsToSnapshot&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;DBInstanceArn&quot;</span><span class="p">:</span> <span class="s2">&quot;arn:aws:rds:us-west-2:123456678901:db:test-db&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>These files can be removed individually or all at once with <a class="reference external" href="https://docs.pytest.org/en/latest/cache.html#usage">the pytest –cache-clear</a> option.
+The cache can be disabled entirely with <a class="reference external" href="https://stackoverflow.com/questions/47744076/preventing-pytest-from-creating-cache-directories-in-pycharm">the pytest -p no:cacheprovider</a>.</p>
+</div>
+</div>
+<div class="section" id="custom-test-config">
+<h2>Custom Test Config<a class="headerlink" href="#custom-test-config" title="Permalink to this headline">¶</a></h2>
+<p>frost adds a <code class="docutils literal notranslate"><span class="pre">--config</span></code> cli option for passing in a custom config file specific to tests within frost.</p>
+<p>The example config in repo (<code class="docutils literal notranslate"><span class="pre">config.yaml.example</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">exemptions</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_instance_has_required_tags</span>
+    <span class="n">test_param_id</span><span class="p">:</span> <span class="n">i</span><span class="o">-</span><span class="mi">0123456789</span><span class="n">f014c162</span>
+    <span class="n">expiration_day</span><span class="p">:</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="n">ec2</span> <span class="n">instance</span> <span class="n">has</span> <span class="n">no</span> <span class="n">owner</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_security_group_opens_specific_ports_to_all</span>
+    <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*HoneyPot&#39;</span>
+    <span class="n">expiration_day</span><span class="p">:</span> <span class="mi">2020</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="n">purposefully</span> <span class="n">insecure</span> <span class="n">security</span> <span class="n">group</span>
+<span class="n">severities</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_instance_has_required_tags</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">INFO</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">ERROR</span>
+<span class="n">regressions</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_security_group_opens_all_ports_to_all</span>
+    <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*mycustomgroup&#39;</span>
+    <span class="n">comment</span><span class="p">:</span> <span class="n">this</span> <span class="n">was</span> <span class="n">remediated</span> <span class="n">by</span> <span class="n">ops</span> <span class="n">team</span>
+<span class="n">aws</span><span class="p">:</span>
+  <span class="n">admin_groups</span><span class="p">:</span>
+    <span class="o">-</span> <span class="s2">&quot;Administrators&quot;</span>
+  <span class="n">admin_policies</span><span class="p">:</span>
+    <span class="o">-</span> <span class="s2">&quot;AWSAdminRequireMFA&quot;</span>
+  <span class="n">user_is_inactive</span><span class="p">:</span>
+    <span class="n">no_activity_since</span><span class="p">:</span>
+      <span class="n">years</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="n">months</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">created_after</span><span class="p">:</span>
+      <span class="n">weeks</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="n">access_key_expires_after</span><span class="p">:</span>
+    <span class="n">years</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">months</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="n">required_tags</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">Name</span>
+    <span class="o">-</span> <span class="n">Type</span>
+    <span class="o">-</span> <span class="n">App</span>
+    <span class="o">-</span> <span class="n">Env</span>
+  <span class="n">required_amis</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">ami</span><span class="o">-</span><span class="mi">00000000000000000</span>
+    <span class="o">-</span> <span class="n">ami</span><span class="o">-</span><span class="mi">55555555555555555</span>
+  <span class="c1"># Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all</span>
+  <span class="c1"># test for all instances</span>
+  <span class="n">allowed_ports_global</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">25</span>
+  <span class="c1"># Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all</span>
+  <span class="c1"># test for specific instances. In this example, we are allowing ports 22</span>
+  <span class="c1"># and 2222 for all security groups that include the word &#39;bastion&#39; in them.</span>
+  <span class="n">allowed_ports</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*bastion&#39;</span>
+      <span class="n">ports</span><span class="p">:</span>
+        <span class="o">-</span> <span class="mi">22</span>
+        <span class="o">-</span> <span class="mi">2222</span>
+<span class="n">gcp</span><span class="p">:</span>
+  <span class="n">allowed_org_domains</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">mygsuiteorg</span><span class="o">.</span><span class="n">com</span>
+  <span class="n">allowed_gke_versions</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mf">1.15</span><span class="o">.</span><span class="mi">12</span><span class="o">-</span><span class="n">gke</span><span class="o">.</span><span class="mi">20</span>
+    <span class="o">-</span> <span class="mf">1.16</span><span class="o">.</span><span class="mi">13</span><span class="o">-</span><span class="n">gke</span><span class="o">.</span><span class="mi">401</span>
+    <span class="o">-</span> <span class="mf">1.17</span><span class="o">.</span><span class="mi">9</span><span class="o">-</span><span class="n">gke</span><span class="o">.</span><span class="mi">1504</span>
+    <span class="o">-</span> <span class="mf">1.18</span><span class="o">.</span><span class="mi">6</span><span class="o">-</span><span class="n">gke</span><span class="o">.</span><span class="mi">3504</span>
+  <span class="c1"># Allowed ports for the test_firewall_opens_any_ports_to_all</span>
+  <span class="c1"># test for all firewalls</span>
+  <span class="n">allowed_ports_global</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">25</span>
+  <span class="c1"># Allowed ports for the test_firewall_opens_any_ports_to_all</span>
+  <span class="c1"># test for specific firewalls. In this example, we are allowing ports 22</span>
+  <span class="c1"># and 2222 for all firewalls that include the word &#39;bastion&#39; in them.</span>
+  <span class="n">allowed_ports</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*bastion&#39;</span>
+      <span class="n">ports</span><span class="p">:</span>
+        <span class="o">-</span> <span class="mi">22</span>
+        <span class="o">-</span> <span class="mi">2222</span>
+<span class="n">gsuite</span><span class="p">:</span>
+  <span class="n">domain</span><span class="p">:</span> <span class="s1">&#39;example.com&#39;</span>
+  <span class="n">user_is_inactive</span><span class="p">:</span>
+    <span class="n">no_activity_since</span><span class="p">:</span>
+      <span class="n">years</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="n">months</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<div class="section" id="test-exemptions">
+<h3>Test Exemptions<a class="headerlink" href="#test-exemptions" title="Permalink to this headline">¶</a></h3>
+<p>frost custom config format adds support for
+marking test and test resource IDs as expected failures.</p>
+<p>The keys for each exemption rule is:</p>
+<ul class="simple">
+<li><p>test_name - Name of the test</p></li>
+<li><p>test_param_id - test ID (usually an AWS resource ID) (prefix with <code class="docutils literal notranslate"><span class="pre">*</span></code> to turn into a regex matcher)</p></li>
+<li><p>expiration_day - exception expiration day (as YYYY-MM-DD)</p></li>
+<li><p>reason - exception reason</p></li>
+</ul>
+<p>The config looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">exemptions</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_instance_has_required_tags</span>
+    <span class="n">test_param_id</span><span class="p">:</span> <span class="n">i</span><span class="o">-</span><span class="mi">0123456789</span><span class="n">f014c162</span>
+    <span class="n">expiration_day</span><span class="p">:</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="n">ec2</span> <span class="n">instance</span> <span class="n">has</span> <span class="n">no</span> <span class="n">owner</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_security_group_opens_specific_ports_to_all</span>
+    <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*HoneyPot&#39;</span>
+    <span class="n">expiration_day</span><span class="p">:</span> <span class="mi">2020</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="n">purposefully</span> <span class="n">insecure</span> <span class="n">security</span> <span class="n">group</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<div class="section" id="enabling-regex-for-test-id">
+<h4>Enabling regex for test ID<a class="headerlink" href="#enabling-regex-for-test-id" title="Permalink to this headline">¶</a></h4>
+<p>You can prefix the test ID with a <code class="docutils literal notranslate"><span class="pre">*</span></code> to enable regex matching for the test ID. The <code class="docutils literal notranslate"><span class="pre">*</span></code> prefix will be stripped
+off, and the rest will be used as a regex.</p>
+<p>For example:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*foobar</span></code> becomes <code class="docutils literal notranslate"><span class="pre">foobar</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*foo\w+</span></code> becomes <code class="docutils literal notranslate"><span class="pre">foo\w+</span></code></p></li>
+</ul>
+<p>For more information on Python’s regex syntax see: <a class="reference external" href="https://docs.python.org/3.4/howto/regex.html#regex-howto">Regular Expression HOWTO</a>.</p>
+<p><strong>Note:</strong> All regex rules are applied first. As well, the ordering of both regex and non-regex rules is top to bottom and the first one wins.</p>
+<p>When a json report is generated, the exemptions will show up in the
+json metadata as serialized markers:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>python -m json.tool report.json | grep -C 20 xfail
+...
+                        &quot;markers&quot;: {
+                            &quot;ec2&quot;: {
+                                &quot;name&quot;: &quot;ec2&quot;,
+                                &quot;args&quot;: [],
+                                &quot;kwargs&quot;: {}
+                            },
+                            &quot;parametrize&quot;: {
+                                &quot;name&quot;: &quot;parametrize&quot;,
+                                &quot;args&quot;: [
+                                    &quot;...skipped...&quot;
+                                ],
+                                &quot;kwargs&quot;: [
+                                    &quot;...skipped...&quot;
+                                ]
+                            },
+                            &quot;xfail&quot;: {
+                                &quot;name&quot;: &quot;xfail&quot;,
+                                &quot;args&quot;: [],
+                                &quot;kwargs&quot;: {
+                                    &quot;reason&quot;: &quot;ec2 instance has no owner&quot;,
+                                    &quot;strict&quot;: true,
+                                    &quot;expiration&quot;: &quot;2019-01-01&quot;
+                                }
+                            }
+                        },
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-severity">
+<h4>Test Severity<a class="headerlink" href="#test-severity" title="Permalink to this headline">¶</a></h4>
+<p>frost custom config format adds support for marking the severity of a certain test. A severity can be <code class="docutils literal notranslate"><span class="pre">INFO</span></code>, <code class="docutils literal notranslate"><span class="pre">WARN</span></code>, or <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>.</p>
+<p>These do not modify pytest results (pass, fail, xfail, skip, etc.).</p>
+<p>The config looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">severities</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="n">test_ec2_instance_has_required_tags</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">INFO</span>
+  <span class="o">-</span> <span class="n">test_name</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">ERROR</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>And results in a severity and severity marker being included in the
+json metadata:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">frost test -s --aws-profiles stage --aws-require-tags Name Type App Stack -k test_ec2_instance_has_required_tags --config config.yaml.example --json=report.json</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>python -m json.tool report.json
+{
+    &quot;report&quot;: {
+        &quot;environment&quot;: {
+            &quot;Python&quot;: &quot;3.6.2&quot;,
+            &quot;Platform&quot;: &quot;Darwin-15.6.0-x86_64-i386-64bit&quot;
+        },
+        &quot;tests&quot;: [
+            {
+...
+                &quot;metadata&quot;: [
+                    {
+...
+                    &quot;markers&quot;: {
+...
+                            &quot;severity&quot;: {
+                                &quot;name&quot;: &quot;severity&quot;,
+                                &quot;args&quot;: [
+                                    &quot;INFO&quot;
+                                ],
+                                &quot;kwargs&quot;: {}
+                            }
+                        },
+...
+                        &quot;severity&quot;: &quot;INFO&quot;,
+                        &quot;unparametrized_name&quot;: &quot;test_ec2_instance_has_required_tags&quot;
+                    }
+...
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="aws-config">
+<h3>AWS Config<a class="headerlink" href="#aws-config" title="Permalink to this headline">¶</a></h3>
+<p>frost has a suite of AWS tests. This section of the custom config includes configuration options specific
+to these tests.</p>
+<p>The config looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="n">aws</span><span class="p">:</span>
+  <span class="c1"># Relative time delta for test_iam_user_is_inactive. no_activity_since will be used as the failure marker,</span>
+  <span class="c1"># so in this example any user that hasn&#39;t had any activity for a year will be marked as a &quot;failure&quot;. created_after</span>
+  <span class="c1"># is used as a grace period, so in this case any user that was created within the last week will be automatically</span>
+  <span class="c1"># pass this test.</span>
+  <span class="n">user_is_inactive</span><span class="p">:</span>
+    <span class="n">no_activity_since</span><span class="p">:</span>
+      <span class="n">years</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="n">months</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">created_after</span><span class="p">:</span>
+      <span class="n">weeks</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="c1"># Required tags used within the test_ec2_instance_has_required_tags test</span>
+  <span class="n">required_tags</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">Name</span>
+    <span class="o">-</span> <span class="n">Type</span>
+    <span class="o">-</span> <span class="n">App</span>
+    <span class="o">-</span> <span class="n">Env</span>
+  <span class="c1"># Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all</span>
+  <span class="c1"># test for all instances</span>
+  <span class="n">allowed_ports_global</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">25</span>
+  <span class="c1"># Allowed ports for the test_ec2_security_group_opens_specific_ports_to_all</span>
+  <span class="c1"># test for specific instances. In this example, we are allowing ports 22</span>
+  <span class="c1"># and 2222 for all security groups that include the word &#39;bastion&#39; in them.</span>
+  <span class="n">allowed_ports</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">test_param_id</span><span class="p">:</span> <span class="s1">&#39;*bastion&#39;</span>
+      <span class="n">ports</span><span class="p">:</span>
+        <span class="o">-</span> <span class="mi">22</span>
+        <span class="o">-</span> <span class="mi">2222</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gsuite-config">
+<h3>GSuite Config<a class="headerlink" href="#gsuite-config" title="Permalink to this headline">¶</a></h3>
+<p>frost has a suite of GSuite tests. This section of the
+custom config includes configuration options specific to these tests.</p>
+<p><strong>Make sure to <a class="reference external" href="#setting-up-gsuite-tests">setup GSuite</a> before running GSuite tests</strong></p>
+<p>The config looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gsuite</span><span class="p">:</span>
+  <span class="c1"># The specific GSuite domain to test.</span>
+  <span class="n">domain</span><span class="p">:</span> <span class="s1">&#39;example.com&#39;</span>
+  <span class="c1"># Relative time delta for test_admin_user_is_inactive. no_activity_since will be used as the failure marker,</span>
+  <span class="c1"># so in this example any user that hasn&#39;t had any activity for a year will be marked as a &quot;failure&quot;.</span>
+  <span class="n">user_is_inactive</span><span class="p">:</span>
+    <span class="n">no_activity_since</span><span class="p">:</span>
+      <span class="n">years</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="n">months</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-accuracy">
+<h3>Test Accuracy<a class="headerlink" href="#test-accuracy" title="Permalink to this headline">¶</a></h3>
+<p>There are two important things to note about <code class="docutils literal notranslate"><span class="pre">frost</span></code> tests that may be different from your expectations.</p>
+<p>First, the focus is on “actionable results”. This plays out as an attempt to reduce false
+positives by trying to filter out unused resources. An example of this can be seen by looking at
+any of the security group tests, where we are skipping any security groups that are not attached to a resource.</p>
+<p>Second, there are some tests that make naive assumptions instead of trying to capture the complexities
+of the system. The current best example of this is all IAM tests that relate to “admin” users. How we
+are determining what an user or role is an admin is based simply off substring matching on the policies
+attached. This obviously has a high chance of false negatives.</p>
+</div>
+</div>
+<div class="section" id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="goals">
+<h3>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h3>
+<ol class="simple">
+<li><p>replace one-off scripts for each check</p></li>
+<li><p>share checks with other organizations</p></li>
+<li><p>consolidate bugs in one place (i.e. one thing to update)</p></li>
+<li><p>in pytest use a known existing framework for writing checks</p></li>
+<li><p>be vendor agnostic e.g. support checks across cloud providers or in hybrid environments or competing services</p></li>
+<li><p>cache and share responses to reduce third party API usage (i.e. lots of tests check AWS security groups so fetch them once)</p></li>
+<li><p>provide a way to run a single test or subset of tests</p></li>
+<li><p>focus on actionable results (see <a class="reference external" href="#test-accuracy">test accuracy</a> for more information)</p></li>
+</ol>
+</div>
+<div class="section" id="non-goals">
+<h3>Non-Goals<a class="headerlink" href="#non-goals" title="Permalink to this headline">¶</a></h3>
+<ol class="simple">
+<li><p>Invent a new DSL for writing expectations (use pytest conventions)</p></li>
+<li><p>Verify how third party services or their client libraries work
+(e.g. don’t answer “Does GET / on the CRUD1 API return 400 when
+query param <code class="docutils literal notranslate"><span class="pre">q</span></code> is <code class="docutils literal notranslate"><span class="pre">$bad_value</span></code>?”)</p></li>
+</ol>
+</div>
+<div class="section" id="design">
+<h3>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h3>
+<p>Currently this is a monolithic pytest package, but should eventually
+<a class="reference external" href="https://github.com/mozilla/frost/issues/3">be extracted into a pytest plugin</a> and with <a class="reference external" href="https://github.com/mozilla/frost/issues/4">separate dependent
+pytest plugins for each service</a>.</p>
+<p>API responses should fit on disk and in memory (i.e. don’t use this
+for log processing or checking binaries for malware), and be safe to
+cache for minutes, hours, or days (i.e. probably don’t use this for
+monitoring a streaming API) (NB: <a class="reference external" href="https://github.com/mozilla/frost/issues/5">bug for specifying data
+freshness</a>).</p>
+<p>Additionally we want:</p>
+<ul class="simple">
+<li><p>data fetching functions in a <code class="docutils literal notranslate"><span class="pre">resources.py</span></code></p></li>
+<li><p>data checking and test helpers in a <code class="docutils literal notranslate"><span class="pre">helpers.py</span></code></p></li>
+<li><p>prefix test files with <code class="docutils literal notranslate"><span class="pre">test_</span></code></p></li>
+<li><p>doctests for non test files (e.g. <code class="docutils literal notranslate"><span class="pre">helpers.py</span></code>, <code class="docutils literal notranslate"><span class="pre">resources.py</span></code>, <code class="docutils literal notranslate"><span class="pre">client.py</span></code>)</p>
+<ul>
+<li><p>tests that depend on external IO or the runtime environment (env vars, file system, HTTP) to use the prefix <code class="docutils literal notranslate"><span class="pre">meta_test_</span></code> (and probably <code class="docutils literal notranslate"><span class="pre">mock</span></code> or <code class="docutils literal notranslate"><span class="pre">pytest.monkeypatch</span></code>)</p>
+<ul>
+<li><p>JSON fixtures for anonymized cached http call in <code class="docutils literal notranslate"><span class="pre">example_cache/v/</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>tests to have pytest markers for any services they depend on for data</p></li>
+<li><p>HTTP clients should be read only and use read only credentials</p></li>
+<li><p>running a test should not modify services</p></li>
+</ul>
+<div class="section" id="file-layout">
+<h4>File Layout<a class="headerlink" href="#file-layout" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">frost</span>
+<span class="go">...</span>
+<span class="go">├── example_cache</span>
+<span class="go">│   └── v</span>
+<span class="go">│       ├── cache</span>
+<span class="go">│       │   └── lastfailed</span>
+<span class="go">│       ├── pytest_aws:example-account:us-east-1:ec2:describe_instances::.json</span>
+<span class="go">│       ├── pytest_aws:example-account:us-east-1:ec2:describe_security_groups::.json</span>
+<span class="go">...</span>
+<span class="go">├── &lt;third party service A&gt;</span>
+<span class="go">│   ├── client.py</span>
+<span class="go">│   ├── conftest.py</span>
+<span class="go">│   ├── meta_test_client.py</span>
+<span class="go">│   ├── &lt;subservice A (optional)&gt;</span>
+<span class="go">│   │   ├── __init__.py</span>
+<span class="go">│   │   ├── helpers.py</span>
+<span class="go">│   │   ├── resources.py</span>
+<span class="go">│   │   ├── ...</span>
+<span class="go">│   │   └── test_ec2_security_group_all_ports.py</span>
+<span class="go">│   ├── &lt;subservice b (optional)&gt;</span>
+<span class="go">│   │   ├── __init__.py</span>
+<span class="go">│   │   ├── resources.py</span>
+<span class="go">│   │   ├── ...</span>
+<span class="go">│   │   └─ test_s3_bucket_web_hosting_disabled.py</span>
+<span class="go">└── &lt;third party service B&gt;</span>
+<span class="go">    ├── __init__.py</span>
+<span class="go">    ├── conftest.py</span>
+<span class="go">    ├── helpers.py</span>
+<span class="go">    ├── resources.py</span>
+<span class="go">    └── test_user_has_escalation_policy.py</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="adding-an-example-test">
+<h3>Adding an example test<a class="headerlink" href="#adding-an-example-test" title="Permalink to this headline">¶</a></h3>
+<p>Let’s write a test to check that http://httpbin.org/ip returns an AWS IP:</p>
+<ol class="simple">
+<li><p>create a file <code class="docutils literal notranslate"><span class="pre">httpbin/test_httpbin_ip.py</span></code> with the contents:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">ipaddress</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+
+<span class="k">def</span> <span class="nf">get_httpbin_ips</span><span class="p">():</span>
+    <span class="c1"># IPs we always want to test</span>
+    <span class="n">ips</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;13.58.0.0&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s1">&#39;http://httpbin.org/ip&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">ips</span>
+
+
+<span class="k">def</span> <span class="nf">get_aws_ips</span><span class="p">():</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s1">&#39;https://ip-ranges.amazonaws.com/ip-ranges.json&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)[</span><span class="s1">&#39;prefixes&#39;</span><span class="p">]</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">httpbin</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">aws_ip_ranges</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;aws_ip_ranges&#39;</span><span class="p">],</span>
+    <span class="nb">zip</span><span class="p">(</span><span class="n">get_httpbin_ips</span><span class="p">(),</span> <span class="n">itertools</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">get_aws_ips</span><span class="p">())))</span>
+<span class="k">def</span> <span class="nf">test_httpbin_ip_in_aws</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">aws_ip_ranges</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">aws_ip_range</span> <span class="ow">in</span> <span class="n">aws_ip_ranges</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">IPv4Address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_network</span><span class="p">(</span><span class="n">aws_ip_range</span><span class="p">[</span><span class="s1">&#39;ip_prefix&#39;</span><span class="p">]),</span> \
+          <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is in AWS range </span><span class="si">{1[ip_prefix]}</span><span class="s2"> region </span><span class="si">{1[region]}</span><span class="s2"> service </span><span class="si">{1[service]}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">aws_ip_range</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>we add two data fetching functions that return lists that we can zip into tuples for <a class="reference external" href="https://docs.pytest.org/en/latest/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions">the pytest parametrize decorator</a></p></li>
+<li><p>we add markers for the services we’re fetching data from</p></li>
+</ul>
+<ol class="simple">
+<li><p>Running <code class="docutils literal notranslate"><span class="pre">frost</span> <span class="pre">test</span></code> with the test file explicitly included we see that one of the IPs is an AWS IP:</p></li>
+</ol>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">frost test httpbin/test_httpbin_ip_in_aws.py</span>
+<span class="go">platform darwin -- Python 3.6.2, pytest-3.3.2, py-1.5.2, pluggy-0.6.0</span>
+<span class="go">metadata: {&#39;Python&#39;: &#39;3.6.2&#39;, &#39;Platform&#39;: &#39;Darwin-15.6.0-x86_64-i386-64bit&#39;, &#39;Packages&#39;: {&#39;pytest&#39;: &#39;3.3.2&#39;, &#39;py&#39;: &#39;1.5.2&#39;, &#39;pluggy&#39;: &#39;0.6.0&#39;}, &#39;Plugins&#39;: {&#39;metadata&#39;: &#39;1.5.1&#39;, &#39;json&#39;: &#39;0.4.0&#39;, &#39;html&#39;: &#39;1.16.1&#39;}}</span>
+<span class="go">rootdir: /Users/gguthe/frost, inifile:</span>
+<span class="go">plugins: metadata-1.5.1, json-0.4.0, html-1.16.1</span>
+<span class="go">collected 3 items</span>
+
+<span class="go">httpbin/test_httpbin_ip_in_aws.py .F.                                                                                               [100%]</span>
+
+<span class="go">================================================================ FAILURES =================================================================</span>
+<span class="go">____________________________________________ test_httpbin_ip_in_aws[13.58.0.0-aws_ip_ranges1] _____________________________________________</span>
+
+<span class="go">ip = &#39;13.58.0.0&#39;</span>
+<span class="go">aws_ip_ranges = [{&#39;ip_prefix&#39;: &#39;13.32.0.0/15&#39;, &#39;region&#39;: &#39;GLOBAL&#39;, &#39;service&#39;: &#39;AMAZON&#39;}, {&#39;ip_prefix&#39;: &#39;13.35.0.0/16&#39;, &#39;region&#39;: &#39;GLOB...on&#39;: &#39;us-west-1&#39;, &#39;service&#39;: &#39;AMAZON&#39;}, {&#39;ip_prefix&#39;: &#39;13.57.0.0/16&#39;, &#39;region&#39;: &#39;us-west-1&#39;, &#39;service&#39;: &#39;AMAZON&#39;}, ...]</span>
+
+<span class="go">    @pytest.mark.httpbin</span>
+<span class="go">    @pytest.mark.aws_ip_ranges</span>
+<span class="go">    @pytest.mark.parametrize(</span>
+<span class="go">        [&#39;ip&#39;, &#39;aws_ip_ranges&#39;],</span>
+<span class="go">        zip(get_httpbin_ips(), itertools.repeat(get_aws_ips())),</span>
+<span class="gp">        #</span> <span class="nv">ids</span><span class="o">=</span>lambda ip: ip
+<span class="go">        )</span>
+<span class="go">    def test_httpbin_ip_in_aws(ip, aws_ip_ranges):</span>
+<span class="go">        for aws_ip_range in aws_ip_ranges:</span>
+<span class="gp">&gt;</span>           assert ipaddress.IPv4Address<span class="o">(</span>ip<span class="o">)</span> not in ipaddress.ip_network<span class="o">(</span>aws_ip_range<span class="o">[</span><span class="s1">&#39;ip_prefix&#39;</span><span class="o">])</span>, <span class="se">\</span>
+              <span class="s2">&quot;{0} is in AWS range {1[ip_prefix]} region {1[region]} service {1[service]}&quot;</span>.format<span class="o">(</span>ip, aws_ip_range<span class="o">)</span>
+<span class="go">E           AssertionError: 13.58.0.0 is in AWS range 13.58.0.0/15 region us-east-2 service AMAZON</span>
+<span class="go">E           assert IPv4Address(&#39;13.58.0.0&#39;) not in IPv4Network(&#39;13.58.0.0/15&#39;)</span>
+<span class="go">E            +  where IPv4Address(&#39;13.58.0.0&#39;) = &lt;class &#39;ipaddress.IPv4Address&#39;&gt;(&#39;13.58.0.0&#39;)</span>
+<span class="go">E            +    where &lt;class &#39;ipaddress.IPv4Address&#39;&gt; = ipaddress.IPv4Address</span>
+<span class="go">E            +  and   IPv4Network(&#39;13.58.0.0/15&#39;) = &lt;function ip_network at 0x107cf66a8&gt;(&#39;13.58.0.0/15&#39;)</span>
+<span class="go">E            +    where &lt;function ip_network at 0x107cf66a8&gt; = ipaddress.ip_network</span>
+
+<span class="go">httpbin/test_httpbin_ip_in_aws.py:43: AssertionError</span>
+<span class="go">=================================================== 1 failed, 2 passed in 15.69 seconds ===================================================</span>
+</pre></div>
+</div>
+<p>Note: marking tests as expected failures with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.xfail</span></code> can hide data fetching errors</p>
+<p>To improve this we could:</p>
+<ol class="simple">
+<li><p>Add parametrize ids so it’s clearer which parametrize caused test failures</p></li>
+<li><p>Add directions about why it’s an issue and how to fix it or what the associated risks are</p></li>
+</ol>
+<p>As we add more tests we can:</p>
+<ol class="simple">
+<li><p>Move the JSON fetching functions to <code class="docutils literal notranslate"><span class="pre">&lt;service</span> <span class="pre">name&gt;/resources.py</span></code> files and import them into the test</p></li>
+<li><p>Move the fetching logic to a shared library <code class="docutils literal notranslate"><span class="pre">&lt;service</span> <span class="pre">name&gt;/client.py</span></code> and save to the pytest cache</p></li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">&lt;service</span> <span class="pre">name&gt;/conftest.py</span></code> and register the service’s marks in a <code class="docutils literal notranslate"><span class="pre">pytest_configure</span></code> to resolve some warnings</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">Frost</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#id1">Usage</a></li>
+<li><a class="reference internal" href="#running">Running</a><ul>
+<li><a class="reference internal" href="#iam-policy-for-frost">IAM Policy for frost</a></li>
+<li><a class="reference internal" href="#setting-up-gcp-tests">Setting up GCP tests</a><ul>
+<li><a class="reference internal" href="#enabling-required-api-s-for-your-project">Enabling required API’s for your project</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#setting-up-gsuite-tests">Setting up GSuite tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caching">Caching</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-test-config">Custom Test Config</a><ul>
+<li><a class="reference internal" href="#test-exemptions">Test Exemptions</a><ul>
+<li><a class="reference internal" href="#enabling-regex-for-test-id">Enabling regex for test ID</a></li>
+<li><a class="reference internal" href="#test-severity">Test Severity</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aws-config">AWS Config</a></li>
+<li><a class="reference internal" href="#gsuite-config">GSuite Config</a></li>
+<li><a class="reference internal" href="#test-accuracy">Test Accuracy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development">Development</a><ul>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#non-goals">Non-Goals</a></li>
+<li><a class="reference internal" href="#design">Design</a><ul>
+<li><a class="reference internal" href="#file-layout">File Layout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-an-example-test">Adding an example test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="index.html" title="previous chapter">Frost’s documentation!</a>
+          <li>Next: <a href="FAQ.html" title="next chapter">Frequently Asked Questions</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

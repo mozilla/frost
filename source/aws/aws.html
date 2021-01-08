@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="aws.autoscaling package" href="aws.autoscaling.html" />
+    <link rel="prev" title="aws" href="modules.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aws.autoscaling.html" title="aws.autoscaling package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="aws"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../Source.html" >Source Code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="modules.html" accesskey="U">aws</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws-package">
+<h1>aws package<a class="headerlink" href="#aws-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aws.autoscaling.html">aws.autoscaling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.autoscaling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.autoscaling.html#module-aws.autoscaling.resources">aws.autoscaling.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.autoscaling.html#module-aws.autoscaling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.cloudtrail.html">aws.cloudtrail package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.cloudtrail.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.cloudtrail.html#module-aws.cloudtrail.resources">aws.cloudtrail.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.cloudtrail.html#aws-cloudtrail-test-cloudtrail-enabled-in-all-regions-module">aws.cloudtrail.test_cloudtrail_enabled_in_all_regions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.cloudtrail.html#aws-cloudtrail-test-cloudtrail-log-validation-enabled-module">aws.cloudtrail.test_cloudtrail_log_validation_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.cloudtrail.html#module-aws.cloudtrail">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.ec2.html">aws.ec2 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#module-aws.ec2.helpers">aws.ec2.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#module-aws.ec2.resources">aws.ec2.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-all-eips-bound-module">aws.ec2.test_ec2_all_eips_bound module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-snapshot-not-too-old-module">aws.ec2.test_ec2_ebs_snapshot_not_too_old module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-snapshots-are-private-module">aws.ec2.test_ec2_ebs_snapshots_are_private module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-attached-to-instance-module">aws.ec2.test_ec2_ebs_volume_attached_to_instance module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-encrypted-module">aws.ec2.test_ec2_ebs_volume_encrypted module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-ebs-volume-not-piops-module">aws.ec2.test_ec2_ebs_volume_not_piops module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-instance-has-required-tags-module">aws.ec2.test_ec2_instance_has_required_tags module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-instance-on-acceptable-ami-module">aws.ec2.test_ec2_instance_on_acceptable_ami module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-in-use-module">aws.ec2.test_ec2_security_group_in_use module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-module">aws.ec2.test_ec2_security_group_opens_all_ports module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_all module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-all-ports-to-self-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_self module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-security-group-opens-specific-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_specific_ports_to_all module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#aws-ec2-test-ec2-vpc-flow-log-enabled-module">aws.ec2.test_ec2_vpc_flow_log_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.ec2.html#module-aws.ec2">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.elasticache.html">aws.elasticache package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticache.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticache.html#module-aws.elasticache.resources">aws.elasticache.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticache.html#module-aws.elasticache">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.elasticsearch.html">aws.elasticsearch package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticsearch.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticsearch.html#module-aws.elasticsearch.resources">aws.elasticsearch.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticsearch.html#aws-elasticsearch-test-elasticsearch-domains-have-logging-enabled-module">aws.elasticsearch.test_elasticsearch_domains_have_logging_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.elasticsearch.html#module-aws.elasticsearch">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.iam.html">aws.iam package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#module-aws.iam.helpers">aws.iam.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#module-aws.iam.resources">aws.iam.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-access-key-is-old-module">aws.iam.test_iam_access_key_is_old module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-admin-user-with-access-keys-module">aws.iam.test_iam_admin_user_with_access_keys module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-admin-user-without-mfa-module">aws.iam.test_iam_admin_user_without_mfa module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-cross-account-admin-roles-require-mfa-module">aws.iam.test_iam_cross_account_admin_roles_require_mfa module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-user-is-inactive-module">aws.iam.test_iam_user_is_inactive module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#aws-iam-test-iam-user-without-mfa-module">aws.iam.test_iam_user_without_mfa module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.iam.html#module-aws.iam">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.rds.html">aws.rds package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#module-aws.rds.helpers">aws.rds.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#module-aws.rds.resources">aws.rds.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-backup-enabled-module">aws.rds.test_rds_db_instance_backup_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-encrypted-module">aws.rds.test_rds_db_instance_encrypted module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-is-multiaz-module">aws.rds.test_rds_db_instance_is_multiaz module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-is-postgres-with-invalid-certificate-module">aws.rds.test_rds_db_instance_is_postgres_with_invalid_certificate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-minor-version-updates-enabled-module">aws.rds.test_rds_db_instance_minor_version_updates_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-not-publicly-accessible-by-vpc-sg-module">aws.rds.test_rds_db_instance_not_publicly_accessible_by_vpc_sg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-instance-storage-type-not-piops-module">aws.rds.test_rds_db_instance_storage_type_not_piops module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-security-group-does-not-grant-public-access-module">aws.rds.test_rds_db_security_group_does_not_grant_public_access module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-encrypted-module">aws.rds.test_rds_db_snapshot_encrypted module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-not-publicly-accessible-module">aws.rds.test_rds_db_snapshot_not_publicly_accessible module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#aws-rds-test-rds-db-snapshot-not-too-old-module">aws.rds.test_rds_db_snapshot_not_too_old module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.rds.html#module-aws.rds">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.redshift.html">aws.redshift package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.redshift.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.redshift.html#module-aws.redshift.helpers">aws.redshift.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.redshift.html#module-aws.redshift.resources">aws.redshift.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.redshift.html#aws-redshift-test-redshift-security-group-does-not-allow-all-ips-access-module">aws.redshift.test_redshift_security_group_does_not_allow_all_ips_access module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.redshift.html#module-aws.redshift">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.route53.html">aws.route53 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.route53.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.route53.html#module-aws.route53.resources">aws.route53.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.route53.html#aws-route53-test-route53-cnames-minimum-ttl-or-greater-module">aws.route53.test_route53_cnames_minimum_ttl_or_greater module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.route53.html#module-aws.route53">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.s3.html">aws.s3 package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#module-aws.s3.helpers">aws.s3.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#module-aws.s3.resources">aws.s3.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-cors-disabled-module">aws.s3.test_s3_bucket_cors_disabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-does-not-grant-all-principals-all-actions-module">aws.s3.test_s3_bucket_does_not_grant_all_principals_all_actions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-has-life-cycle-policy-module">aws.s3.test_s3_bucket_has_life_cycle_policy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-logging-enabled-module">aws.s3.test_s3_bucket_logging_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-no-world-acl-module">aws.s3.test_s3_bucket_no_world_acl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-versioning-enabled-module">aws.s3.test_s3_bucket_versioning_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-versioning-mfa-delete-enabled-module">aws.s3.test_s3_bucket_versioning_mfa_delete_enabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#aws-s3-test-s3-bucket-web-hosting-disabled-module">aws.s3.test_s3_bucket_web_hosting_disabled module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.s3.html#module-aws.s3">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aws.sns.html">aws.sns package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#module-aws.sns.resources">aws.sns.resources module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-pending-verified-module">aws.sns.test_sns_pending_verified module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-subscriptions-without-topics-module">aws.sns.test_sns_subscriptions_without_topics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#aws-sns-test-sns-topics-without-subscriptions-module">aws.sns.test_sns_topics_without_subscriptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws.sns.html#module-aws.sns">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.client">
+<span id="aws-client-module"></span><h2>aws.client module<a class="headerlink" href="#module-aws.client" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.client.get_session">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; botocore.session.Session<a class="reference internal" href="../../_modules/aws/client.html#get_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new or cached botocore session for the AWS profile.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_client">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_client</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">region</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">service</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; botocore.client.BaseClient<a class="reference internal" href="../../_modules/aws/client.html#get_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new or cached botocore service client for the AWS profile, region, and service.</p>
+<p>Warns when a service is not available for a region, which means we
+need to update botocore or skip that call for that region.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_available_profiles">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_available_profiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#get_available_profiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_available_profiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_available_regions">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_available_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#get_available_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_available_regions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_available_services">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_available_services</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#get_available_services"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_available_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_account_id">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_account_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../../_modules/aws/client.html#get_account_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_account_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.full_results">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">full_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n">botocore.client.BaseClient</span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#full_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.full_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns JSON results for an AWS botocore call. Flattens paginated results (if any).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="aws.client.AWSAPICall">
+<em class="property">class </em><code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">AWSAPICall</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profile</span></em>, <em class="sig-param"><span class="n">region</span></em>, <em class="sig-param"><span class="n">service</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/client.html#AWSAPICall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.AWSAPICall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.profile">
+<code class="sig-name descname">profile</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.region">
+<code class="sig-name descname">region</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.service">
+<code class="sig-name descname">service</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.method">
+<code class="sig-name descname">method</code><em class="property">: Optional<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.args">
+<code class="sig-name descname">args</code><em class="property">: List<span class="p">[</span>str<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="aws.client.AWSAPICall.kwargs">
+<code class="sig-name descname">kwargs</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#aws.client.AWSAPICall.kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.cache_key">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">cache_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">call</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#aws.client.AWSAPICall" title="aws.client.AWSAPICall">aws.client.AWSAPICall</a></span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../../_modules/aws/client.html#cache_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.cache_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fullname (directory and filename) for an AWS API call.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache_key</span><span class="p">(</span><span class="n">default_call</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+<span class="gp">... </span><span class="n">profile</span><span class="o">=</span><span class="s1">&#39;profile&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">region</span><span class="o">=</span><span class="s1">&#39;region&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">service</span><span class="o">=</span><span class="s1">&#39;service_name&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;method_name&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="s1">&#39;arg2&#39;</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">kwarg1</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+<span class="go">&#39;pytest_aws/profile/region/service_name/method_name/9965c005f623cd9130dd5a6dbdee87de.json&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.client.get_aws_resource">
+<code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">get_aws_resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">method_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">call_args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">call_kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cache</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>_pytest.cacheprovider.Cache<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">profiles</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Optional<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">regions</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">result_from_error</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span>Any<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">debug_calls</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">debug_cache</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#get_aws_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.get_aws_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches and yields AWS API JSON responses for all profiles and regions (list params)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="aws.client.BotocoreClient">
+<em class="property">class </em><code class="sig-prename descclassname">aws.client.</code><code class="sig-name descname">BotocoreClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">profiles</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Optional<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">regions</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cache</span><span class="p">:</span> <span class="n">_pytest.cacheprovider.Cache</span></em>, <em class="sig-param"><span class="n">debug_calls</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">debug_cache</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">offline</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.get_regions">
+<code class="sig-name descname">get_regions</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.get_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.get_regions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">method_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">call_args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">call_kwargs</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">profiles</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>Optional<span class="p">[</span>str<span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">regions</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">result_from_error</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span>Any<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">do_not_cache</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aws.client.BotocoreClient" title="aws.client.BotocoreClient">aws.client.BotocoreClient</a><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.values">
+<code class="sig-name descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>Any<span class="p">]</span><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the wrapped value</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.extract_key">
+<code class="sig-name descname">extract_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aws.client.BotocoreClient" title="aws.client.BotocoreClient">aws.client.BotocoreClient</a><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.extract_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.extract_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>From an iterable of dicts returns the value with the given
+keys discarding other values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+<span class="go">[1, 2]</span>
+</pre></div>
+</div>
+<p>When the key does not exist it returns the second arg which defaults to None:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+<span class="go">[1, None]</span>
+</pre></div>
+</div>
+<p>Propagates the ‘__pytest_meta’ key to dicts and lists of dicts:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;Attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">},</span> <span class="s1">&#39;__pytest_meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;meta&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">}}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;Attrs&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+<span class="go">[{&#39;Name&#39;: &#39;Test&#39;, &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;Tags&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="s1">&#39;Tag&#39;</span><span class="p">}],</span> <span class="s1">&#39;__pytest_meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;meta&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">}}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;Tags&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+<span class="go">[[{&#39;Name&#39;: &#39;Test&#39;, &#39;Value&#39;: &#39;Tag&#39;, &#39;__pytest_meta&#39;: {&#39;meta&#39;: &#39;dict&#39;}}]]</span>
+</pre></div>
+</div>
+<p>But not to primitives:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;PolicyNames&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">,</span> <span class="s1">&#39;P2&#39;</span><span class="p">]}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;PolicyNames&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+<span class="go">[[&#39;P1&#39;, &#39;P2&#39;]]</span>
+</pre></div>
+</div>
+<p>Errors when the outer dict is missing a meta key:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;Attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">}}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s1">&#39;Attrs&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;__pytest_meta&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.flatten">
+<code class="sig-name descname">flatten</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aws.client.BotocoreClient" title="aws.client.BotocoreClient">aws.client.BotocoreClient</a><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flattens one level of a nested list:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">BotocoreClient</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">offline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="go">[&#39;A&#39;, 1, &#39;B&#39;]</span>
+</pre></div>
+</div>
+<p>Only works for a list of lists:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">can only concatenate list (not &quot;dict&quot;) to list</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="aws.client.BotocoreClient.debug">
+<code class="sig-name descname">debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#aws.client.BotocoreClient" title="aws.client.BotocoreClient">aws.client.BotocoreClient</a><a class="reference internal" href="../../_modules/aws/client.html#BotocoreClient.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.client.BotocoreClient.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-aws.conftest">
+<span id="aws-conftest-module"></span><h2>aws.conftest module<a class="headerlink" href="#module-aws.conftest" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.conftest.pytest_configure">
+<code class="sig-prename descclassname">aws.conftest.</code><code class="sig-name descname">pytest_configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="p">:</span> <span class="n">_pytest.config.Config</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../../_modules/aws/conftest.html#pytest_configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.conftest.pytest_configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-aws">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">aws package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-aws.client">aws.client module</a></li>
+<li><a class="reference internal" href="#module-aws.conftest">aws.conftest module</a></li>
+<li><a class="reference internal" href="#module-aws">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../Source.html">Source Code</a>
+        <ul>
+      <li><a href="modules.html">aws</a>
+        <ul>
+          <li>Previous: <a href="modules.html" title="previous chapter">aws</a>
+          <li>Next: <a href="aws.autoscaling.html" title="next chapter">aws.autoscaling package</a></ul>
+      </li></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

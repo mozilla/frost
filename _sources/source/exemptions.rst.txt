@@ -1,0 +1,7 @@
+exemptions module
+=================
+
+.. automodule:: exemptions
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gcp.compute package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gcp.compute package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="gcp-compute-package">
+<h1>gcp.compute package<a class="headerlink" href="#gcp-compute-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gcp.compute.helpers">
+<span id="gcp-compute-helpers-module"></span><h2>gcp.compute.helpers module<a class="headerlink" href="#module-gcp.compute.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gcp.compute.helpers.does_firewall_open_all_ports_to_any">
+<code class="sig-prename descclassname">gcp.compute.helpers.</code><code class="sig-name descname">does_firewall_open_all_ports_to_any</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">firewall</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/helpers.html#does_firewall_open_all_ports_to_any"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.helpers.does_firewall_open_all_ports_to_any" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if firewall has a rule to open all ports to any source. Excludes ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_any</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_any</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;300&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_any</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_any</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_any</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;10.0.0.5/32&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.helpers.does_firewall_open_all_ports_to_all">
+<code class="sig-prename descclassname">gcp.compute.helpers.</code><code class="sig-name descname">does_firewall_open_all_ports_to_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">firewall</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/helpers.html#does_firewall_open_all_ports_to_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.helpers.does_firewall_open_all_ports_to_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if firewall has a rule to open all ports to all. Excludes ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_all</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.helpers.does_firewall_open_any_ports_to_all">
+<code class="sig-prename descclassname">gcp.compute.helpers.</code><code class="sig-name descname">does_firewall_open_any_ports_to_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">firewall</span></em>, <em class="sig-param"><span class="n">allowed_ports</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/helpers.html#does_firewall_open_any_ports_to_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.helpers.does_firewall_open_any_ports_to_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if firewall has a rule to open any ports (except 80/443) to all. Excludes ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0-65535&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1.1.1.1/1&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;123&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;123&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;80&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;443&#39;</span><span class="p">]}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">does_firewall_open_any_ports_to_all</span><span class="p">({</span><span class="s1">&#39;sourceRanges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">],</span> <span class="s1">&#39;allowed&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;ports&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;22&#39;</span><span class="p">,</span> <span class="s1">&#39;80&#39;</span><span class="p">,</span> <span class="s1">&#39;443&#39;</span><span class="p">]}]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.helpers.firewall_id">
+<code class="sig-prename descclassname">gcp.compute.helpers.</code><code class="sig-name descname">firewall_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">firewall</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/helpers.html#firewall_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.helpers.firewall_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A getter fn for test ids for Firewalls</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-gcp.compute.resources">
+<span id="gcp-compute-resources-module"></span><h2>gcp.compute.resources module<a class="headerlink" href="#module-gcp.compute.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="gcp.compute.resources.firewalls">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">firewalls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#firewalls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.firewalls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.resources.networks">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">networks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#networks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.networks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.resources.instances">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">instances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.instances" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.resources.clusters">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">clusters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.clusters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.resources.networks_with_instances">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">networks_with_instances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#networks_with_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.networks_with_instances" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="gcp.compute.resources.in_use_firewalls">
+<code class="sig-prename descclassname">gcp.compute.resources.</code><code class="sig-name descname">in_use_firewalls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gcp/compute/resources.html#in_use_firewalls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gcp.compute.resources.in_use_firewalls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gcp-compute-test-firewall-opens-all-ports-to-all-module">
+<h2>gcp.compute.test_firewall_opens_all_ports_to_all module<a class="headerlink" href="#gcp-compute-test-firewall-opens-all-ports-to-all-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="gcp-compute-test-firewall-opens-all-ports-to-any-module">
+<h2>gcp.compute.test_firewall_opens_all_ports_to_any module<a class="headerlink" href="#gcp-compute-test-firewall-opens-all-ports-to-any-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="gcp-compute-test-firewall-opens-any-ports-to-all-module">
+<h2>gcp.compute.test_firewall_opens_any_ports_to_all module<a class="headerlink" href="#gcp-compute-test-firewall-opens-any-ports-to-all-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="gcp-compute-test-gke-version-up-to-date-module">
+<h2>gcp.compute.test_gke_version_up_to_date module<a class="headerlink" href="#gcp-compute-test-gke-version-up-to-date-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="gcp-compute-test-only-allowed-gke-versions-module">
+<h2>gcp.compute.test_only_allowed_gke_versions module<a class="headerlink" href="#gcp-compute-test-only-allowed-gke-versions-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-gcp.compute">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-gcp.compute" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">gcp.compute package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-gcp.compute.helpers">gcp.compute.helpers module</a></li>
+<li><a class="reference internal" href="#module-gcp.compute.resources">gcp.compute.resources module</a></li>
+<li><a class="reference internal" href="#gcp-compute-test-firewall-opens-all-ports-to-all-module">gcp.compute.test_firewall_opens_all_ports_to_all module</a></li>
+<li><a class="reference internal" href="#gcp-compute-test-firewall-opens-all-ports-to-any-module">gcp.compute.test_firewall_opens_all_ports_to_any module</a></li>
+<li><a class="reference internal" href="#gcp-compute-test-firewall-opens-any-ports-to-all-module">gcp.compute.test_firewall_opens_any_ports_to_all module</a></li>
+<li><a class="reference internal" href="#gcp-compute-test-gke-version-up-to-date-module">gcp.compute.test_gke_version_up_to_date module</a></li>
+<li><a class="reference internal" href="#gcp-compute-test-only-allowed-gke-versions-module">gcp.compute.test_only_allowed_gke_versions module</a></li>
+<li><a class="reference internal" href="#module-gcp.compute">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

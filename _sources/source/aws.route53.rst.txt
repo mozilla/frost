@@ -1,0 +1,29 @@
+aws.route53 package
+===================
+
+Submodules
+----------
+
+aws.route53.resources module
+----------------------------
+
+.. automodule:: aws.route53.resources
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+aws.route53.test\_route53\_cnames\_minimum\_ttl\_or\_greater module
+-------------------------------------------------------------------
+
+.. automodule:: aws.route53.test_route53_cnames_minimum_ttl_or_greater
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: aws.route53
+   :members:
+   :undoc-members:
+   :show-inheritance:

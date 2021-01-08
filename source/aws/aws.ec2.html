@@ -1,0 +1,571 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.ec2 package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="aws.elasticache package" href="aws.elasticache.html" />
+    <link rel="prev" title="aws.cloudtrail package" href="aws.cloudtrail.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aws.elasticache.html" title="aws.elasticache package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="aws.cloudtrail.html" title="aws.cloudtrail package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../Source.html" >Source Code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="modules.html" >aws</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="aws.html" accesskey="U">aws package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.ec2 package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws-ec2-package">
+<h1>aws.ec2 package<a class="headerlink" href="#aws-ec2-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.ec2.helpers">
+<span id="aws-ec2-helpers-module"></span><h2>aws.ec2.helpers module<a class="headerlink" href="#module-aws.ec2.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.ec2.helpers.ip_permission_opens_all_ports">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ip_permission_opens_all_ports</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ipp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ip_permission_opens_all_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ip_permission_opens_all_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an EC2 security group IP permission opens all
+ports and False otherwise.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_opens_all_ports</span><span class="p">({</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">65535</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_opens_all_ports</span><span class="p">({</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">965535</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_opens_all_ports</span><span class="p">({</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_opens_all_ports</span><span class="p">({</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_opens_all_ports</span><span class="p">({</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ip_permission_cidr_allows_all_ips">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ip_permission_cidr_allows_all_ips</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ipp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ip_permission_cidr_allows_all_ips"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ip_permission_cidr_allows_all_ips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if any IPv4 or IPv6 range for an EC2 security group
+IP permission opens allows access to or from all IPs and False
+otherwise.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">({</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">({</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIpv6&#39;</span><span class="p">:</span> <span class="s1">&#39;::/0&#39;</span><span class="p">}]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">({</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;192.0.1.1/8&#39;</span><span class="p">}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">({</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIpv6&#39;</span><span class="p">:</span> <span class="s1">&#39;192.0.1.1/8&#39;</span><span class="p">}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">({})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ip_permission_grants_access_to_group_with_id">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ip_permission_grants_access_to_group_with_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ipp</span></em>, <em class="sig-param"><span class="n">security_group_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ip_permission_grants_access_to_group_with_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ip_permission_grants_access_to_group_with_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an EC2 security group IP permission opens access to
+a security with the given ID and False otherwise.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_grants_access_to_group_with_id</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">}]},</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_grants_access_to_group_with_id</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">}]},</span> <span class="s1">&#39;not-test-sgid&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ip_permission_grants_access_to_group_with_id</span><span class="p">({},</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_security_group_opens_all_ports">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_security_group_opens_all_ports</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_security_group</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_security_group_opens_all_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_security_group_opens_all_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an ec2 security group includes a permission
+allowing inbound access on all ports and False otherwise
+or if protocol is ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[{},</span> <span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">65536</span><span class="p">}]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[{},</span> <span class="p">{</span><span class="s1">&#39;IpProtocol&#39;</span><span class="p">:</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span> <span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports</span><span class="p">({})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_security_group_opens_all_ports_to_self">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_security_group_opens_all_ports_to_self</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_security_group</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_security_group_opens_all_ports_to_self"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_security_group_opens_all_ports_to_self" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an ec2 security group includes a permission
+allowing all IPs inbound access on all ports and False otherwise
+or if protocol is ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({</span>
+<span class="gp">... </span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">65535</span><span class="p">,</span> <span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({</span>
+<span class="gp">... </span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;IpProtocol&#39;</span><span class="p">:</span> <span class="s2">&quot;icmp&quot;</span><span class="p">,</span> <span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({</span>
+<span class="gp">... </span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({</span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({</span>
+<span class="gp">... </span><span class="s1">&#39;GroupId&#39;</span><span class="p">:</span> <span class="s1">&#39;test-sgid&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;UserIdGroupPairs&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_self</span><span class="p">([])</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_security_group_opens_all_ports_to_all">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_security_group_opens_all_ports_to_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_security_group</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_security_group_opens_all_ports_to_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_security_group_opens_all_ports_to_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an ec2 security group includes a permission
+allowing all IPs inbound access on all ports and False otherwise
+or if protocol is ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">65535</span><span class="p">,</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">65535</span><span class="p">,</span><span class="s1">&#39;Ipv6Ranges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIpv6&#39;</span><span class="p">:</span> <span class="s1">&#39;::/0&#39;</span><span class="p">}]}</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;IpProtocol&#39;</span><span class="p">:</span> <span class="s1">&#39;icmp&#39;</span><span class="p">,</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_all_ports_to_all</span><span class="p">([])</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_security_group_opens_specific_ports_to_all">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_security_group_opens_specific_ports_to_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_security_group</span></em>, <em class="sig-param"><span class="n">allowed_ports</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_security_group_opens_specific_ports_to_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_security_group_opens_specific_ports_to_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if an ec2 security group includes a permission
+allowing all IPs inbound access on specific unsafe ports and False
+otherwise or if protocol is ICMP.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">234</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">432</span><span class="p">,</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">... </span><span class="p">{</span><span class="s1">&#39;FromPort&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span><span class="s1">&#39;ToPort&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span><span class="s1">&#39;IpRanges&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;CidrIp&#39;</span><span class="p">:</span> <span class="s1">&#39;0.0.0.0/0&#39;</span><span class="p">}]},</span>
+<span class="gp">... </span><span class="p">]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">({</span><span class="s1">&#39;IpPermissions&#39;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_security_group_opens_specific_ports_to_all</span><span class="p">([])</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_instance_test_id">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_instance_test_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_instance_test_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_instance_test_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A getter fn for test ids for EC2 instances</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_security_group_test_id">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_security_group_test_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_security_group</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_security_group_test_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_security_group_test_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A getter fn for test ids for EC2 security groups</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_address_id">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_address_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_address</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_address_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_address_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format an Elastic IP address.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.is_ebs_volume_encrypted">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">is_ebs_volume_encrypted</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ebs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#is_ebs_volume_encrypted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.is_ebs_volume_encrypted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the EBS volume ‘Encrypted’ value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_encrypted</span><span class="p">({</span><span class="s1">&#39;Encrypted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_encrypted</span><span class="p">({</span><span class="s1">&#39;Encrypted&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_encrypted</span><span class="p">({})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;Encrypted&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_encrypted</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;int&#39; object is not subscriptable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_encrypted</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;NoneType&#39; object is not subscriptable</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.is_ebs_volume_piops">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">is_ebs_volume_piops</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ebs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#is_ebs_volume_piops"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.is_ebs_volume_piops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the EBS volume type is provisioned iops</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_piops</span><span class="p">({</span><span class="s1">&#39;VolumeType&#39;</span><span class="p">:</span> <span class="s1">&#39;io1&#39;</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_piops</span><span class="p">({</span><span class="s1">&#39;VolumeType&#39;</span><span class="p">:</span> <span class="s1">&#39;standard&#39;</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_piops</span><span class="p">({})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&#39;VolumeType&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_piops</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;int&#39; object is not subscriptable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_volume_piops</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">&#39;NoneType&#39; object is not subscriptable</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.is_ebs_snapshot_public">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">is_ebs_snapshot_public</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ebs_snapshot</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#is_ebs_snapshot_public"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.is_ebs_snapshot_public" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the EBS snapshot’s ‘CreateVolumePermissions’ attribute allows for public creation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_snapshot_public</span><span class="p">({</span><span class="s1">&#39;CreateVolumePermissions&#39;</span><span class="p">:[{</span><span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;all&#39;</span><span class="p">}]})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_snapshot_public</span><span class="p">({</span><span class="s1">&#39;CreateVolumePermissions&#39;</span><span class="p">:[{</span><span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_snapshot_public</span><span class="p">({</span><span class="s1">&#39;CreateVolumePermissions&#39;</span><span class="p">:[{</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">}]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_snapshot_public</span><span class="p">({</span><span class="s1">&#39;CreateVolumePermissions&#39;</span><span class="p">:[]})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_ebs_snapshot_public</span><span class="p">({})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ec2_instance_missing_tag_names">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ec2_instance_missing_tag_names</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ec2_instance</span></em>, <em class="sig-param"><span class="n">required_tag_names</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ec2_instance_missing_tag_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ec2_instance_missing_tag_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns any tag names that are missing from an EC2 Instance.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_instance_missing_tag_names</span><span class="p">({</span><span class="s1">&#39;Tags&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="s1">&#39;Name&#39;</span><span class="p">}]},</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s1">&#39;Name&#39;</span><span class="p">]))</span>
+<span class="go">frozenset()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ec2_instance_missing_tag_names</span><span class="p">({</span>
+<span class="gp">... </span><span class="s1">&#39;InstanceId&#39;</span><span class="p">:</span> <span class="s1">&#39;iid&#39;</span><span class="p">,</span> <span class="s1">&#39;Tags&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="s1">&#39;Bar&#39;</span><span class="p">}]},</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s1">&#39;Name&#39;</span><span class="p">]))</span>
+<span class="go">frozenset({&#39;Name&#39;})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ebs_volume_attached_to_instance">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ebs_volume_attached_to_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ebs</span></em>, <em class="sig-param"><span class="n">volume_created_days_ago</span><span class="o">=</span><span class="default_value">90</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ebs_volume_attached_to_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ebs_volume_attached_to_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check an ebs volume is attached to an instance. The “volume_created_days_ago”
+parameter allows checking for volumes that were created that many days ago.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timezone</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_volume_attached_to_instance</span><span class="p">({</span><span class="s2">&quot;CreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2020-09-11T19:45:22.116+00:00&quot;</span><span class="p">),</span> <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;in-use&quot;</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_volume_attached_to_instance</span><span class="p">({</span><span class="s2">&quot;CreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2000-09-11T19:45:22.116+00:00&quot;</span><span class="p">),</span> <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;in-use&quot;</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_volume_attached_to_instance</span><span class="p">({</span><span class="s2">&quot;CreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">),</span> <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;available&quot;</span><span class="p">})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_volume_attached_to_instance</span><span class="p">({</span><span class="s2">&quot;CreateTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2000-09-11T19:45:22.116+00:00&quot;</span><span class="p">),</span> <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;available&quot;</span><span class="p">})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.helpers.ebs_snapshot_not_too_old">
+<code class="sig-prename descclassname">aws.ec2.helpers.</code><code class="sig-name descname">ebs_snapshot_not_too_old</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snapshot</span></em>, <em class="sig-param"><span class="n">snapshot_started_days_ago</span><span class="o">=</span><span class="default_value">365</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/helpers.html#ebs_snapshot_not_too_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.helpers.ebs_snapshot_not_too_old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check an ebs snapshot is created less than “snapshot_started_days_ago”.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timezone</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">aws.ec2.helpers</span> <span class="kn">import</span> <span class="n">ebs_snapshot_not_too_old</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_snapshot_not_too_old</span><span class="p">({</span><span class="s2">&quot;StartTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)})</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ebs_snapshot_not_too_old</span><span class="p">({</span><span class="s2">&quot;StartTime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2019-09-11T19:45:22.116+00:00&quot;</span><span class="p">)})</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aws.ec2.resources">
+<span id="aws-ec2-resources-module"></span><h2>aws.ec2.resources module<a class="headerlink" href="#module-aws.ec2.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_instances">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_instances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_instances">http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_instances</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_security_groups">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_security_groups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_security_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_security_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups">http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_ebs_volumes">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_ebs_volumes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_ebs_volumes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_ebs_volumes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_volumes">http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_volumes</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_ebs_snapshots">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_ebs_snapshots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_ebs_snapshots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_ebs_snapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_snapshots">http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_snapshots</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_ebs_snapshots_create_permission">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_ebs_snapshots_create_permission</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_ebs_snapshots_create_permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_ebs_snapshots_create_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshot_attribute">https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_snapshot_attribute</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_flow_logs">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_flow_logs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_flow_logs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_flow_logs" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_flow_logs">https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_flow_logs</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_vpcs">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_vpcs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_vpcs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_vpcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_vpcs">https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_vpcs</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_addresses">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_addresses</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_addresses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_addresses" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_addresses">https://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_addresses</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_security_groups_with_in_use_flag">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_security_groups_with_in_use_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_security_groups_with_in_use_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_security_groups_with_in_use_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns security groups with an additional “InUse” key,
+which is True if it is associated with at least one resource.</p>
+<p>Possible resources:
+- EC2
+- ELBs (v1 and v2)
+- RDS
+- Redshift
+- ElasticCache
+- ElasticSearchService
+- AutoScaling</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.ec2.resources.ec2_images_owned_by">
+<code class="sig-prename descclassname">aws.ec2.resources.</code><code class="sig-name descname">ec2_images_owned_by</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">account_ids</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aws/ec2/resources.html#ec2_images_owned_by"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.ec2.resources.ec2_images_owned_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of EC2 images owned by a list of provided account ids</p>
+</dd></dl>
+
+</div>
+<div class="section" id="aws-ec2-test-ec2-all-eips-bound-module">
+<h2>aws.ec2.test_ec2_all_eips_bound module<a class="headerlink" href="#aws-ec2-test-ec2-all-eips-bound-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-ebs-snapshot-not-too-old-module">
+<h2>aws.ec2.test_ec2_ebs_snapshot_not_too_old module<a class="headerlink" href="#aws-ec2-test-ec2-ebs-snapshot-not-too-old-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-ebs-snapshots-are-private-module">
+<h2>aws.ec2.test_ec2_ebs_snapshots_are_private module<a class="headerlink" href="#aws-ec2-test-ec2-ebs-snapshots-are-private-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-ebs-volume-attached-to-instance-module">
+<h2>aws.ec2.test_ec2_ebs_volume_attached_to_instance module<a class="headerlink" href="#aws-ec2-test-ec2-ebs-volume-attached-to-instance-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-ebs-volume-encrypted-module">
+<h2>aws.ec2.test_ec2_ebs_volume_encrypted module<a class="headerlink" href="#aws-ec2-test-ec2-ebs-volume-encrypted-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-ebs-volume-not-piops-module">
+<h2>aws.ec2.test_ec2_ebs_volume_not_piops module<a class="headerlink" href="#aws-ec2-test-ec2-ebs-volume-not-piops-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-instance-has-required-tags-module">
+<h2>aws.ec2.test_ec2_instance_has_required_tags module<a class="headerlink" href="#aws-ec2-test-ec2-instance-has-required-tags-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-instance-on-acceptable-ami-module">
+<h2>aws.ec2.test_ec2_instance_on_acceptable_ami module<a class="headerlink" href="#aws-ec2-test-ec2-instance-on-acceptable-ami-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-security-group-in-use-module">
+<h2>aws.ec2.test_ec2_security_group_in_use module<a class="headerlink" href="#aws-ec2-test-ec2-security-group-in-use-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-security-group-opens-all-ports-module">
+<h2>aws.ec2.test_ec2_security_group_opens_all_ports module<a class="headerlink" href="#aws-ec2-test-ec2-security-group-opens-all-ports-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-security-group-opens-all-ports-to-all-module">
+<h2>aws.ec2.test_ec2_security_group_opens_all_ports_to_all module<a class="headerlink" href="#aws-ec2-test-ec2-security-group-opens-all-ports-to-all-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-security-group-opens-all-ports-to-self-module">
+<h2>aws.ec2.test_ec2_security_group_opens_all_ports_to_self module<a class="headerlink" href="#aws-ec2-test-ec2-security-group-opens-all-ports-to-self-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-security-group-opens-specific-ports-to-all-module">
+<h2>aws.ec2.test_ec2_security_group_opens_specific_ports_to_all module<a class="headerlink" href="#aws-ec2-test-ec2-security-group-opens-specific-ports-to-all-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-ec2-test-ec2-vpc-flow-log-enabled-module">
+<h2>aws.ec2.test_ec2_vpc_flow_log_enabled module<a class="headerlink" href="#aws-ec2-test-ec2-vpc-flow-log-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.ec2">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws.ec2" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">aws.ec2 package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-aws.ec2.helpers">aws.ec2.helpers module</a></li>
+<li><a class="reference internal" href="#module-aws.ec2.resources">aws.ec2.resources module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-all-eips-bound-module">aws.ec2.test_ec2_all_eips_bound module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-ebs-snapshot-not-too-old-module">aws.ec2.test_ec2_ebs_snapshot_not_too_old module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-ebs-snapshots-are-private-module">aws.ec2.test_ec2_ebs_snapshots_are_private module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-ebs-volume-attached-to-instance-module">aws.ec2.test_ec2_ebs_volume_attached_to_instance module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-ebs-volume-encrypted-module">aws.ec2.test_ec2_ebs_volume_encrypted module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-ebs-volume-not-piops-module">aws.ec2.test_ec2_ebs_volume_not_piops module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-instance-has-required-tags-module">aws.ec2.test_ec2_instance_has_required_tags module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-instance-on-acceptable-ami-module">aws.ec2.test_ec2_instance_on_acceptable_ami module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-security-group-in-use-module">aws.ec2.test_ec2_security_group_in_use module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-security-group-opens-all-ports-module">aws.ec2.test_ec2_security_group_opens_all_ports module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-security-group-opens-all-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_all module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-security-group-opens-all-ports-to-self-module">aws.ec2.test_ec2_security_group_opens_all_ports_to_self module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-security-group-opens-specific-ports-to-all-module">aws.ec2.test_ec2_security_group_opens_specific_ports_to_all module</a></li>
+<li><a class="reference internal" href="#aws-ec2-test-ec2-vpc-flow-log-enabled-module">aws.ec2.test_ec2_vpc_flow_log_enabled module</a></li>
+<li><a class="reference internal" href="#module-aws.ec2">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../Source.html">Source Code</a>
+        <ul>
+      <li><a href="modules.html">aws</a>
+        <ul>
+      <li><a href="aws.html">aws package</a>
+        <ul>
+          <li>Previous: <a href="aws.cloudtrail.html" title="previous chapter">aws.cloudtrail package</a>
+          <li>Next: <a href="aws.elasticache.html" title="next chapter">aws.elasticache package</a></ul>
+      </li></ul>
+      </li></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

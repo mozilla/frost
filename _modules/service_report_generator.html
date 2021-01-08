@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>service_report_generator &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">service_report_generator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for service_report_generator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Transform results and metadata from a pytest report JSON output and writes Service JSON reports.</span>
+
+<span class="sd">Pytest Service JSON format:</span>
+
+<span class="sd">{</span>
+<span class="sd">  &#39;name&#39;: &#39;pytest&#39;,</span>
+<span class="sd">  &#39;tool_url&#39;: &#39;https://github.com/mozilla/frost&#39;,</span>
+<span class="sd">  &#39;version&#39;: 1,</span>
+<span class="sd">  &#39;created_at&#39;: &#39;2000-01-01 15:50:00.123123&#39;,</span>
+<span class="sd">  &#39;meanings&#39;: {</span>
+<span class="sd">    &#39;pass&#39;: {</span>
+<span class="sd">      &#39;short&#39;: &#39;pass&#39;,    // text that _could_ be used in a badge</span>
+<span class="sd">      &#39;long&#39;: &#39;Test passed / no issues found.&#39;</span>
+<span class="sd">    },</span>
+<span class="sd">    &#39;warn&#39;: {</span>
+<span class="sd">      &#39;short&#39;: &#39;warn&#39;,</span>
+<span class="sd">      &#39;long&#39;: &#39;Expected test failures, either due to test-level xfail/xpass markers or exemptions.&#39;</span>
+<span class="sd">    },</span>
+<span class="sd">    &#39;fail&#39;: {</span>
+<span class="sd">      &#39;short&#39;: &#39;fail&#39;,</span>
+<span class="sd">      &#39;long&#39;: &#39;Critical test failure that should never happen e.g. publicly accessible DB snapshot,&#39;</span>
+<span class="sd">              &#39; user without MFA in prod.&#39;</span>
+<span class="sd">    },</span>
+<span class="sd">    &#39;err&#39;: {</span>
+<span class="sd">      &#39;short&#39;: &#39;err&#39;,</span>
+<span class="sd">      &#39;long&#39;: &#39;Error fetching an resource from AWS.&#39;</span>
+<span class="sd">    }</span>
+<span class="sd">  },</span>
+<span class="sd">  &#39;results&#39;: [</span>
+<span class="sd">    {</span>
+<span class="sd">       &#39;test_name&#39;:  # unparametrized pytest test name</span>
+<span class="sd">       &#39;resource_name&#39;: # best effort at resource name</span>
+<span class="sd">       &#39;name&#39;:</span>
+<span class="sd">       &#39;status&#39;:</span>
+<span class="sd">       &#39;value&#39;:</span>
+<span class="sd">       &#39;reason&#39;:  # pytest test outcome reason if any (e.g. resource fetch failed)</span>
+<span class="sd">       &#39;markers&#39;:  # pytest markers on the test e.g. aws service, ruleset</span>
+<span class="sd">       &#39;metadata&#39;:  # additional metadata on the resource being tested</span>
+<span class="sd">       &#39;rationale&#39;: # (optional) rationale behind the test. (null if not set)</span>
+<span class="sd">       &#39;description&#39;: # (optional) description of the test (null if not set)</span>
+<span class="sd">       &#39;severity&#39;: # (optional) severity of the test (null if not set)</span>
+<span class="sd">       &#39;regression&#39;: # (optional) regression comment (null if not set)</span>
+<span class="sd">    },</span>
+<span class="sd">    ...</span>
+<span class="sd">  ]</span>
+<span class="sd">}</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">STATUSES_TO_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fail&quot;</span><span class="p">,</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span> <span class="s2">&quot;err&quot;</span><span class="p">]</span>
+
+<span class="n">service_json_template</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;frost&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tool_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/mozilla/frost&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;meanings&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;pass&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="s2">&quot;Pass&quot;</span><span class="p">,</span> <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="s2">&quot;Test passed / no issues found.&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="s2">&quot;Warn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="s2">&quot;Expected test failures, either due to test-level &quot;</span>
+            <span class="s2">&quot;xfail/xpass markers or exemptions.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;fail&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="s2">&quot;FAIL&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="s2">&quot;Critical test failure that should never happen &quot;</span>
+            <span class="s2">&quot;e.g. publicly accessible DB snapshot, user without MFA in prod.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;err&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="s2">&quot;Err&quot;</span><span class="p">,</span> <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="s2">&quot;Error fetching an resource from AWS.&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="parse_args"><a class="viewcode-back" href="../source/service_report_generator.html#service_report_generator.parse_args">[docs]</a><span class="k">def</span> <span class="nf">parse_args</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="vm">__doc__</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--jo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--json-out&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;service-report.json&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;json_out&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Service json output filename.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;pytest_json&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;&lt;pytest-results.json&gt;&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pytest results output in JSON format.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_test_status"><a class="viewcode-back" href="../source/service_report_generator.html#service_report_generator.get_test_status">[docs]</a><span class="k">def</span> <span class="nf">get_test_status</span><span class="p">(</span><span class="n">outcome</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;errored&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;err&quot;</span>
+    <span class="k">elif</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xfailed&quot;</span><span class="p">,</span> <span class="s2">&quot;xpassed&quot;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="s2">&quot;warn&quot;</span>
+    <span class="k">elif</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;passed&quot;</span><span class="p">,</span> <span class="s2">&quot;skipped&quot;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="s2">&quot;pass&quot;</span>
+    <span class="k">elif</span> <span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;fail&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unexpected test outcome </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">outcome</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_resource_name"><a class="viewcode-back" href="../source/service_report_generator.html#service_report_generator.get_resource_name">[docs]</a><span class="k">def</span> <span class="nf">get_resource_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># test_elb_instances_attached[elb-name]</span>
+        <span class="n">rname</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">rname</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="get_result_for_test"><a class="viewcode-back" href="../source/service_report_generator.html#service_report_generator.get_result_for_test">[docs]</a><span class="k">def</span> <span class="nf">get_result_for_test</span><span class="p">(</span><span class="n">test</span><span class="p">):</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;test_name&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;unparametrized_name&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;resource_name&quot;</span><span class="p">:</span> <span class="n">get_resource_name</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;parametrized_name&quot;</span><span class="p">]),</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;parametrized_name&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">get_test_status</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;outcome&quot;</span><span class="p">]),</span>
+        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;outcome&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;reason&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;markers&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;rationale&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;rationale&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;severity&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;regression&quot;</span><span class="p">],</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="pytest_json_to_service_json"><a class="viewcode-back" href="../source/service_report_generator.html#service_report_generator.pytest_json_to_service_json">[docs]</a><span class="k">def</span> <span class="nf">pytest_json_to_service_json</span><span class="p">(</span><span class="n">pytest_json</span><span class="p">):</span>
+    <span class="n">service_json_template</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pytest_json</span><span class="p">[</span><span class="s2">&quot;report&quot;</span><span class="p">][</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span>
+    <span class="n">service_json_template</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">pytest_json</span><span class="p">[</span><span class="s2">&quot;report&quot;</span><span class="p">][</span><span class="s2">&quot;tests&quot;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">service_json_template</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_result_for_test</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">service_json_template</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">pytest_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pytest_json</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">))</span>
+
+    <span class="n">service_json</span> <span class="o">=</span> <span class="n">pytest_json_to_service_json</span><span class="p">(</span><span class="n">pytest_json</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">json_out</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">service_json</span><span class="p">,</span> <span class="n">fout</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    <ul>
+      <li><a href="index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

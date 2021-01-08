@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adding a New Service &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing Documentation" href="ContributingDocumentation.html" />
+    <link rel="prev" title="Mozilla Deployment" href="MozillaDeployment.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = './';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ContributingDocumentation.html" title="Contributing Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MozillaDeployment.html" title="Mozilla Deployment"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Adding a New Service</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at https://mozilla.org/MPL/2.0/. --><div class="section" id="adding-a-new-service">
+<h1>Adding a New Service<a class="headerlink" href="#adding-a-new-service" title="Permalink to this headline">¶</a></h1>
+<p>Here are the steps to add a new service to the Frost framework.</p>
+<div class="section" id="claim-a-name">
+<h2>Claim a name<a class="headerlink" href="#claim-a-name" title="Permalink to this headline">¶</a></h2>
+<p>Like ‘heroku’ ;)</p>
+<div class="section" id="create-a-new-directory-by-that-name">
+<h3>Create a new directory by that name<a class="headerlink" href="#create-a-new-directory-by-that-name" title="Permalink to this headline">¶</a></h3>
+<p>Clone the repo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">mozilla</span><span class="o">/</span><span class="n">frost</span><span class="o">.</span><span class="n">git</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">new_service</span>
+</pre></div>
+</div>
+<p>Setup for new service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">heroku</span>
+<span class="n">cd</span> <span class="n">heroku</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-default-files">
+<h3>Create Default Files<a class="headerlink" href="#create-default-files" title="Permalink to this headline">¶</a></h3>
+<p>The new service should be a Python Package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="n">client</span><span class="o">.</span><span class="n">py</span> <span class="n">resources</span><span class="o">.</span><span class="n">py</span> <span class="n">conftest</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Commit shell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
+<span class="n">git</span> <span class="n">push</span> <span class="o">-</span><span class="n">m</span> <span class="s1">&#39;Adding new service Heroku&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="add-service-specific-content">
+<h2>Add Service Specific Content<a class="headerlink" href="#add-service-specific-content" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">client.py</span></code>: responsible for obtaining data from the service, and
+placing it into the PyTest cache. The client module typically exposes the data via a
+“{service}_client” object. The PyTest framework will instantiate the client
+before any tests are run with all the configuration &amp; credential
+information provided by the configuration files and command line
+options. (See <a class="reference internal" href="Architecture.html#architecture"><span class="std std-ref">Architecture</span></a> for status of cache functionality.) (See
+<a class="reference internal" href="CodingConventions.html#offline"><span class="std std-ref">doctest offline support</span></a> for other requirements.)</p>
+<p><code class="docutils literal notranslate"><span class="pre">resources.py</span></code>: holds mapping functions which convert the data from
+the cache into the format expected by the tests. This should be the only
+file which imports the instantiation of the client. (Future best
+practices may pre-populate the cache outside of the PyTest execution.)</p>
+<p><code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> (optional) As much as possible, put service specific
+options, etc. in this local file. (Some things may not work c.f. BUG.)
+In conventional <code class="docutils literal notranslate"><span class="pre">PyTest</span></code> usage, <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> would contain fixture
+routines which did the combined steps of fetching the data and providing to the
+tests.  If caching is not important, the traditional approach may be used.</p>
+<p>Tests for these support files should be included as doc tests whenever
+practical. If possible, the default of executing the module should be to run
+the doc tests.</p>
+<div class="section" id="conventions-for-parametrization">
+<h3>Conventions for Parametrization<a class="headerlink" href="#conventions-for-parametrization" title="Permalink to this headline">¶</a></h3>
+<p>One of the enhancements Frost makes to pytest is simplifying the task of getting test specific metadata into the JSON file to simplify downstream processing. To access this feature, you need to follow a few conventions that are unique to Frost.</p>
+<p>When you use the <code class="docutils literal notranslate"><span class="pre">pytest.mark.parametrize</span></code> function, you supply two key arguments (see the <a class="reference external" href="https://docs.pytest.org/en/stable/reference.html#pytest.python.Metafunc.parametrize">pytest documentation</a> for more details):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">argvalues</span></code> (2nd argument) - an iterable where each item contains information for one execution of the test.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ids</span></code> (keyword argument) - a iterable where which results in a text string displayed, in addition to the test name, to uniquly identify one execution of the test. Caution: the string value is used for lookup during exemption processing. The mapping must be stable for this to work as expected – you can not let pytest generate a default value.</p></li>
+</ul>
+<p>For any values you want to appear in the JSON output, <code class="docutils literal notranslate"><span class="pre">argvalues</span></code> should supply a dictionary with a unique-to-context key value. To actually insert the key, value pair into the output JSON, you must also specify the key in the global set <code class="docutils literal notranslate"><span class="pre">METADATA_KEYS</span></code>. Presence of the key in that set is what triggers the frost additions to put the key, value pair into the output JSON.  One way to do that is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">METADATA_KEYS</span>
+
+<span class="n">METADATA_KEYS</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;key_1&quot;</span><span class="p">,</span> <span class="s2">&quot;key_2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="add-service-specific-tests">
+<h3>Add Service Specific Tests<a class="headerlink" href="#add-service-specific-tests" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">test_*.py</span></code>: normal PyTest tests, which each import the resources they
+need to test.</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">Adding a New Service</a><ul>
+<li><a class="reference internal" href="#claim-a-name">Claim a name</a><ul>
+<li><a class="reference internal" href="#create-a-new-directory-by-that-name">Create a new directory by that name</a></li>
+<li><a class="reference internal" href="#create-default-files">Create Default Files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#add-service-specific-content">Add Service Specific Content</a><ul>
+<li><a class="reference internal" href="#conventions-for-parametrization">Conventions for Parametrization</a></li>
+<li><a class="reference internal" href="#add-service-specific-tests">Add Service Specific Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="index.html">Overview</a>
+    <ul>
+          <li>Previous: <a href="MozillaDeployment.html" title="previous chapter">Mozilla Deployment</a>
+          <li>Next: <a href="ContributingDocumentation.html" title="next chapter">Contributing Documentation</a>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.rds.resources &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.rds.resources</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.rds.resources</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">conftest</span> <span class="kn">import</span> <span class="n">botocore_client</span>
+
+
+<div class="viewcode-block" id="rds_db_instances"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_instances">[docs]</a><span class="k">def</span> <span class="nf">rds_db_instances</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_instances&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rds&quot;</span><span class="p">,</span> <span class="s2">&quot;describe_db_instances&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;DBInstances&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rds_db_instance_tags"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_instance_tags">[docs]</a><span class="k">def</span> <span class="nf">rds_db_instance_tags</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.list_tags_for_resource&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;rds&quot;</span><span class="p">,</span>
+            <span class="n">method_name</span><span class="o">=</span><span class="s2">&quot;list_tags_for_resource&quot;</span><span class="p">,</span>
+            <span class="n">call_args</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ResourceName&quot;</span><span class="p">:</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;DBInstanceArn&quot;</span><span class="p">]},</span>
+            <span class="n">profiles</span><span class="o">=</span><span class="p">[</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;profile&quot;</span><span class="p">]],</span>
+            <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;region&quot;</span><span class="p">]],</span>
+            <span class="n">result_from_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;TagList&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rds_db_instances_with_tags"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_instances_with_tags">[docs]</a><span class="k">def</span> <span class="nf">rds_db_instances_with_tags</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;TagList&quot;</span><span class="p">:</span> <span class="n">rds_db_instance_tags</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)},</span> <span class="o">**</span><span class="n">db</span><span class="p">}</span> <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">rds_db_instances</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="rds_db_instances_vpc_security_groups"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_instances_vpc_security_groups">[docs]</a><span class="k">def</span> <span class="nf">rds_db_instances_vpc_security_groups</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_security_groups&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;ec2&quot;</span><span class="p">,</span>
+            <span class="n">method_name</span><span class="o">=</span><span class="s2">&quot;describe_security_groups&quot;</span><span class="p">,</span>
+            <span class="n">call_args</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Filters&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;group-id&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Values&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="n">sg</span><span class="p">[</span><span class="s2">&quot;VpcSecurityGroupId&quot;</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">[</span><span class="s2">&quot;VpcSecurityGroups&quot;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">sg</span><span class="p">[</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span>
+                        <span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="n">profiles</span><span class="o">=</span><span class="p">[</span><span class="n">instance</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;profile&quot;</span><span class="p">]],</span>
+            <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="n">instance</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;region&quot;</span><span class="p">]],</span>
+            <span class="n">result_from_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SecurityGroups&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="p">)</span>  <span class="c1"># treat not found as empty list</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;SecurityGroups&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">rds_db_instances</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="rds_db_snapshots"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_snapshots">[docs]</a><span class="k">def</span> <span class="nf">rds_db_snapshots</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshots&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rds&quot;</span><span class="p">,</span> <span class="s2">&quot;describe_db_snapshots&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{})</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;DBSnapshots&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rds_db_snapshot_attributes"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_snapshot_attributes">[docs]</a><span class="k">def</span> <span class="nf">rds_db_snapshot_attributes</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_snapshot_attributes&quot;</span>
+    <span class="n">empty_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;DBSnapshotAttributesResult&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;DBSnapshotAttributes&quot;</span><span class="p">:</span> <span class="p">[]}}</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;rds&quot;</span><span class="p">,</span>
+            <span class="n">method_name</span><span class="o">=</span><span class="s2">&quot;describe_db_snapshot_attributes&quot;</span><span class="p">,</span>
+            <span class="n">call_args</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">call_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DBSnapshotIdentifier&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;DBSnapshotIdentifier&quot;</span><span class="p">]},</span>
+            <span class="n">profiles</span><span class="o">=</span><span class="p">[</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;profile&quot;</span><span class="p">]],</span>
+            <span class="n">regions</span><span class="o">=</span><span class="p">[</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;__pytest_meta&quot;</span><span class="p">][</span><span class="s2">&quot;region&quot;</span><span class="p">]],</span>
+            <span class="n">result_from_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">empty_attrs</span><span class="p">,</span>  <span class="c1"># treat not found as empty list</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;DBSnapshotAttributesResult&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">extract_key</span><span class="p">(</span><span class="s2">&quot;DBSnapshotAttributes&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">snapshot</span> <span class="ow">in</span> <span class="n">rds_db_snapshots</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="rds_db_security_groups"><a class="viewcode-back" href="../../../source/aws/aws.rds.html#aws.rds.resources.rds_db_security_groups">[docs]</a><span class="k">def</span> <span class="nf">rds_db_security_groups</span><span class="p">():</span>
+    <span class="s2">&quot;http://botocore.readthedocs.io/en/latest/reference/services/rds.html#RDS.Client.describe_db_security_groups&quot;</span>
+    <span class="n">sgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">botocore_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;rds&quot;</span><span class="p">,</span> <span class="s2">&quot;describe_db_security_groups&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">sgs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;DBSecurityGroups&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sgs</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

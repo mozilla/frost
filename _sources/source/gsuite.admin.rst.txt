@@ -1,0 +1,45 @@
+gsuite.admin package
+====================
+
+Submodules
+----------
+
+gsuite.admin.helpers module
+---------------------------
+
+.. automodule:: gsuite.admin.helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+gsuite.admin.resources module
+-----------------------------
+
+.. automodule:: gsuite.admin.resources
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+gsuite.admin.test\_admin\_user\_is\_inactive module
+---------------------------------------------------
+
+.. automodule:: gsuite.admin.test_admin_user_is_inactive
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+gsuite.admin.test\_groups\_have\_enough\_owners module
+------------------------------------------------------
+
+.. automodule:: gsuite.admin.test_groups_have_enough_owners
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: gsuite.admin
+   :members:
+   :undoc-members:
+   :show-inheritance:

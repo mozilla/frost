@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.ec2.helpers &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.ec2.helpers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.ec2.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">get_param_id</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+
+<div class="viewcode-block" id="ip_permission_opens_all_ports"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ip_permission_opens_all_ports">[docs]</a><span class="k">def</span> <span class="nf">ip_permission_opens_all_ports</span><span class="p">(</span><span class="n">ipp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an EC2 security group IP permission opens all</span>
+<span class="sd">    ports and False otherwise.</span>
+
+<span class="sd">    &gt;&gt;&gt; ip_permission_opens_all_ports({&#39;FromPort&#39;: 1, &#39;ToPort&#39;: 65535})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_opens_all_ports({&#39;FromPort&#39;: 1, &#39;ToPort&#39;: 965535})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_opens_all_ports({&#39;FromPort&#39;: -1, &#39;ToPort&#39;: 20})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_opens_all_ports({&#39;FromPort&#39;: 20, &#39;ToPort&#39;: -1})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ip_permission_opens_all_ports({&#39;ToPort&#39;: -1})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;FromPort&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">or</span> <span class="s2">&quot;ToPort&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipp</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">from_port</span><span class="p">,</span> <span class="n">to_port</span> <span class="o">=</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;FromPort&quot;</span><span class="p">],</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;ToPort&quot;</span><span class="p">]</span>
+
+    <span class="c1"># -1 indicates all ICMP/ICMPv6 codes</span>
+    <span class="k">if</span> <span class="n">from_port</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">to_port</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;FromPort&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;ToPort&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">65535</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ip_permission_cidr_allows_all_ips"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ip_permission_cidr_allows_all_ips">[docs]</a><span class="k">def</span> <span class="nf">ip_permission_cidr_allows_all_ips</span><span class="p">(</span><span class="n">ipp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if any IPv4 or IPv6 range for an EC2 security group</span>
+<span class="sd">    IP permission opens allows access to or from all IPs and False</span>
+<span class="sd">    otherwise.</span>
+
+<span class="sd">    &gt;&gt;&gt; ip_permission_cidr_allows_all_ips({&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_cidr_allows_all_ips({&#39;Ipv6Ranges&#39;: [{&#39;CidrIpv6&#39;: &#39;::/0&#39;}]})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ip_permission_cidr_allows_all_ips({&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;192.0.1.1/8&#39;}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_cidr_allows_all_ips({&#39;Ipv6Ranges&#39;: [{&#39;CidrIpv6&#39;: &#39;192.0.1.1/8&#39;}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_cidr_allows_all_ips({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">ip_range</span> <span class="ow">in</span> <span class="n">ipp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;IpRanges&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">ip_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CidrIp&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;0.0.0.0/0&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">for</span> <span class="n">ip_range</span> <span class="ow">in</span> <span class="n">ipp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Ipv6Ranges&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">ip_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CidrIpv6&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;::/0&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ip_permission_grants_access_to_group_with_id"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ip_permission_grants_access_to_group_with_id">[docs]</a><span class="k">def</span> <span class="nf">ip_permission_grants_access_to_group_with_id</span><span class="p">(</span><span class="n">ipp</span><span class="p">,</span> <span class="n">security_group_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an EC2 security group IP permission opens access to</span>
+<span class="sd">    a security with the given ID and False otherwise.</span>
+
+<span class="sd">    &gt;&gt;&gt; ip_permission_grants_access_to_group_with_id(</span>
+<span class="sd">    ... {&#39;UserIdGroupPairs&#39;: [{&#39;GroupId&#39;: &#39;test-sgid&#39;}]}, &#39;test-sgid&#39;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_grants_access_to_group_with_id(</span>
+<span class="sd">    ... {&#39;UserIdGroupPairs&#39;: [{&#39;GroupId&#39;: &#39;test-sgid&#39;}]}, &#39;not-test-sgid&#39;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ip_permission_grants_access_to_group_with_id({}, &#39;test-sgid&#39;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">user_id_group_pair</span> <span class="ow">in</span> <span class="n">ipp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;UserIdGroupPairs&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">user_id_group_pair</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GroupId&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">security_group_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_security_group_opens_all_ports"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_security_group_opens_all_ports">[docs]</a><span class="k">def</span> <span class="nf">ec2_security_group_opens_all_ports</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an ec2 security group includes a permission</span>
+<span class="sd">    allowing inbound access on all ports and False otherwise</span>
+<span class="sd">    or if protocol is ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports(</span>
+<span class="sd">    ... {&#39;IpPermissions&#39;: [{}, {&#39;FromPort&#39;: -1,&#39;ToPort&#39;: 65536}]})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports(</span>
+<span class="sd">    ... {&#39;IpPermissions&#39;: [{}, {&#39;IpProtocol&#39;: &#39;icmp&#39;, &#39;FromPort&#39;: -1,&#39;ToPort&#39;: -1}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;IpPermissions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">ipp</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">[</span><span class="s2">&quot;IpPermissions&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;IpProtocol&quot;</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">and</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;IpProtocol&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;icmp&quot;</span><span class="p">,</span> <span class="s2">&quot;icmpv6&quot;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">ip_permission_opens_all_ports</span><span class="p">(</span><span class="n">ipp</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_security_group_opens_all_ports_to_self"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_security_group_opens_all_ports_to_self">[docs]</a><span class="k">def</span> <span class="nf">ec2_security_group_opens_all_ports_to_self</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an ec2 security group includes a permission</span>
+<span class="sd">    allowing all IPs inbound access on all ports and False otherwise</span>
+<span class="sd">    or if protocol is ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({</span>
+<span class="sd">    ... &#39;GroupId&#39;: &#39;test-sgid&#39;,</span>
+<span class="sd">    ... &#39;IpPermissions&#39;: [</span>
+<span class="sd">    ...     {&#39;FromPort&#39;: 1, &#39;ToPort&#39;: 65535, &#39;UserIdGroupPairs&#39;: [{&#39;GroupId&#39;: &#39;test-sgid&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({</span>
+<span class="sd">    ... &#39;GroupId&#39;: &#39;test-sgid&#39;,</span>
+<span class="sd">    ... &#39;IpPermissions&#39;: [</span>
+<span class="sd">    ...     {&#39;IpProtocol&#39;: &quot;icmp&quot;, &#39;FromPort&#39;: -1, &#39;ToPort&#39;: -1, &#39;UserIdGroupPairs&#39;: [{&#39;GroupId&#39;: &#39;test-sgid&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({</span>
+<span class="sd">    ... &#39;GroupId&#39;: &#39;test-sgid&#39;,</span>
+<span class="sd">    ... &#39;IpPermissions&#39;: [</span>
+<span class="sd">    ...     {&#39;UserIdGroupPairs&#39;: [{&#39;GroupId&#39;: &#39;test-sgid&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({&#39;GroupId&#39;: &#39;test-sgid&#39;})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({</span>
+<span class="sd">    ... &#39;GroupId&#39;: &#39;test-sgid&#39;,</span>
+<span class="sd">    ... &#39;IpPermissions&#39;: [</span>
+<span class="sd">    ...     {&#39;UserIdGroupPairs&#39;: []},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_self([])</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;GroupId&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">self_group_id</span> <span class="o">=</span> <span class="n">ec2_security_group</span><span class="p">[</span><span class="s2">&quot;GroupId&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;IpPermissions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">ipp</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">[</span><span class="s2">&quot;IpPermissions&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;IpProtocol&quot;</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">and</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;IpProtocol&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;icmp&quot;</span><span class="p">,</span> <span class="s2">&quot;icmpv6&quot;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">ip_permission_opens_all_ports</span><span class="p">(</span>
+            <span class="n">ipp</span>
+        <span class="p">)</span> <span class="ow">and</span> <span class="n">ip_permission_grants_access_to_group_with_id</span><span class="p">(</span><span class="n">ipp</span><span class="p">,</span> <span class="n">self_group_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_security_group_opens_all_ports_to_all"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_security_group_opens_all_ports_to_all">[docs]</a><span class="k">def</span> <span class="nf">ec2_security_group_opens_all_ports_to_all</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an ec2 security group includes a permission</span>
+<span class="sd">    allowing all IPs inbound access on all ports and False otherwise</span>
+<span class="sd">    or if protocol is ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;FromPort&#39;: -1,&#39;ToPort&#39;: 65535,&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;FromPort&#39;: 1,&#39;ToPort&#39;: 65535,&#39;Ipv6Ranges&#39;: [{&#39;CidrIpv6&#39;: &#39;::/0&#39;}]}</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;IpProtocol&#39;: &#39;icmp&#39;,&#39;FromPort&#39;: -1,&#39;ToPort&#39;: -1,&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all({&#39;IpPermissions&#39;: []})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_all_ports_to_all([])</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;IpPermissions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">ipp</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">[</span><span class="s2">&quot;IpPermissions&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;IpProtocol&quot;</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">and</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;IpProtocol&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;icmp&quot;</span><span class="p">,</span> <span class="s2">&quot;icmpv6&quot;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">ip_permission_opens_all_ports</span><span class="p">(</span><span class="n">ipp</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">(</span>
+            <span class="n">ipp</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_security_group_opens_specific_ports_to_all"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_security_group_opens_specific_ports_to_all">[docs]</a><span class="k">def</span> <span class="nf">ec2_security_group_opens_specific_ports_to_all</span><span class="p">(</span>
+    <span class="n">ec2_security_group</span><span class="p">,</span> <span class="n">allowed_ports</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if an ec2 security group includes a permission</span>
+<span class="sd">    allowing all IPs inbound access on specific unsafe ports and False</span>
+<span class="sd">    otherwise or if protocol is ICMP.</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;FromPort&#39;: 22,&#39;ToPort&#39;: 22,&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;FromPort&#39;: 234,&#39;ToPort&#39;: 432,&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all({&#39;IpPermissions&#39;: [</span>
+<span class="sd">    ... {&#39;FromPort&#39;: 80,&#39;ToPort&#39;: 80,&#39;IpRanges&#39;: [{&#39;CidrIp&#39;: &#39;0.0.0.0/0&#39;}]},</span>
+<span class="sd">    ... ]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all({&#39;IpPermissions&#39;: []})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; ec2_security_group_opens_specific_ports_to_all([])</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">allowed_ports</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">allowed_ports</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;IpPermissions&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">ipp</span> <span class="ow">in</span> <span class="n">ec2_security_group</span><span class="p">[</span><span class="s2">&quot;IpPermissions&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;IpProtocol&quot;</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">and</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;IpProtocol&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;icmp&quot;</span><span class="p">,</span> <span class="s2">&quot;icmpv6&quot;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">ip_permission_cidr_allows_all_ips</span><span class="p">(</span><span class="n">ipp</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;FromPort&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipp</span> <span class="ow">or</span> <span class="s2">&quot;ToPort&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipp</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">from_port</span><span class="p">,</span> <span class="n">to_port</span> <span class="o">=</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;FromPort&quot;</span><span class="p">],</span> <span class="n">ipp</span><span class="p">[</span><span class="s2">&quot;ToPort&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">from_port</span> <span class="o">==</span> <span class="n">to_port</span> <span class="ow">and</span> <span class="n">from_port</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">443</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">from_port</span> <span class="o">==</span> <span class="n">to_port</span> <span class="ow">and</span> <span class="n">from_port</span> <span class="ow">in</span> <span class="n">allowed_ports</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_instance_test_id"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_instance_test_id">[docs]</a><span class="k">def</span> <span class="nf">ec2_instance_test_id</span><span class="p">(</span><span class="n">ec2_instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A getter fn for test ids for EC2 instances&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{0[InstanceId]}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ec2_instance</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ec2_instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ec2_security_group_test_id"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_security_group_test_id">[docs]</a><span class="k">def</span> <span class="nf">ec2_security_group_test_id</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A getter fn for test ids for EC2 security groups&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{0[GroupId]}</span><span class="s2"> </span><span class="si">{0[GroupName]}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ec2_security_group</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ec2_address_id"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_address_id">[docs]</a><span class="k">def</span> <span class="nf">ec2_address_id</span><span class="p">(</span><span class="n">ec2_address</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format an Elastic IP address.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_param_id</span><span class="p">(</span><span class="n">ec2_address</span><span class="p">,</span> <span class="s2">&quot;PublicIp&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_ebs_volume_encrypted"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.is_ebs_volume_encrypted">[docs]</a><span class="k">def</span> <span class="nf">is_ebs_volume_encrypted</span><span class="p">(</span><span class="n">ebs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks the EBS volume &#39;Encrypted&#39; value.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_encrypted({&#39;Encrypted&#39;: True})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_encrypted({&#39;Encrypted&#39;: False})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_encrypted({})</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    KeyError: &#39;Encrypted&#39;</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_encrypted(0)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: &#39;int&#39; object is not subscriptable</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_encrypted(None)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: &#39;NoneType&#39; object is not subscriptable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ebs</span><span class="p">[</span><span class="s2">&quot;Encrypted&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="is_ebs_volume_piops"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.is_ebs_volume_piops">[docs]</a><span class="k">def</span> <span class="nf">is_ebs_volume_piops</span><span class="p">(</span><span class="n">ebs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the EBS volume type is provisioned iops</span>
+
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_piops({&#39;VolumeType&#39;: &#39;io1&#39;})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_piops({&#39;VolumeType&#39;: &#39;standard&#39;})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_piops({})</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    KeyError: &#39;VolumeType&#39;</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_piops(0)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: &#39;int&#39; object is not subscriptable</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_volume_piops(None)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: &#39;NoneType&#39; object is not subscriptable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ebs</span><span class="p">[</span><span class="s2">&quot;VolumeType&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;io&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_ebs_snapshot_public"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.is_ebs_snapshot_public">[docs]</a><span class="k">def</span> <span class="nf">is_ebs_snapshot_public</span><span class="p">(</span><span class="n">ebs_snapshot</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the EBS snapshot&#39;s &#39;CreateVolumePermissions&#39; attribute allows for public creation.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_ebs_snapshot_public({&#39;CreateVolumePermissions&#39;:[{&#39;Group&#39;: &#39;all&#39;}]})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_snapshot_public({&#39;CreateVolumePermissions&#39;:[{&#39;Group&#39;: &#39;&#39;}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_snapshot_public({&#39;CreateVolumePermissions&#39;:[{&#39;foo&#39;: &#39;bar&#39;}]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_snapshot_public({&#39;CreateVolumePermissions&#39;:[]})</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_ebs_snapshot_public({})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">ebs_snapshot</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CreateVolumePermissions&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ec2_instance_missing_tag_names"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ec2_instance_missing_tag_names">[docs]</a><span class="k">def</span> <span class="nf">ec2_instance_missing_tag_names</span><span class="p">(</span><span class="n">ec2_instance</span><span class="p">,</span> <span class="n">required_tag_names</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns any tag names that are missing from an EC2 Instance.</span>
+
+<span class="sd">    &gt;&gt;&gt; ec2_instance_missing_tag_names({&#39;Tags&#39;: [{&#39;Key&#39;: &#39;Name&#39;}]}, frozenset([&#39;Name&#39;]))</span>
+<span class="sd">    frozenset()</span>
+<span class="sd">    &gt;&gt;&gt; ec2_instance_missing_tag_names({</span>
+<span class="sd">    ... &#39;InstanceId&#39;: &#39;iid&#39;, &#39;Tags&#39;: [{&#39;Key&#39;: &#39;Bar&#39;}]}, frozenset([&#39;Name&#39;]))</span>
+<span class="sd">    frozenset({&#39;Name&#39;})</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">ec2_instance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Tags&quot;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">instance_tag_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tag</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span> <span class="k">if</span> <span class="s2">&quot;Key&quot;</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">required_tag_names</span> <span class="o">-</span> <span class="n">instance_tag_names</span></div>
+
+
+<div class="viewcode-block" id="ebs_volume_attached_to_instance"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ebs_volume_attached_to_instance">[docs]</a><span class="k">def</span> <span class="nf">ebs_volume_attached_to_instance</span><span class="p">(</span><span class="n">ebs</span><span class="p">,</span> <span class="n">volume_created_days_ago</span><span class="o">=</span><span class="mi">90</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check an ebs volume is attached to an instance. The &quot;volume_created_days_ago&quot;</span>
+<span class="sd">    parameter allows checking for volumes that were created that many days ago.</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; from datetime import datetime</span>
+<span class="sd">    &gt;&gt;&gt; from datetime import timezone</span>
+
+<span class="sd">    &gt;&gt;&gt; ebs_volume_attached_to_instance({&quot;CreateTime&quot;: datetime.fromisoformat(&quot;2020-09-11T19:45:22.116+00:00&quot;), &quot;State&quot;: &quot;in-use&quot;})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ebs_volume_attached_to_instance({&quot;CreateTime&quot;: datetime.fromisoformat(&quot;2000-09-11T19:45:22.116+00:00&quot;), &quot;State&quot;: &quot;in-use&quot;})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ebs_volume_attached_to_instance({&quot;CreateTime&quot;: datetime.now(timezone.utc), &quot;State&quot;: &quot;available&quot;})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ebs_volume_attached_to_instance({&quot;CreateTime&quot;: datetime.fromisoformat(&quot;2000-09-11T19:45:22.116+00:00&quot;), &quot;State&quot;: &quot;available&quot;})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">creation_time</span> <span class="o">=</span> <span class="n">ebs</span><span class="p">[</span><span class="s2">&quot;CreateTime&quot;</span><span class="p">]</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">creation_time</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">creation_time</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&gt;</span> <span class="n">volume_created_days_ago</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ebs</span><span class="p">[</span><span class="s2">&quot;State&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;available&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ebs_snapshot_not_too_old"><a class="viewcode-back" href="../../../source/aws/aws.ec2.html#aws.ec2.helpers.ebs_snapshot_not_too_old">[docs]</a><span class="k">def</span> <span class="nf">ebs_snapshot_not_too_old</span><span class="p">(</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">snapshot_started_days_ago</span><span class="o">=</span><span class="mi">365</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check an ebs snapshot is created less than &quot;snapshot_started_days_ago&quot;.</span>
+
+<span class="sd">    &gt;&gt;&gt; from datetime import datetime</span>
+<span class="sd">    &gt;&gt;&gt; from datetime import timezone</span>
+<span class="sd">    &gt;&gt;&gt; from aws.ec2.helpers import ebs_snapshot_not_too_old</span>
+<span class="sd">    &gt;&gt;&gt; ebs_snapshot_not_too_old({&quot;StartTime&quot;: datetime.now(timezone.utc)})</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ebs_snapshot_not_too_old({&quot;StartTime&quot;: datetime.fromisoformat(&quot;2019-09-11T19:45:22.116+00:00&quot;)})</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;StartTime&quot;</span><span class="p">]</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">start_time</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;</span> <span class="n">snapshot_started_days_ago</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

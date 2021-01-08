@@ -1,0 +1,37 @@
+gsuite package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   gsuite.admin
+
+Submodules
+----------
+
+gsuite.client module
+--------------------
+
+.. automodule:: gsuite.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+gsuite.conftest module
+----------------------
+
+.. automodule:: gsuite.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: gsuite
+   :members:
+   :undoc-members:
+   :show-inheritance:

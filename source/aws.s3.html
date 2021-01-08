@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.s3 package &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Frost  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.s3 package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="aws-s3-package">
+<h1>aws.s3 package<a class="headerlink" href="#aws-s3-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.s3.helpers">
+<span id="aws-s3-helpers-module"></span><h2>aws.s3.helpers module<a class="headerlink" href="#module-aws.s3.helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.s3.helpers.get_s3_bucket_name">
+<code class="sig-prename descclassname">aws.s3.helpers.</code><code class="sig-name descname">get_s3_bucket_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/helpers.html#get_s3_bucket_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.helpers.get_s3_bucket_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.helpers.get_s3_resource_id">
+<code class="sig-prename descclassname">aws.s3.helpers.</code><code class="sig-name descname">get_s3_resource_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/helpers.html#get_s3_resource_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.helpers.get_s3_resource_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-aws.s3.resources">
+<span id="aws-s3-resources-module"></span><h2>aws.s3.resources module<a class="headerlink" href="#module-aws.s3.resources" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_buckets">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_buckets</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_cors_rules">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_cors_rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_cors_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_cors_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_cors">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_cors</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_logging">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_logging">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_logging</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_acls">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_acls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_acls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_acls" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_acl">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_acl</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_versioning">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_versioning</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_versioning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_versioning" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_versioning">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_versioning</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_website">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_website</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_website"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_website" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_website">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_website</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_buckets_policy">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_buckets_policy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_buckets_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_buckets_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_policy">http://botocore.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.get_bucket_policy</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aws.s3.resources.s3_bucket_lifecycle_configuration">
+<code class="sig-prename descclassname">aws.s3.resources.</code><code class="sig-name descname">s3_bucket_lifecycle_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aws/s3/resources.html#s3_bucket_lifecycle_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aws.s3.resources.s3_bucket_lifecycle_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_bucket_lifecycle_configuration">https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.get_bucket_lifecycle_configuration</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-cors-disabled-module">
+<h2>aws.s3.test_s3_bucket_cors_disabled module<a class="headerlink" href="#aws-s3-test-s3-bucket-cors-disabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-does-not-grant-all-principals-all-actions-module">
+<h2>aws.s3.test_s3_bucket_does_not_grant_all_principals_all_actions module<a class="headerlink" href="#aws-s3-test-s3-bucket-does-not-grant-all-principals-all-actions-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-has-life-cycle-policy-module">
+<h2>aws.s3.test_s3_bucket_has_life_cycle_policy module<a class="headerlink" href="#aws-s3-test-s3-bucket-has-life-cycle-policy-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-logging-enabled-module">
+<h2>aws.s3.test_s3_bucket_logging_enabled module<a class="headerlink" href="#aws-s3-test-s3-bucket-logging-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-no-world-acl-module">
+<h2>aws.s3.test_s3_bucket_no_world_acl module<a class="headerlink" href="#aws-s3-test-s3-bucket-no-world-acl-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-versioning-enabled-module">
+<h2>aws.s3.test_s3_bucket_versioning_enabled module<a class="headerlink" href="#aws-s3-test-s3-bucket-versioning-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-versioning-mfa-delete-enabled-module">
+<h2>aws.s3.test_s3_bucket_versioning_mfa_delete_enabled module<a class="headerlink" href="#aws-s3-test-s3-bucket-versioning-mfa-delete-enabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="aws-s3-test-s3-bucket-web-hosting-disabled-module">
+<h2>aws.s3.test_s3_bucket_web_hosting_disabled module<a class="headerlink" href="#aws-s3-test-s3-bucket-web-hosting-disabled-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-aws.s3">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws.s3" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+
+  <h3>Contents</h3>
+  <ul>
+<li><a class="reference internal" href="#">aws.s3 package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-aws.s3.helpers">aws.s3.helpers module</a></li>
+<li><a class="reference internal" href="#module-aws.s3.resources">aws.s3.resources module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-cors-disabled-module">aws.s3.test_s3_bucket_cors_disabled module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-does-not-grant-all-principals-all-actions-module">aws.s3.test_s3_bucket_does_not_grant_all_principals_all_actions module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-has-life-cycle-policy-module">aws.s3.test_s3_bucket_has_life_cycle_policy module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-logging-enabled-module">aws.s3.test_s3_bucket_logging_enabled module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-no-world-acl-module">aws.s3.test_s3_bucket_no_world_acl module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-versioning-enabled-module">aws.s3.test_s3_bucket_versioning_enabled module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-versioning-mfa-delete-enabled-module">aws.s3.test_s3_bucket_versioning_mfa_delete_enabled module</a></li>
+<li><a class="reference internal" href="#aws-s3-test-s3-bucket-web-hosting-disabled-module">aws.s3.test_s3_bucket_web_hosting_disabled module</a></li>
+<li><a class="reference internal" href="#module-aws.s3">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../index.html">Overview</a>
+    
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

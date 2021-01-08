@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>aws.iam.helpers &#8212; Frost  documentation</title>
+    <link rel="stylesheet" href="../../../_static/flask.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <script>DOCUMENTATION_OPTIONS.URL_ROOT = '../../../';</script>
+   
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Frost  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">aws.iam.helpers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aws.iam.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">parse</span>
+
+<span class="kn">from</span> <span class="nn">helpers</span> <span class="kn">import</span> <span class="n">get_param_id</span>
+
+
+<div class="viewcode-block" id="user_is_inactive"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.helpers.user_is_inactive">[docs]</a><span class="k">def</span> <span class="nf">user_is_inactive</span><span class="p">(</span><span class="n">iam_user</span><span class="p">,</span> <span class="n">no_activity_since</span><span class="p">,</span> <span class="n">created_after</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns False if any of these are true:</span>
+<span class="sd">        - The user was created after the passed in &quot;created_after&quot; datetime.</span>
+<span class="sd">        - The user has used either potentially active access keys since the date</span>
+<span class="sd">          that is &quot;no_activity_since&quot;</span>
+<span class="sd">        - The user has logged into the AWS console since the date that is</span>
+<span class="sd">          &quot;no_activity_since&quot;</span>
+<span class="sd">    else it will return True.</span>
+
+<span class="sd">    &gt;&gt;&gt; from datetime import datetime</span>
+<span class="sd">    &gt;&gt;&gt; no_activity_since = datetime(2017, 1, 1)</span>
+<span class="sd">    &gt;&gt;&gt; created_after = datetime(2018, 1, 8)</span>
+
+<span class="sd">    User considered active due to being created after the created_after datetime.</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({&#39;user_creation_time&#39;: &#39;2018-01-10&#39;}, created_after, no_activity_since)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    User considered active due to usage of access key 1 after no_activity_since</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({</span>
+<span class="sd">    ...     &#39;user_creation_time&#39;: &#39;2016-01-10&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_active&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_last_used_date&#39;: &#39;2017-06-01&#39;,</span>
+<span class="sd">    ... }, no_activity_since, created_after)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    User considered active due to usage of access key 2 after no_activity_since</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({</span>
+<span class="sd">    ...     &#39;user_creation_time&#39;: &#39;2010-01-10&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_active&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_last_used_date&#39;: &#39;2014-06-01&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_active&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_last_used_date&#39;: &#39;2017-02-01&#39;,</span>
+<span class="sd">    ... }, no_activity_since, created_after)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    User considered active due to usage of password after no_activity_since</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({</span>
+<span class="sd">    ...     &#39;user_creation_time&#39;: &#39;2010-01-10&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_active&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_last_used_date&#39;: &#39;2014-06-01&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_active&#39;: &#39;false&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_last_used_date&#39;: &#39;N/A&#39;,</span>
+<span class="sd">    ...     &#39;password_enabled&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;password_last_used&#39;: &#39;2017-09-01&#39;,</span>
+<span class="sd">    ... }, no_activity_since, created_after)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    User considered inactive due to the only usage (access key 1) being before no_activity_since</span>
+<span class="sd">    and user being created before created_after</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({</span>
+<span class="sd">    ...     &#39;user_creation_time&#39;: &#39;2016-01-10&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_active&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_last_used_date&#39;: &#39;2016-06-01&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_active&#39;: &#39;false&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_last_used_date&#39;: &#39;N/A&#39;,</span>
+<span class="sd">    ...     &#39;password_enabled&#39;: &#39;false&#39;,</span>
+<span class="sd">    ...     &#39;password_last_used&#39;: &#39;N/A&#39;,</span>
+<span class="sd">    ... }, no_activity_since, created_after)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    User considered inactive due to the only usage (password) being before no_activity_since</span>
+<span class="sd">    and user being created before created_after</span>
+<span class="sd">    &gt;&gt;&gt; user_is_inactive({</span>
+<span class="sd">    ...     &#39;user_creation_time&#39;: &#39;2016-01-10&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_active&#39;: &#39;false&#39;,</span>
+<span class="sd">    ...     &#39;access_key_1_last_used_date&#39;: &#39;N/A&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_active&#39;: &#39;false&#39;,</span>
+<span class="sd">    ...     &#39;access_key_2_last_used_date&#39;: &#39;N/A&#39;,</span>
+<span class="sd">    ...     &#39;password_enabled&#39;: &#39;true&#39;,</span>
+<span class="sd">    ...     &#39;password_last_used&#39;: &#39;2016-06-01&#39;,</span>
+<span class="sd">    ... }, no_activity_since, created_after)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">parse</span><span class="p">(</span><span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;user_creation_time&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">created_after</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_credential_active</span><span class="p">(</span>
+            <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_1_active&quot;</span><span class="p">],</span> <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_1_last_used_date&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="ow">and</span> <span class="n">parse</span><span class="p">(</span><span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_1_last_used_date&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">no_activity_since</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_credential_active</span><span class="p">(</span>
+            <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_2_active&quot;</span><span class="p">],</span> <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_2_last_used_date&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="ow">and</span> <span class="n">parse</span><span class="p">(</span><span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;access_key_2_last_used_date&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">no_activity_since</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">is_credential_active</span><span class="p">(</span>
+            <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;password_enabled&quot;</span><span class="p">],</span> <span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;password_last_used&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="ow">and</span> <span class="n">parse</span><span class="p">(</span><span class="n">iam_user</span><span class="p">[</span><span class="s2">&quot;password_last_used&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">no_activity_since</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="is_credential_active"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.helpers.is_credential_active">[docs]</a><span class="k">def</span> <span class="nf">is_credential_active</span><span class="p">(</span><span class="n">credential_active</span><span class="p">,</span> <span class="n">credential_last_used</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">credential_active</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span> <span class="ow">and</span> <span class="n">credential_last_used</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;N/A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;no_information&quot;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="is_access_key_expired"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.helpers.is_access_key_expired">[docs]</a><span class="k">def</span> <span class="nf">is_access_key_expired</span><span class="p">(</span><span class="n">iam_access_key</span><span class="p">,</span> <span class="n">access_key_expiration_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compares the CreateDate of the access key with the datetime object passed</span>
+<span class="sd">    in as `access_key_expiration_date` and returns True if the CreateDate is</span>
+<span class="sd">    before the `access_key_expiration_date` datetime object.</span>
+
+<span class="sd">    Returns False if the Status of the key is not `Active`, as though it may</span>
+<span class="sd">    have expired, it cannot be used.</span>
+
+<span class="sd">    &gt;&gt;&gt; from datetime import datetime</span>
+<span class="sd">    &gt;&gt;&gt; access_key_expiration_date = datetime(2018, 1, 8)</span>
+
+<span class="sd">    &gt;&gt;&gt; is_access_key_expired({&#39;Status&#39;: &#39;Inactive&#39;}, access_key_expiration_date)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_access_key_expired({&#39;Status&#39;: &#39;Active&#39;, &#39;CreateDate&#39;: datetime(2018, 1, 9)}, access_key_expiration_date)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_access_key_expired({&#39;Status&#39;: &#39;Active&#39;, &#39;CreateDate&#39;: datetime(2020, 1, 9)}, access_key_expiration_date)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &gt;&gt;&gt; is_access_key_expired({&#39;Status&#39;: &#39;Active&#39;, &#39;CreateDate&#39;: datetime(2018, 1, 7)}, access_key_expiration_date)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_access_key_expired({&#39;Status&#39;: &#39;Active&#39;, &#39;CreateDate&#39;: datetime(2000, 1, 9)}, access_key_expiration_date)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">iam_access_key</span><span class="p">[</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Active&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iam_access_key</span><span class="p">[</span><span class="s2">&quot;CreateDate&quot;</span><span class="p">],</span> <span class="n">datetime</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">access_key_expiration_date</span> <span class="o">&gt;</span> <span class="n">iam_access_key</span><span class="p">[</span><span class="s2">&quot;CreateDate&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_iam_user_name"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.helpers.get_iam_user_name">[docs]</a><span class="k">def</span> <span class="nf">get_iam_user_name</span><span class="p">(</span><span class="n">login</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_param_id</span><span class="p">(</span><span class="n">login</span><span class="p">,</span> <span class="s2">&quot;UserName&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_iam_resource_id"><a class="viewcode-back" href="../../../source/aws/aws.iam.html#aws.iam.helpers.get_iam_resource_id">[docs]</a><span class="k">def</span> <span class="nf">get_iam_resource_id</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;UserName&quot;</span> <span class="ow">in</span> <span class="n">resource</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_iam_user_name</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;empty&quot;</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+  <span id="sidebar-top"></span>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  
+    
+  
+<h3>Navigation</h3>
+<ul>
+  <li><a href="../../../index.html">Overview</a>
+    <ul>
+      <li><a href="../../index.html">Module code</a>
+        
+          
+          </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  <script src="../../../_static/version_warning_offset.js"></script>
+
+  </body>
+</html>

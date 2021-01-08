@@ -1,0 +1,47 @@
+aws package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   aws.autoscaling
+   aws.cloudtrail
+   aws.ec2
+   aws.elasticache
+   aws.elasticsearch
+   aws.iam
+   aws.rds
+   aws.redshift
+   aws.route53
+   aws.s3
+   aws.sns
+
+Submodules
+----------
+
+aws.client module
+-----------------
+
+.. automodule:: aws.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+aws.conftest module
+-------------------
+
+.. automodule:: aws.conftest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: aws
+   :members:
+   :undoc-members:
+   :show-inheritance:
