@@ -40,7 +40,7 @@ jobs:
         git config --local user.email "publish@gha"
         git config --local user.name "frost publish-gh-pages GHA"
 
-        mv -f docs/_build/html/ .
+        mv -f docs/_build/html/* .
         git add .
         git commit -vm "build docs for gh-page for commit ${{ github.sha }}"
         git push -f origin HEAD:gh-pages
