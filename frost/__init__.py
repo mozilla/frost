@@ -1,2 +1,2 @@
 SOURCE_URL = "https://github.com/mozilla/frost"
-VERSION = "0.4.4"
+VERSION = "0.4.5"
