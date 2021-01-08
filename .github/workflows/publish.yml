@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        ssh-key: ${{ secrets.DEPLOY_KEY }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -35,11 +37,9 @@ jobs:
         make doc-build
 
     - name: publish docs to GH pages
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
-        mv docs/_build/html/ .
+        mv -f docs/_build/html/* .
         git add .
         git commit -vm 'build docs for gh-page'
         git push -f origin HEAD:gh-pages
