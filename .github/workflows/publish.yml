@@ -27,7 +27,7 @@ jobs:
 
     - name: Install doc dependencies in venv
       run: |
-        make install-docs
+        make install install-docs
 
     - name: build docs
       shell: bash
@@ -37,9 +37,12 @@ jobs:
     - name: publish docs to GH pages
       shell: bash
       run: |
-        mv -f docs/_build/html/* .
+        git config --local user.email "publish@gha"
+        git config --local user.name "frost publish-gh-pages GHA"
+
+        mv -f docs/_build/html/ .
         git add .
-        git commit -vm 'build docs for gh-page'
+        git commit -vm "build docs for gh-page for commit ${{ github.sha }}"
         git push -f origin HEAD:gh-pages
 
   publish-package:
