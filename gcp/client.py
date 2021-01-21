@@ -1,11 +1,5 @@
-import warnings
-
 from apiclient.discovery import build as build_service
 from apiclient.errors import HttpError
-
-warnings.filterwarnings(
-    "ignore", "Your application has authenticated using end user credentials"
-)
 
 
 def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
@@ -275,6 +269,8 @@ class GCPClient:
             except HttpError as e:
                 # This will be thrown if an API is disabled.
                 if "has not been used in project" in e._get_reason():
+                    return []
+                if "has not enabled" in e._get_reason():
                     return []
                 raise e
             items = sum([items], resp.get(results_key, []))
