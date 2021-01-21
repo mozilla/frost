@@ -15,7 +15,7 @@ def datasets():
             get_dataset(d["datasetReference"]["datasetId"], project_id)
             for d in datasets
         ]
-    return sum(results, [])
+    return results
 
 
 def get_dataset(dataset_id, project_id):
