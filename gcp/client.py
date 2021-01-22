@@ -1,11 +1,20 @@
 import warnings
+import logging
 
 from apiclient.discovery import build as build_service
 from apiclient.errors import HttpError
 
+
+# Filters out the warning about using end user credentials.
 warnings.filterwarnings(
     "ignore", "Your application has authenticated using end user credentials"
 )
+
+# Filters out a warning around a feature we don't use - https://github.com/googleapis/google-api-python-client/issues/299
+logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
+
+# Filters out a warning about not have a default GCP Project ID. Not required for Frost, no need to display.
+logging.getLogger("google.auth._default").setLevel(logging.ERROR)
 
 
 def cache_key(project_id, version, product, subproduct, call="list", id_value="na"):
@@ -275,6 +284,8 @@ class GCPClient:
             except HttpError as e:
                 # This will be thrown if an API is disabled.
                 if "has not been used in project" in e._get_reason():
+                    return []
+                if "has not enabled" in e._get_reason():
                     return []
                 raise e
             items = sum([items], resp.get(results_key, []))
