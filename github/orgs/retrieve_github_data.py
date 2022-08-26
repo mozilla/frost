@@ -289,7 +289,7 @@ def _all_owned_orgs(endpoint: Any) -> List[str]:
     d = endpoint(op)
     errors = d.get("errors")
     if errors:
-        logger.error("using PAT %s".format(os.environ.get("GH_TOKEN", "<unset>")))
+        logger.error("using PAT {}".format(os.environ.get("GH_TOKEN", "<unset>")))
         endpoint.report_download_errors(errors)
         raise StopIteration
     else:
