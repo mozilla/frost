@@ -149,10 +149,14 @@ def parse_args():
         default=DEFAULT_GRAPHQL_ENDPOINT,
     )
     ap.add_argument(
-        "--token", "-T", default=os.environ.get("GH_TOKEN"), help=("API token to use."),
+        "--token",
+        "-T",
+        default=os.environ.get("GH_TOKEN"),
+        help=("API token to use."),
     )
     ap.add_argument(
-        "--output", help=("Filename to write to (default STDOUT)",),
+        "--output",
+        help=("Filename to write to (default STDOUT)",),
     )
     ap.add_argument(
         "--verbose", "-v", help="Increase verbosity", action="count", default=0
@@ -285,6 +289,7 @@ def _all_owned_orgs(endpoint: Any) -> List[str]:
     d = endpoint(op)
     errors = d.get("errors")
     if errors:
+        logger.error("using PAT %s".format(os.environ["GH_TOKEN"]))
         endpoint.report_download_errors(errors)
         raise StopIteration
     else:
@@ -345,7 +350,12 @@ def _report_download_errors(errors):
 def get_connection(base_url: str, token: Optional[str]) -> Any:
     # corner case -- we come through here during CI when there is no
     # token and doctests are running, so token is None
-    endpoint = HTTPEndpoint(base_url, {"Authorization": "bearer " + (token or ""),})
+    endpoint = HTTPEndpoint(
+        base_url,
+        {
+            "Authorization": "bearer " + (token or ""),
+        },
+    )
     endpoint.report_download_errors = _report_download_errors
 
     # determine which date we're collecting for
