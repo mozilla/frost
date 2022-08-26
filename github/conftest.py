@@ -42,8 +42,12 @@ def gql_connection():
         # without irrelevant configuration
 
         token = os.environ["GH_TOKEN"]
+        logger.error("using PAT %s".format(token))
         endpoint = HTTPEndpoint(
-            DEFAULT_GRAPHQL_ENDPOINT, {"Authorization": "bearer " + token,},
+            DEFAULT_GRAPHQL_ENDPOINT,
+            {
+                "Authorization": "bearer " + token,
+            },
         )
     else:
         endpoint = {}
