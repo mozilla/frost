@@ -366,7 +366,7 @@ def ec2_instance_missing_tag_names(ec2_instance, required_tag_names):
     frozenset({'Name'})
     """
     tags = ec2_instance.get("Tags", [])
-    instance_tag_names = set(tag["Key"] for tag in tags if "Key" in tag)
+    instance_tag_names = {tag["Key"] for tag in tags if "Key" in tag}
     return required_tag_names - instance_tag_names
 
 
@@ -374,7 +374,7 @@ def ebs_volume_attached_to_instance(ebs, volume_created_days_ago=90):
     """
     Check an ebs volume is attached to an instance. The "volume_created_days_ago"
     parameter allows checking for volumes that were created that many days ago.
-    
+
     >>> from datetime import datetime
     >>> from datetime import timezone
 

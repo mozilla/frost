@@ -31,9 +31,9 @@ __ https://docs.google.com/document/d/1ePUkJPcHEj9XxaVYr2TSABOxRjhDBKr2KSQ2EzgHJ
 Adjacent Tools at Mozilla
 =========================
 
-We feed some of the output of Frost tests into our metrics system. While the output of Frost is JSON, it's not in a format 
-that is easily consumable by our injestion engine: AWS Athena reading from S3.  For that, more traditional formats, 
-such as CSV and un-nested JSON are easier to work with. To support that, our jobs typically post process the Frost JSON 
+We feed some of the output of Frost tests into our metrics system. While the output of Frost is JSON, it's not in a format
+that is easily consumable by our injestion engine: AWS Athena reading from S3.  For that, more traditional formats,
+such as CSV and un-nested JSON are easier to work with. To support that, our jobs typically post process the Frost JSON
 into reasonable morsels for our metrics. Our conventions__ may be of interest.
 
 __ https://github.com/mozilla-services/foxsec-tools/tree/master/metrics/utils/Conventions.md

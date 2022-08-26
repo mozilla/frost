@@ -28,9 +28,9 @@ def test_rds_db_instance_not_publicly_accessible_by_vpc_security_group(
     if not ec2_security_groups:
         assert not rds_db_instance["VpcSecurityGroups"]
     else:
-        assert set(sg["GroupId"] for sg in ec2_security_groups) == set(
+        assert {sg["GroupId"] for sg in ec2_security_groups} == {
             sg["VpcSecurityGroupId"] for sg in rds_db_instance["VpcSecurityGroups"]
-        )
+        }
 
         assert not any(
             does_vpc_security_group_grant_public_access(sg)

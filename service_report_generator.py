@@ -153,7 +153,7 @@ def pytest_json_to_service_json(pytest_json):
 if __name__ == "__main__":
     args = parse_args()
 
-    pytest_json = json.load(open(args.pytest_json, "r"))
+    pytest_json = json.load(open(args.pytest_json))
 
     service_json = pytest_json_to_service_json(pytest_json)
 

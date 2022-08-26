@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from typing import Any
 
 import pytest
 
@@ -9,13 +10,23 @@ from cache import patch_cache_set
 from aws.client import BotocoreClient
 from gcp.client import GCPClient
 from gsuite.client import GsuiteClient
+from github.client import GitHubClient
 
 import custom_config
 
 botocore_client = None
 gcp_client = None
 gsuite_client = None
+github_client = None
 custom_config_global = None
+
+# globals in conftest.py are hard to import from several levels down, so provide access function
+def get_client(client_name: str) -> Any:
+    # restrict to variables with defined suffix
+    suffix = "_client"
+    if client_name.endswith(suffix):
+        client_name = client_name[: -len(suffix)]
+    return globals()[f"{client_name}_client"]
 
 
 def pytest_addoption(parser):
@@ -77,6 +88,7 @@ def pytest_configure(config):
     global botocore_client
     global gcp_client
     global gsuite_client
+    global github_client
     global custom_config_global
 
     # run with -p 'no:cacheprovider'
@@ -116,6 +128,11 @@ def pytest_configure(config):
         cache=cache,
         debug_calls=config.getoption("--debug-calls"),
         debug_cache=config.getoption("--debug-cache"),
+        offline=config.getoption("--offline"),
+    )
+
+    github_client = GitHubClient(
+        debug_calls=config.getoption("--debug-calls"),
         offline=config.getoption("--offline"),
     )
 
@@ -215,7 +232,7 @@ class SingleSet(set):
                 error_values.add(value)
         if error_values:
             # we want the non-duplicate values added
-            super().update(values - error_values)
+            super().update(set(values))
             raise DuplicateKeyError(
                 "Value(s) {!r} already present".format(error_values)
             )
@@ -276,17 +293,28 @@ def serialize_datetimes(obj):
 
 
 def extract_metadata(resource):
-    return {
-        metadata_key: resource[metadata_key]
+    # In some cases, `resource` will "have a dict" rather than "be a
+    # dict". (e.g. DataClasses instances). We do require that
+    # those non-dict classes have a "real" dict as the value of their
+    # __dict__ instance variable. (Runtime exception if not.)
+    if isinstance(resource, (dict,)):
+        # resource is (or inherits from) dict
+        target = resource
+    else:
+        # resource has an embedded dict that should be used
+        target = resource.__dict__
+    x = {
+        metadata_key: target[metadata_key]
         for metadata_key in METADATA_KEYS
-        if metadata_key in resource
+        if metadata_key in target
     }
+    return x
 
 
 def get_metadata_from_funcargs(funcargs):
     metadata = {}
     for k in funcargs:
-        if isinstance(funcargs[k], dict):
+        if isinstance(funcargs[k], dict) or hasattr(funcargs[k], "__dict__"):
             metadata = {**metadata, **extract_metadata(funcargs[k])}
     return metadata
 

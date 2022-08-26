@@ -1,6 +1,4 @@
-"""
-Patch for pytest cache to serialize datetime.datetime
-"""
+"""Patch for pytest cache to serialize datetime.datetime."""
 
 import datetime
 import functools
@@ -53,12 +51,12 @@ def datetime_encode_set(
     path = self._getvaluepath(key)
     try:
         path.parent.mkdir(exist_ok=True, parents=True)
-    except (IOError, OSError):
+    except OSError:
         self.warn("could not create cache path {path}", path=path)
         return
     try:
         f = path.open("w")
-    except (IOError, OSError):
+    except OSError:
         self.warn("cache could not write path {path}", path=path)
     else:
         with f:
@@ -82,7 +80,7 @@ def datetime_encode_get(
     try:
         with path.open("r") as f:
             return json.load(f, object_hook=json_iso_datetime_string_to_datetime)
-    except (ValueError, IOError, OSError):
+    except (ValueError, OSError):
         return default
 
 

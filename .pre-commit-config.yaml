@@ -3,3 +3,61 @@ repos:
     rev: 19.10b0
     hooks:
     - id: black
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-ast
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: check-case-conflict
+    -   id: check-docstring-first
+    -   id: check-merge-conflict
+    -   id: check-toml
+
+## ## -   repo: https://github.com/asottile/pyupgrade
+## ##     rev: v2.7.2
+## ##     hooks:
+## ##     -   id: pyupgrade
+## ##         args: ["--py38-plus"]
+
+## ## - repo: https://github.com/jumanjihouse/pre-commit-hooks
+## ##   rev: master  # or specific git tag
+## ##   hooks:
+## ##     - id: forbid-binary
+## ##       ## TODO - disable for docs/_build/html
+## ##     - id: markdownlint # Configure in .mdlrc
+## ##       # TODO - disable MD012 (consecutive blank lines)
+## ##       #        disable MD013 (line length)
+## ##       #        fix MD031 (fenced code needs blank lines) README.md
+## ##     - id: shellcheck
+
+## ## - repo: https://github.com/IamTheFij/docker-pre-commit
+## ##   rev: v2.0.0
+## ##   hooks:
+## ##         - id: docker-compose-check
+## ##         - id: hadolint
+## ##           # TODO - disable DL3005 (apt upgrade)
+## ##           #        disable DL3008 (unpinned packages)
+## ##           #        disable DL3009 (left apt-get lists around)
+
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.6.2
+  hooks:
+    - id: bandit
+      args:
+      - "--skip"
+      - "B101"          # use of assert
+      - "--baseline"
+      - ".bandit_baseline.json" # use of md5 for local filename
+      - "--quiet"
+
+- repo: https://github.com/Yelp/detect-secrets
+  rev: v0.14.2
+  hooks:
+    - id: detect-secrets
+      args: ['--baseline', '.secrets.baseline']
+      exclude: ".*/tests/.*|docs/_build/html/.buildinfo"

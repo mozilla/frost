@@ -1,3 +1,4 @@
+SHELL := bash -o pipefail
 
 TODAY := $(shell date '+%Y-%m-%d')
 
@@ -45,7 +46,7 @@ doc-build: check_venv
 	@# we regen the api docs every time -- they are not checked in.
 	rm -rf docs/source
 	sphinx-apidoc --no-toc -o docs/source .
-	@# TODO: Add new service modules below also in docs/Source.rst
+	@# Add new service modules below also in docs/Source.rst
 	for module in frost aws gcp gsuite; do \
 		sphinx-apidoc -f -o docs/source/$$module $$module ; \
 	done
@@ -55,17 +56,23 @@ doc-preview: check_venv
 	@#sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	sphinx-autobuild $(AUTOBUILD_OPTS) "docs/" "docs/_build/html/" $(SPHINXOPTS) $(O)
 
-doctest: check_venv
-	frost test -vv --doctest-modules --doctest-glob='*.py' -s --offline --debug-calls $(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py) \
-		--doctest-modules -s --offline --debug-calls
+# We need the list of all python file in several places, so only compute
+# it once.
+.all_python_files.tmp:
+	find . -type d \( -name venv -o -name .??\* \) -prune \
+		-o -not -name setup.py -name \*.py -print \
+		> $@
 
-coverage: check_venv
+doctest: check_venv .all_python_files.tmp
+	frost test -vv --doctest-modules -s --offline --debug-calls $$(cat .all_python_files.tmp)
+
+coverage: check_venv .all_python_files.tmp
 	frost test --cov-config .coveragerc --cov=. \
 		--aws-profiles example-account \
 		-o python_files=meta_test*.py \
 		-o cache_dir=./example_cache/ \
 		--offline \
-		$(shell find . -type f -name '*.py' | grep -v venv | grep -v .pyenv | grep -v setup.py)
+		$$(cat .all_python_files.tmp)
 	coverage report -m
 	coverage html
 
@@ -96,6 +103,7 @@ build-image:
 	docker build -t localhost/frost:latest .
 
 .PHONY: \
+	.all_python_files.tmp \
 	all \
 	awsci \
 	black \
