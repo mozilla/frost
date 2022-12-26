@@ -11,4 +11,4 @@ pytest-metadata==1.10.0
 pytest==6.0.2
 python-dateutil==2.7.5
 ruamel.yaml==0.15.85
-wheel==0.33.1
+wheel==0.38.1
